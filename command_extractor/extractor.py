@@ -14,6 +14,7 @@ from vector_registry import add_to_registry, search_registry
 from security_auditor import audit_asset
 from hotswapper import hotswap_mcp_server
 from git_sync import commit_asset
+from provenance import save_provenance
 
 STATE_FILE = "/data/data/com.termux/files/home/meta/command_extractor/state.json"
 SHELL_STATE_FILE = "/data/data/com.termux/files/home/meta/command_extractor/shell_state.json"
@@ -91,6 +92,7 @@ def handle_analysis(analysis, original_input):
                 system_prompt = generate_command_template(cmd_name, cmd_desc, original_input)
                 save_new_command(cmd_name, cmd_desc, system_prompt)
                 add_to_registry(cmd_name, {"type": "toml", "desc": cmd_desc}, f"{cmd_name} {cmd_desc}")
+                save_provenance(cmd_name, original_input)
                 commit_asset(cmd_name, "TOML Command")
             elif choice == 'm':
                 mcp_content = get_python_mcp_template(cmd_name, cmd_desc, cmd_name, cmd_desc, raw_logic)
@@ -113,6 +115,7 @@ def handle_analysis(analysis, original_input):
                 mcp_path = os.path.join("/data/data/com.termux/files/home/meta/commands/mcp_servers", f"{cmd_name}.py")
                 save_mcp_server(cmd_name, mcp_content)
                 add_to_registry(cmd_name, {"type": "mcp", "path": mcp_path, "desc": cmd_desc}, f"{cmd_name} {cmd_desc}")
+                save_provenance(cmd_name, original_input)
                 hotswap_mcp_server(cmd_name, mcp_path)
                 commit_asset(cmd_name, "MCP Server")
         except EOFError: pass
