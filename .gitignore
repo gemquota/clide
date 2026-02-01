@@ -1,0 +1,15 @@
+# CLIDE Git Ignore
+__pycache__/
+*.pyc
+.DS_Store
+
+# State files (Session specific)
+state.json
+shell_state.json
+
+# Local temporary data
+/data/data/com.termux/files/home/.gemini/tmp/
+logs.json
+
+# User-specific settings that might contain paths
+/data/data/com.termux/files/home/.gemini/settings.json

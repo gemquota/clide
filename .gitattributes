@@ -1,0 +1,5 @@
+clide/memory.db filter=lfs diff=lfs merge=lfs -text
+clide/backups/memory_20260217_033458.db filter=lfs diff=lfs merge=lfs -text
+swarm/commands/vector_registry.json filter=lfs diff=lfs merge=lfs -text
+*.db filter=lfs diff=lfs merge=lfs -text
+*.json filter=lfs diff=lfs merge=lfs -text
