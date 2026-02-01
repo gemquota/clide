@@ -29,14 +29,10 @@ Audit this documentation against the actual source code.
 Identify if the documentation is outdated or missing key functions/logic.
 
 Source Code:
-"""
 {code_content}
-"""
 
 Current Documentation:
-"""
 {doc_content}
-"""
 
 If the documentation is accurate, return 'OK'. 
 If not, return a fully updated version of the documentation in Markdown format.

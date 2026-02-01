@@ -17,10 +17,37 @@ Return ONLY the docstring and the signature line (e.g. def tool(args: str) -> st
     except:
         return f'def {tool_name}(args: str) -> str:\n    """Logic for {tool_name}"""'
 
+def extract_dependencies(logic_code):
+    """Uses Gemini to detect required external libraries."""
+    prompt = f"""
+Identify the Python external libraries (PyPI package names) required to run this code:
+Code:
+{logic_code}
+
+Return ONLY a comma-separated list of package names (e.g., "requests,beautifulsoup4"). If none, return "None".
+"""
+    try:
+        result = subprocess.run(["gemini", "-p", prompt], capture_output=True, text=True)
+        deps = result.stdout.strip()
+        if deps.lower() == "none": return []
+        return [d.strip() for d in deps.split(",")]
+    except:
+        return []
+
 def get_python_mcp_template(server_name, description, tool_name, tool_description, logic_code):
     metadata = generate_tool_metadata(tool_name, logic_code)
+    deps = extract_dependencies(logic_code)
+    # Always include fastmcp if it's the framework used
+    if "mcp" not in [d.lower() for d in deps]: deps.append("mcp[cli]")
     
-    return f'''
+    dep_string = "\n".join([f'#   "{d}",' for d in deps])
+    
+    return f'''# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+{dep_string}
+# ]
+# ///
 import asyncio
 from mcp.server.fastmcp import FastMCP
 

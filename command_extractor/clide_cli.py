@@ -30,6 +30,9 @@ if __name__ == "__main__":
         list_assets()
     elif cmd == "search":
         search_assets(" ".join(sys.argv[2:]))
+    elif cmd == "dashboard":
+        from dashboard_generator import generate_dashboard
+        generate_dashboard()
     else:
         # Fallback to monitor
         import extractor
