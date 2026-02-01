@@ -1,0 +1,277 @@
+[
+  {
+    "id": "engineer",
+    "metadata": {
+      "type": "toml",
+      "desc": "Activates the Termux Engineer persona"
+    },
+    "embedding": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "id": "dev",
+    "metadata": {
+      "type": "toml",
+      "desc": "Executes the Feature Implementation Workflow (Protocol 1.1 - SQLite Backed)"
+    },
+    "embedding": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "id": "bug",
+    "metadata": {
+      "type": "toml",
+      "desc": "Executes the Bug/Hotfix Resolution Flow (Protocol 1.2 - SQLite Backed)"
+    },
+    "embedding": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "id": "plan",
+    "metadata": {
+      "type": "toml",
+      "desc": "Executes the Architecture & Roadmap Workflow (Protocol 2.2 - SQLite Backed)"
+    },
+    "embedding": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "id": "brainstorm",
+    "metadata": {
+      "type": "toml",
+      "desc": "Executes the Idea Exploration Workflow (Protocol 2.1 - SQLite Backed)"
+    },
+    "embedding": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "id": "review",
+    "metadata": {
+      "type": "toml",
+      "desc": "Executes the Knowledge Review Workflow (Protocol 3.1 - SQLite Backed)"
+    },
+    "embedding": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "id": "meta",
+    "metadata": {
+      "type": "toml",
+      "desc": "Executes the System Instruction Revision Workflow (Protocol 3.2 - SQLite Backed)"
+    },
+    "embedding": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "id": "wipe",
+    "metadata": {
+      "type": "toml",
+      "desc": "Clears context and resets to baseline persona"
+    },
+    "embedding": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "id": "clide",
+    "metadata": {
+      "type": "toml",
+      "desc": "Command Line Interface - Database: Everything"
+    },
+    "embedding": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "id": "diff",
+    "metadata": {
+      "type": "toml",
+      "desc": "Executes the Exhaustive Semantic Code Evolution Workflow (SQLite Backed)"
+    },
+    "embedding": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "id": "document",
+    "metadata": {
+      "type": "toml",
+      "desc": "Expands a singular concept, plan, or specification into a comprehensive, hierarchical collection of documentation files and folders."
+    },
+    "embedding": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  }
+]
