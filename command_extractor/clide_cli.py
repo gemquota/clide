@@ -33,6 +33,22 @@ if __name__ == "__main__":
     elif cmd == "dashboard":
         from dashboard_generator import generate_dashboard
         generate_dashboard()
+    elif cmd == "rollback":
+        if len(sys.argv) < 3:
+            print("Usage: clide rollback <asset_id>")
+        else:
+            from git_sync import rollback_asset
+            rollback_asset(sys.argv[2])
+    elif cmd == "why":
+        if len(sys.argv) < 3:
+            print("Usage: clide why <asset_id>")
+        else:
+            from provenance import get_provenance
+            print(f"\n--- Provenance for '{sys.argv[2]}' ---")
+            print(get_provenance(sys.argv[2]))
+    elif cmd == "janitor":
+        from janitor import run_janitor
+        run_janitor()
     else:
         # Fallback to monitor
         import extractor
