@@ -10,7 +10,7 @@ PDB artifacts are transient but critical—they are the blueprints of the "Datab
 This index tracks all current brainstorming sessions, prototype definitions, and architectural decisions.
 
 ### 1. Core Architectures
-*   *(No artifacts yet)*
+*   **[v0.6.0 Roadmap](./v0.6.0_roadmap_brainstorm.md)**: Strategies for Auto-Repair, Security Auditing, and RAG-based search.
 
 ### 2. Extracted Command Prototypes
 *   *(No artifacts yet)*

@@ -8,14 +8,11 @@ def classify_shell_intent(commands_batch):
     # Concatenate batch for context
     batch_text = "\n".join(commands_batch)
     
-    prompt = f"""
-Analyze this sequence of shell commands executed by a user in Termux.
+    prompt = f""".analyze this sequence of shell commands executed by a user in Termux.
 Determine if this sequence (or a specific command within it) should be formalized into a reusable CLIDE command.
 
 Commands:
-"""
 {batch_text}
-"""
 
 Focus on:
 1. Complex one-liners (pipelining, complex flags).

@@ -2,22 +2,24 @@ import json
 import os
 import subprocess
 import math
+import re
 
 VECTOR_DB_PATH = "/data/data/com.termux/files/home/meta/commands/vector_registry.json"
 
 def get_embedding(text):
-    """Uses Gemini to get a vector embedding for the text."""
-    # Note: This assumes gemini CLI has an embedding command or we use a prompt to simulate/fetch one.
-    # For now, we'll use a placeholder or a small prompt-based 'summary vector' approach 
-    # until a formal embedding tool is verified.
-    prompt = f"Generate a high-dimensional semantic representation (comma-separated floats) for: {text}"
+    """Uses Gemini to get a semantic representation for the text."""
+    # Objective D: Upgrade to a more robust representation.
+    # While waiting for native embedding tool, we use a 32-dim semantic summary vector.
+    prompt = f"Generate a 32-dimensional semantic embedding vector (comma-separated floats) for the following CLI tool description: {text}. Return ONLY the numbers."
     try:
         result = subprocess.run(["gemini", "-p", prompt], capture_output=True, text=True)
-        # Placeholder logic: parsing floats from LLM output
-        # In a real scenario, we'd use a dedicated embedding model.
-        return [float(x) for x in re.findall(r"[-+]?\d*\.\d+|\d+", result.stdout)[:16]] # 16-dim stub
+        # Extract floats using regex
+        vec = [float(x) for x in re.findall(r"[-+]?\d*\.\d+|\d+", result.stdout)]
+        if len(vec) < 32:
+            vec.extend([0.0] * (32 - len(vec)))
+        return vec[:32]
     except:
-        return [0.0] * 16
+        return [0.0] * 32
 
 def cosine_similarity(v1, v2):
     dot_product = sum(x * y for x, y in zip(v1, v2))

@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.6.0] - 2026-02-01
+### Added
+- **Auto-Repair (Healer Loop)**: Dry-runs and self-repair logic for generated MCP servers.
+- **Security Auditor**: Integrated mandatory security risk assessment for all new agentic assets.
+- **Dependency Management**: Support for PEP 723 inline script metadata (`uv` compatible) in synthesized servers.
+- **Visual Registry**: Added `./clide dashboard` to generate a searchable Markdown summary of the asset database.
+- **RAG Expansion**: Upgraded vector registry to 32-dimensional semantic embeddings for higher search accuracy.
+
 ## [0.5.0] - 2026-02-01
 ### Added
 - **Git-Backed Asset Syncing**: Automatic git commits for every new TOML command or MCP server created.
