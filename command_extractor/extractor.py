@@ -12,6 +12,7 @@ from shell_intent_classifier import classify_shell_intent
 from mcp_generator import get_python_mcp_template, save_mcp_server
 from vector_registry import add_to_registry, search_registry
 from hotswapper import hotswap_mcp_server
+from git_sync import commit_asset
 
 STATE_FILE = "/data/data/com.termux/files/home/meta/command_extractor/state.json"
 SHELL_STATE_FILE = "/data/data/com.termux/files/home/meta/command_extractor/shell_state.json"
@@ -37,7 +38,6 @@ def get_latest_log_file():
     return log_file if os.path.exists(log_file) else None
 
 def track_usage(text, state):
-    # Look for /command patterns
     cmds = re.findall(r'/(\w+)', text)
     for c in cmds:
         state["usage_stats"][c] = state["usage_stats"].get(c, 0) + 1
@@ -46,14 +46,15 @@ def track_usage(text, state):
             print(f"Suggestion: Promote '{c}' to a full MCP Skill for better performance.")
 
 def get_contextual_suggestions():
-    files = os.listdir(".")
-    context = " ".join(files[:10]) # Use first 10 files as context
-    print(f"\n[Context] Current directory contains: {context[:50]}...")
-    results = search_registry(context, limit=2)
-    if results and results[0][0] > 0.4:
-        print(f"Recommended tools for this environment:")
-        for sim, item in results:
-            print(f"  - {item['id']} ({item['metadata']['desc']})")
+    try:
+        files = os.listdir(".")
+        context = " ".join(files[:10])
+        results = search_registry(context, limit=2)
+        if results and results[0][0] > 0.4:
+            print(f"\n[Context] Recommended tools for this environment:")
+            for sim, item in results:
+                print(f"  - {item['id']} ({item['metadata']['desc']})")
+    except: pass
 
 def handle_analysis(analysis, original_input):
     category = analysis.get('category', 'NICHE')
@@ -78,22 +79,22 @@ def handle_analysis(analysis, original_input):
                 system_prompt = generate_command_template(cmd_name, cmd_desc, original_input)
                 save_new_command(cmd_name, cmd_desc, system_prompt)
                 add_to_registry(cmd_name, {"type": "toml", "desc": cmd_desc}, f"{cmd_name} {cmd_desc}")
+                commit_asset(cmd_name, "TOML Command")
             elif choice == 'm':
                 mcp_content = get_python_mcp_template(cmd_name, cmd_desc, cmd_name, cmd_desc, raw_logic)
                 mcp_path = os.path.join("/data/data/com.termux/files/home/meta/commands/mcp_servers", f"{cmd_name}.py")
                 save_mcp_server(cmd_name, mcp_content)
                 add_to_registry(cmd_name, {"type": "mcp", "path": mcp_path, "desc": cmd_desc}, f"{cmd_name} {cmd_desc}")
                 hotswap_mcp_server(cmd_name, mcp_path)
+                commit_asset(cmd_name, "MCP Server")
         except EOFError: pass
 
 def monitor():
-    print("Initializing CLIDE v0.4.8 (Command Line Interface - Database: Everything)...")
-    print("Status: Active. Usage Tracking, Contextual Loading, & Self-Refactoring enabled.")
+    print("Initializing CLIDE v0.5.0 (Command Line Interface - Database: Everything)...")
+    print("Status: Active. Full Repository Syncing enabled.")
     
     state = load_state()
     last_id = state.get("last_message_id", -1)
-    
-    # Run a context check on startup
     get_contextual_suggestions()
     
     while True:
@@ -120,6 +121,7 @@ def monitor():
             except Exception as e:
                 print(f"Neural Stream Error: {e}")
 
+        new_shell_cmds, total_count = get_new_commands(load_state().get("last_shell_count", 0))
         time.sleep(10)
 
 if __name__ == "__main__":

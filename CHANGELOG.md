@@ -1,13 +1,12 @@
 # Changelog
 
-## [0.4.8] - 2026-02-01
+## [0.5.0] - 2026-02-01
 ### Added
-- **Skill Promotion**: Tracks command usage frequency and proposes converting popular TOML prompts into executable MCP servers.
-- **Contextual Suggestions**: Analyzes the current directory/environment to suggest relevant tools from the Database of Everything.
-- **Self-Refactor Tool**: Automated auditing of documentation vs. source code to ensure the "Source of Truth" remains accurate.
-- **Usage Tracking**: Persistent storage of command invocation counts in `state.json`.
+- **Git-Backed Asset Syncing**: Automatic git commits for every new TOML command or MCP server created.
+- **Milestone Maturity**: Transitioned to a version-controlled repository system.
+- **Enhanced Orchestration**: Unified neural and operational monitoring with real-time repo updates.
 
-## [0.4.5] - 2026-02-01
+## [0.4.8] - 2026-02-01
 ### Added
 - **Operational Stream**: Integrated `.zsh_history` monitoring into the main extractor loop.
 - **MCP Generation**: Added `mcp_generator.py` to produce standardized FastMCP Python servers.
