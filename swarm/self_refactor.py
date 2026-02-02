@@ -2,7 +2,7 @@ import os
 import subprocess
 
 DOCS_DIR = "/data/data/com.termux/files/home/meta/docs/modules"
-CODE_DIR = "/data/data/com.termux/files/home/meta/command_extractor"
+CODE_DIR = "/data/data/com.termux/files/home/meta/clide_src"
 
 def refactor_docs():
     print("--- CLIDE Self-Refactor: Auditing Docs vs Code ---")

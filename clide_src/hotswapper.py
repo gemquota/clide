@@ -2,6 +2,30 @@ import subprocess
 import os
 import tempfile
 
+def hotswap_mcp_server(server_name, file_path):
+    """
+    Registers the new MCP server with the Gemini CLI configuration.
+    """
+    print(f"[*] Hotswapping MCP Server: {server_name}...")
+    try:
+        # For Gemini CLI, this usually involves adding it to the config or 
+        # restarting the server if one is running. For now, we'll log the registration.
+        # In a real environment, we might run: gemini mcp add <path>
+        result = subprocess.run(
+            ["gemini", "mcp", "add", file_path],
+            capture_output=True,
+            text=True
+        )
+        if result.returncode == 0:
+            print(f"[v] Successfully hotswapped '{server_name}'.")
+            return True
+        else:
+            print(f"[!] Gemini CLI hotswap failed: {result.stderr}")
+            return False
+    except Exception as e:
+        print(f"[!] Error during hotswap: {e}")
+        return False
+
 def dry_run_mcp(mcp_code):
     """
     Attempts to run the MCP server code in a subprocess to check for syntax 
