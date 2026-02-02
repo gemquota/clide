@@ -1,7 +1,7 @@
 import json
 import os
 
-PROVENANCE_DIR = "/data/data/com.termux/files/home/meta/commands/provenance"
+PROVENANCE_DIR = "/data/data/com.termux/files/home/meta/swarm/commands/provenance"
 
 def save_provenance(asset_id, context_text):
     """Saves the chat context/trigger for a specific asset."""

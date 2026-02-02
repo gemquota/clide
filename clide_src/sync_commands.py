@@ -4,7 +4,7 @@ from commands_loader import load_commands
 from vector_registry import add_to_registry
 
 COMMANDS_DIR = "/data/data/com.termux/files/home/.gemini/commands"
-INDEX_FILE = "/data/data/com.termux/files/home/meta/commands/commands_index.md"
+INDEX_FILE = "/data/data/com.termux/files/home/meta/swarm/commands/commands_index.md"
 
 def sync():
     print("Synchronizing existing commands into CLIDE Database...")
@@ -22,7 +22,7 @@ def sync():
         f.write("# CLIDE: Commands Index\n\n")
         f.write("## 1. Internal CLIDE Commands\n")
         f.write("*   **[clide](../clide)**: The primary shell launcher.\n")
-        f.write("*   **[extractor.py](../command_extractor/extractor.py)**: The core monitoring service.\n\n")
+        f.write("*   **[extractor.py](../clide_src/extractor.py)**: The core monitoring service.\n\n")
         
         f.write("## 2. Integrated Gemini Commands\n")
         for name, info in sorted(cmds.items()):

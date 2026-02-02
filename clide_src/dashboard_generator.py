@@ -2,7 +2,7 @@ import json
 import os
 from datetime import datetime
 
-REGISTRY_PATH = "/data/data/com.termux/files/home/meta/commands/vector_registry.json"
+REGISTRY_PATH = "/data/data/com.termux/files/home/meta/swarm/commands/vector_registry.json"
 OUTPUT_PATH = "/data/data/com.termux/files/home/meta/docs/dashboard.md"
 
 def generate_dashboard():

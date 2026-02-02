@@ -28,18 +28,43 @@ def commit_asset(asset_name, asset_type):
     except Exception as e:
         print(f"[Git] Error during sync: {e}")
 
+def rollback_asset_and_memory(asset_id):
+    """
+    Finds the last commit related to the asset and rolls back.
+    """
+    print(f"[*] Searching for last commit for '{asset_id}'...")
+    try:
+        # Find the commit hash for the last change to this asset
+        result = subprocess.run(
+            ["git", "log", "-n", "1", "--format=%H", "--", f"swarm/commands/{asset_id}.toml"],
+            capture_output=True,
+            text=True
+        )
+        commit_hash = result.stdout.strip()
+        
+        if not commit_hash:
+            print(f"[!] No commit history found for '{asset_id}'.")
+            return
+
+        print(f"[*] Rolling back to {commit_hash}^...")
+        subprocess.run(["git", "checkout", f"{commit_hash}^", "--", "swarm/commands/"], check=True)
+        subprocess.run(["git", "checkout", f"{commit_hash}^", "--", "clide_src/memory.db"], check=False)
+        
+        print(f"[v] Rollback complete for '{asset_id}' and associated memory state.")
+    except Exception as e:
+        print(f"[!] Rollback failed: {e}")
+
 def rollback_asset(asset_id):
     """Rolls back a specific asset to its previous version in Git."""
-    # We need to find the file path for the asset first.
-    # We check both commands/ and commands/mcp_servers/
     potential_paths = [
-        f"commands/{asset_id}.toml",
-        f"commands/mcp_servers/{asset_id}.py"
+        f"swarm/commands/{asset_id}.toml",
+        f"swarm/commands/mcp_servers/{asset_id}.py"
     ]
     
     found_path = None
     for p in potential_paths:
-        if os.path.exists(os.path.join(REPO_DIR, p)):
+        full_p = os.path.join(REPO_DIR, p)
+        if os.path.exists(full_p):
             found_path = p
             break
             
@@ -49,11 +74,18 @@ def rollback_asset(asset_id):
 
     try:
         os.chdir(REPO_DIR)
-        # Revert the file to the previous commit
+        # Check if the file is tracked
+        tracked = subprocess.run(["git", "ls-files", "--error-unmatch", found_path], capture_output=True)
+        if tracked.returncode != 0:
+            print(f"Error: Asset '{asset_id}' is not tracked by Git. Cannot rollback.")
+            return False
+
+        # Revert the file to the state in HEAD (undoes unstaged changes)
+        # If we want the *previous* version, we use HEAD^
         result = subprocess.run(["git", "checkout", "HEAD^", "--", found_path], capture_output=True, text=True)
         if result.returncode == 0:
             print(f"[v] Successfully rolled back '{asset_id}' to previous version.")
-            # Commit the rollback
+            subprocess.run(["git", "add", found_path], capture_output=True)
             subprocess.run(["git", "commit", "-m", f"revert(asset): Rollback '{asset_id}'"], capture_output=True)
             return True
         else:

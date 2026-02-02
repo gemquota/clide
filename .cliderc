@@ -1,0 +1,13 @@
+{
+  "project_name": "meta",
+  "paths": {
+    "commands": "swarm/commands",
+    "core": "swarm/core",
+    "memory": "clide_src/memory.db",
+    "registry": "swarm/commands/vector_registry.json"
+  },
+  "extraction": {
+    "repetition_limit": 1000,
+    "complexity_threshold": 4
+  }
+}

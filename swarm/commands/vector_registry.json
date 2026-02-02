@@ -273,5 +273,97 @@
       0.0,
       0.0
     ]
+  },
+  {
+    "id": "engineer_clone",
+    "metadata": {
+      "type": "toml",
+      "desc": "Activates the Termux Engineer persona for system work"
+    },
+    "embedding": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "id": "state_manager",
+    "metadata": {
+      "type": "mcp",
+      "path": "/data/data/com.termux/files/home/meta/core/state_manager.py",
+      "desc": "Centralized SQLite state manager for project features, bugs, and tasks."
+    },
+    "embedding": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "id": "analyze_logs",
+    "metadata": {
+      "type": "toml",
+      "desc": "Parses and analyzes Gemini session logs and history to support debugging and context extraction."
+    },
+    "embedding": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
   }
 ]
