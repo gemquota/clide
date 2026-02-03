@@ -3,7 +3,7 @@
   "paths": {
     "commands": "swarm/commands",
     "core": "swarm/core",
-    "memory": "clide_src/memory.db",
+    "memory": "clide/memory.db",
     "registry": "swarm/commands/vector_registry.json"
   },
   "extraction": {

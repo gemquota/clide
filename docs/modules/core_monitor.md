@@ -13,7 +13,7 @@ The heartbeat of the system. It manages the infinite polling loop and coordinate
 4. **Operational Stream Processing**:
    - Calls `shell_ingestor`.
    - Passes batches to `shell_intent_classifier`.
-5. **Interactive Gating**: Implements a blocking `input()` call to ensure user approval for new assets.
+5. **Ingestion Gating**: Implements a non-blocking notification for new assets. Users are prompted to run `clide ingest` to review and finalize detected commands, ensuring the monitor loop remains resilient and autonomous.
 6. **Post-Processing**: Updates both Neural and Operational offsets in their respective state files.
 
 ## State Management

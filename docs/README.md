@@ -11,14 +11,23 @@ CLIDE is an **Autonomous Knowledge & Asset Forge**. It solves the "Ephemeral Int
 ## 🛠 Architecture: The Forge & The Swarm
 The system is partitioned into two discrete domains to ensure stability and focus:
 
-### 1. The Extraction Engine (`clide_src/`)
+### 1. The Extraction Engine (`clide/`)
 A self-contained utility that observes the neural stream and executes the **Forge Workflow**:
 - **Pattern Detection:** Monitors last 100 messages for repetitive tasks.
 - **Intent Classification:** Recognizes `COMMAND`, `FACT`, `DISCOVERY`, `LESSON`, and `TODO`.
 - **Memory Layer:** Stores non-tool knowledge in `memory.db`.
-- **Asset Synthesis:** Uses the `agents.md` Constitution and `memory.db` Facts to generate context-aware tools.
+- **Asset Synthesis:** Uses the `agents.md` Constitution and `memory.db` Facts to generate context-aware agentic tools.
 
-### 2. The Agent Swarm (`swarm/`)
+---
+
+## 📖 Terminology
+In the CLIDE ecosystem, we distinguish between different types of context to ensure clarity for agentic workflows:
+- **Agentic Context (or simply "Context"):** Refers to components that enhance LLM intelligence, such as system prompts, custom commands, MCP tools, and specialized agent personas.
+- **Project Source:** Refers to the actual codebase, scripts, and non-agentic files of the application.
+
+---
+
+## The Agent Swarm (`swarm/`)
 The library of generated tools and their persistent execution state:
 - **`commands/`**: The library of TOML and MCP assets.
 - **`core/state.db`**: Shared memory for agents (Project Atlas) to track multi-day features and bugs.
