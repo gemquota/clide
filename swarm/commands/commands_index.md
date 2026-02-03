@@ -2,7 +2,7 @@
 
 ## 1. Internal CLIDE Commands
 *   **[clide](../clide)**: The primary shell launcher.
-*   **[extractor.py](../command_extractor/extractor.py)**: The core monitoring service.
+*   **[extractor.py](../clide/extractor.py)**: The core monitoring service.
 
 ## 2. Integrated Gemini Commands
 *   **brainstorm**: Executes the Idea Exploration Workflow (Protocol 2.1 - SQLite Backed)

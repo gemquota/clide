@@ -4,7 +4,7 @@ This guide covers ALL functional areas of CLIDE. Perform these tests to ensure t
 
 ---
 
-## SECTION 1: THE EXTRACTION ENGINE (clide_src/)
+## SECTION 1: THE EXTRACTION ENGINE (clide/)
 
 ### 1.1 Neural Stream Monitoring (Logs)
 - **Action:** Run `./clide monitor`. In your chat, type a clear command request: "Create a command called 'weather' that fetches the current temperature for a city."
@@ -56,7 +56,7 @@ This guide covers ALL functional areas of CLIDE. Perform these tests to ensure t
 
 ### 3.2 Temporal Rollback
 - **Action:** Run `./clide rollback <id_of_merged_tool>`.
-- **Verify:** Git restores the previous state. Check if `clide_src/memory.db` was reverted (if applicable).
+- **Verify:** Git restores the previous state. Check if `clide/memory.db` was reverted (if applicable).
 
 ### 3.3 The Project Brain (Graph)
 - **Action:** Run `./clide brain`.

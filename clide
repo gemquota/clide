@@ -1,2 +1,0 @@
-#!/bin/bash
-python /data/data/com.termux/files/home/meta/clide_src/clide_cli.py "$@"
