@@ -1,0 +1,23 @@
+#!/bin/bash
+# CLIDE Morph Script - Instant Hotspot Transition
+
+PERSONA_FILE="/data/data/com.termux/files/home/openclaw/meta/clide/active_persona.toml"
+
+if [ ! -f "$PERSONA_FILE" ]; then
+    echo "[!] No active hotspot detected yet. Run './cli pulse' or work normally to trigger one."
+    exit 1
+fi
+
+# The file now contains the raw clean prompt from activator.py
+PROMPT=$(cat "$PERSONA_FILE")
+
+if [ -z "$PROMPT" ]; then
+    echo "[!] Persona file is empty."
+    exit 1
+fi
+
+echo "[*] Morphing session into latest Hotspot..."
+# Relaunch Gemini with the detected prompt
+# We suppress stderr during the start to hide the telemetry bug, 
+# but we do it in a way that doesn't break the interactive session.
+gemini -m gemini-2.0-flash -p "$PROMPT" 2>/dev/null

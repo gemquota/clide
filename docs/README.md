@@ -6,6 +6,20 @@ CLIDE is an **Autonomous Knowledge & Asset Forge**. It solves the "Ephemeral Int
 1. **Agentic Assets:** Hot-swappable Prompts (TOML) and MCP Servers (Python).
 2. **Project Brain:** A persistent knowledge base of Facts, Discoveries, Lessons, and TODOs.
 
+## 🚦 Quick Start
+1. **Start the Brain Monitor:**
+   ```bash
+   ./cli monitor
+   ```
+2. **View Project Progress:**
+   Check `ingestion_logs/progress.md` for live status.
+3. **Visualize Knowledge:**
+   ```bash
+   ./cli brain
+   ```
+4. **Full Documentation:**
+   See [The In-Depth Manual](manual.md) for detailed workflows and database architecture.
+
 ---
 
 ## 🛠 Architecture: The Forge & The Swarm

@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CLIDE // CONTROL CENTER V6</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link href="../../lib/gridstack.min.css" rel="stylesheet"/>
+    <style>
+        :root {
+            --bg: #050505;
+            --panel-bg: #111;
+            --border: #333;
+            --text: #eee;
+            --accent: #00ff88;
+            --accent-dim: rgba(0, 255, 136, 0.1);
+            --danger: #ff4444;
+            --color-tracks: #00aaff;
+            --color-intent: #ff00ff;
+            --color-sim: #ffaa00;
+            --color-hotspot: #00ff88;
+            --color-memory: #888888;
+            --color-report: #ffffff;
+            --color-vnc: #ffcc00;
+            --color-audio: #00ffff;
+        }
+        @keyframes snapBounce {
+            0% { transform: scale(0.98); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        .grid-stack-item.snapping { animation: snapBounce 0.3s ease-out; }
+
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'JetBrains Mono', monospace; overflow-x: hidden; touch-action: pan-x pan-y; }
+        header { background: var(--panel-bg); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 15px; justify-content: space-between; position: sticky; top: 0; z-index: 1000; height: 45px; }
+        .logo { color: var(--accent); font-weight: bold; letter-spacing: 1px; font-size: 0.85rem; }
+        .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #444; margin-right: 8px; transition: 0.3s; }
+        .status-dot.online { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+        .status-dot.offline { background: var(--danger); box-shadow: 0 0 8px var(--danger); }
+        .toolbar { display: flex; gap: 8px; align-items: center; }
+        
+        #dashboard-grid { min-height: calc(100vh - 45px); padding: 0 !important; }
+        #loading-overlay { position: fixed; top: 45px; left: 0; right: 0; bottom: 0; background: var(--bg); z-index: 5000; display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 0.8rem; }
+        
+        .grid-stack-item-content { background: var(--panel-bg); border: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column; }
+        .panel { height: 100%; display: flex; flex-direction: column; border-top: 2px solid transparent; }
+        .panel[data-type="tracks"] { border-top-color: var(--color-tracks); }
+        .panel[data-type="intent"] { border-top-color: var(--color-intent); }
+        .panel[data-type="sim"] { border-top-color: var(--color-sim); }
+        .panel[data-type="persona"] { border-top-color: var(--color-hotspot); }
+        .panel[data-type="knowledge"] { border-top-color: var(--color-memory); }
+        .panel[data-type="report"] { border-top-color: var(--color-report); }
+        .panel[data-type="vnc"] { border-top-color: var(--color-vnc); }
+        .panel[data-type="audio"] { border-top-color: var(--color-audio); }
+
+        .panel-header { padding: 2px 8px; background: #161616; border-bottom: 1px solid var(--border); font-size: 0.55rem; text-transform: uppercase; color: #555; display: flex; justify-content: space-between; align-items: center; }
+        body.edit-mode .panel-header { cursor: move; color: #888; }
+        .panel-content { padding: 5px; flex: 1; overflow: auto; font-size: 0.65rem; display: flex; flex-direction: column; }
+        
+        .btn-tiny { background: transparent; color: #666; border: 1px solid #333; padding: 1px 4px; border-radius: 2px; cursor: pointer; font-family: inherit; font-size: 0.5rem; }
+        .btn-tiny:hover { color: var(--accent); border-color: var(--accent); }
+        .btn-edit { font-size: 1rem; border: none; background: transparent; color: #444; cursor: pointer; width: 30px; }
+        body.edit-mode .btn-edit { color: var(--accent); }
+        .close-btn { display: none; }
+        body.edit-mode .close-btn { display: block; }
+
+        #settings-popup, #selector-popup { display: none; position: fixed; background: #111; border: 1px solid var(--accent); padding: 10px; z-index: 3000; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        #settings-popup { top: 50px; right: 15px; width: 180px; }
+        #selector-popup { width: 220px; }
+        .selector-item { padding: 6px; border-bottom: 1px solid #222; cursor: pointer; border-left: 3px solid transparent; }
+        .selector-item:hover { background: #1a1a1a; }
+        .selector-item b { font-size: 0.6rem; color: var(--accent); display: block; }
+        .selector-item span { font-size: 0.5rem; color: #666; }
+
+        .intent-graph-container { background: #000; flex: 1; width: 100%; height: 100%; }
+        textarea { flex: 1; width: 100%; background: #000; color: var(--accent); border: 1px solid #222; font-family: inherit; font-size: 0.6rem; padding: 4px; resize: none; }
+        .knowledge-entry { cursor: pointer; border-bottom: 1px solid #222; padding: 2px 0; }
+        .knowledge-entry:hover { background: #1a1a1a; }
+        
+        .edit-only { display: none !important; }
+        body.edit-mode .edit-only { display: inline-block !important; }
+        #error-log { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,0,0,0.1); color: #ff4444; font-size: 0.5rem; padding: 2px 10px; z-index: 9999; display: none; }
+
+        /* Modal Styles */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 6000; display: none; flex-direction: column; }
+        .modal-header { height: 40px; background: #111; border-bottom: 1px solid #333; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; }
+        .modal-title { color: var(--accent); font-size: 0.7rem; font-weight: bold; letter-spacing: 2px; }
+        .modal-body { flex: 1; position: relative; }
+        .modal-body iframe { width: 100%; height: 100%; border: none; }
+        .close-modal { background: none; border: none; color: #666; font-size: 1.2rem; cursor: pointer; }
+        .close-modal:hover { color: #fff; }
+    </style>
+</head>
+<body class="edit-mode">
+    <header>
+        <div style="display:flex; align-items:center;">
+            <div id="connection-status" class="status-dot"></div>
+            <div class="logo">CLIDE // V6</div>
+            <div id="monitor-status" style="margin-left: 15px; display: flex; align-items: center; gap: 5px;">
+                <div id="monitor-dot" class="status-dot"></div>
+                <span id="monitor-text" style="font-size: 0.5rem; color: #555;">MONITOR: OFF</span>
+                <button class="btn-tiny" id="btn-monitor-toggle" onclick="toggleMonitor()">START</button>
+            </div>
+        </div>
+        <div style="display:flex; gap: 5px; margin-left: 20px;">
+            <button class="btn-tiny" onclick="openVizModal('../v1_swarm/index.html', 'V1: SEMANTIC_SWARM')">V1</button>
+            <button class="btn-tiny" onclick="openVizModal('../v2_neural/index.html', 'V2: NEURAL_MAP')">V2</button>
+            <button class="btn-tiny" onclick="openVizModal('../v3_observatory/index.html', 'V3: DEEP_SPACE')">V3</button>
+            <button class="btn-tiny" onclick="openVizModal('../v4_construct/index.html', 'V4: THE_CONSTRUCT')">V4</button>
+            <button class="btn-tiny" onclick="openVizModal('../v5_constellation/index.html', 'V5: NEURAL_GALAXY')">V5</button>
+        </div>
+        <div class="toolbar">
+            <button class="btn-tiny edit-only" onclick="openSelector(event)">+ MOD</button>
+            <button class="btn-tiny edit-only" onclick="applyPreset()">PRESET</button>
+            <button class="btn-tiny edit-only" onclick="saveLayout()">SAVE</button>
+            <button class="btn-tiny edit-only" onclick="resetWorkspace()">RESET</button>
+            <button class="btn-tiny edit-only" onclick="toggleSettings()">SETTINGS</button>
+            <button class="btn-tiny" onclick="launchScenario()">SIM</button>
+            <button class="btn-edit" onclick="toggleEditMode()">⚙</button>
+        </div>
+    </header>
+
+    <div id="loading-overlay">INITIALIZING_CORE...</div>
+    <div id="dashboard-grid" class="grid-stack"></div>
+    <div id="error-log"></div>
+
+    <div id="viz-modal" class="modal-overlay">
+        <div class="modal-header">
+            <div class="modal-title" id="modal-title">VISUALIZATION_LAYER</div>
+            <button class="close-modal" onclick="closeVizModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <iframe id="modal-frame" src=""></iframe>
+        </div>
+    </div>
+
+    <div id="settings-popup">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:0.6rem; color:#888">PADDING</span>
+            <div style="display:flex; background:#000; border:1px solid #222; position:relative">
+                <span style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); font-size:0.4rem; color:#333; pointer-events:none">PAD</span>
+                <button class="btn-tiny" style="width:20px; border:none" onclick="adjustPadding(-1)">-</button>
+                <button class="btn-tiny" style="width:20px; border:none; border-left:1px solid #222" onclick="adjustPadding(1)">+</button>
+            </div>
+        </div>
+        <button class="btn-tiny" style="width:100%; margin-top:10px" onclick="toggleSettings()">CLOSE</button>
+    </div>
+
+    <div id="selector-popup">
+        <div class="selector-item" style="border-left-color:var(--color-tracks)" onclick="confirmAdd('tracks','Tracks')"><b>TRACKS</b><span>Roadmap status</span></div>
+        <div class="selector-item" style="border-left-color:var(--color-intent)" onclick="confirmAdd('intent','Intent')"><b>INTENT</b><span>Agent flow</span></div>
+        <div class="selector-item" style="border-left-color:var(--color-sim)" onclick="confirmAdd('sim','Monitor')"><b>MONITOR</b><span>Bus messages</span></div>
+        <div class="selector-item" style="border-left-color:var(--color-vnc)" onclick="confirmAdd('vnc','VNC Terminal')"><b>VNC</b><span>Remote Desktop</span></div>
+        <div class="selector-item" style="border-left-color:var(--color-audio)" onclick="confirmAdd('audio','Audio Pulse')"><b>AUDIO</b><span>VQ-06 Telemetry</span></div>
+        <div class="selector-item" style="border-left-color:var(--color-hotspot)" onclick="confirmAdd('persona','Hotspot')"><b>HOTSPOT</b><span>Persona logic</span></div>
+        <div class="selector-item" style="border-left-color:var(--color-memory)" onclick="confirmAdd('knowledge','Memory')"><b>MEMORY</b><span>Knowledge Auditor</span></div>
+        <div class="selector-item" style="border-left-color:var(--color-report)" onclick="confirmAdd('report','Report')"><b>ANALYZER</b><span>Sim reports</span></div>
+        <button class="btn-tiny" style="width:100%; margin-top:5px; color:var(--danger)" onclick="closeSelector()">CANCEL</button>
+    </div>
+
+    <script src="../../lib/gridstack-all.js"></script>
+    <script src="../../lib/cytoscape.min.js"></script>
+    <script>
+        window.onerror = function(msg, url, line) {
+            const log = document.getElementById('error-log');
+            log.style.display = 'block';
+            log.innerText = `ERR: ${msg} @ ${line}`;
+        };
+
+        let grid = null;
+        let isEditMode = true;
+        let currentPadding = 0;
+        let cyInstances = [];
+
+        function initDashboard() {
+            if (typeof GridStack === 'undefined') {
+                throw new Error("GridStack library not loaded. Check viz/lib/ paths.");
+            }
+            grid = GridStack.init({
+                column: 60,
+                cellHeight: 40,
+                margin: currentPadding,
+                float: true,
+                staticGrid: !isEditMode,
+                animate: true
+            });
+
+            grid.on('resizestop', function(event, el) {
+                applyBounce(el);
+                snapToPreferedWidths(el);
+            });
+        }
+
+        function snapToPreferedWidths(el) {
+            const node = el.gridstackNode;
+            const w = node.w;
+            const targets = [60, 30, 20, 15, 12];
+            let closest = targets.reduce((prev, curr) => Math.abs(curr - w) < Math.abs(prev - w) ? curr : prev);
+            if (Math.abs(closest - w) < 5) grid.update(el, { w: closest });
+        }
+
+        function applyBounce(el) {
+            el.classList.add('snapping');
+            setTimeout(() => el.classList.remove('snapping'), 300);
+        }
+
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            document.body.classList.toggle('edit-mode', isEditMode);
+            if (grid) grid.setStatic(!isEditMode);
+        }
+
+        function toggleSettings() {
+            const el = document.getElementById('settings-popup');
+            el.style.display = el.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function adjustPadding(delta) {
+            currentPadding = Math.max(-10, Math.min(20, currentPadding + delta));
+            if (grid) grid.margin(currentPadding);
+        }
+
+        function openSelector(e) {
+            const popup = document.getElementById('selector-popup');
+            popup.style.display = 'block';
+            popup.style.top = Math.min(e.clientY, window.innerHeight - 350) + 'px';
+            popup.style.left = Math.max(10, e.clientX - 230) + 'px';
+            e.stopPropagation();
+        }
+        function closeSelector() { document.getElementById('selector-popup').style.display = 'none'; }
+        function confirmAdd(type, title) { addPanel(title, type); closeSelector(); }
+
+        function addPanel(title, type, w=20, h=6, x=null, y=null) {
+            if (!grid) return;
+            let inner = `<div class="data-content ${type}">Loading...</div>`;
+            if (type === 'persona') inner = `<textarea class="persona-area"></textarea><button class="btn-tiny" onclick="savePersona(this)">SAVE</button>`;
+            if (type === 'intent') inner = `<div class="intent-graph-container"></div>`;
+            if (type === 'report') inner = `<button class="btn-tiny" onclick="generateReport(this)">GENERATE</button><div class="report-area"></div>`;
+            if (type === 'vnc') inner = `<iframe src="http://localhost:6080/vnc.html" style="width:100%; height:100%; border:none;"></iframe>`;
+            if (type === 'audio') inner = `<canvas class="audio-pulse-canvas" style="width:100%; height:100%; background:#000;"></canvas>`;
+
+            const widget = grid.addWidget({
+                x: x, y: y, w: w, h: h,
+                content: `
+                    <div class="panel" data-type="${type}">
+                        <div class="panel-header"><span>${title}</span><button class="btn-tiny close-btn" onclick="removeMod(this)">X</button></div>
+                        <div class="panel-content" data-type="${type}">${inner}</div>
+                    </div>
+                `
+            });
+            if (type === 'intent') setTimeout(() => initGraph(widget.querySelector('.intent-graph-container')), 100);
+            if (type === 'persona') setTimeout(loadPersona, 100);
+        }
+
+        function removeMod(el) {
+            const widget = el.closest('.grid-stack-item');
+            if (grid) grid.removeWidget(widget);
+        }
+
+        function initGraph(container) {
+            if (!container || typeof cytoscape === 'undefined') return;
+            const cy = cytoscape({
+                container: container,
+                style: [
+                    { selector: 'node', style: { 'background-color': '#00ff88', 'label': 'data(id)', 'color': '#eee', 'font-family': 'monospace', 'font-size': '6px', 'text-valign': 'center', 'width': '15px', 'height': '15px' } },
+                    { selector: 'edge', style: { 'width': 1, 'line-color': '#333', 'target-arrow-color': '#333', 'target-arrow-shape': 'triangle', 'curve-style': 'bezier', 'label': 'data(label)', 'font-size': '5px', 'color': '#888' } }
+                ],
+                layout: { name: 'grid' }
+            });
+            cyInstances.push(cy);
+        }
+
+        async function toggleMonitor() {
+            const btn = document.getElementById('btn-monitor-toggle');
+            const isRunning = btn.innerText === 'STOP';
+            const endpoint = isRunning ? '/api/monitor/stop' : '/api/monitor/start';
+            
+            try {
+                const response = await fetch(endpoint, { method: 'POST' });
+                const data = await response.json();
+                if (data.status === 'started' || data.status === 'running') {
+                    setMonitorUI(true);
+                } else {
+                    setMonitorUI(false);
+                }
+            } catch (e) { console.error("Monitor toggle failed:", e); }
+        }
+
+        function setMonitorUI(running) {
+            const dot = document.getElementById('monitor-dot');
+            const text = document.getElementById('monitor-text');
+            const btn = document.getElementById('btn-monitor-toggle');
+            
+            if (running) {
+                dot.className = 'status-dot online';
+                text.innerText = 'MONITOR: ACTIVE';
+                text.style.color = 'var(--accent)';
+                btn.innerText = 'STOP';
+                btn.style.color = 'var(--danger)';
+                btn.style.borderColor = 'var(--danger)';
+            } else {
+                dot.className = 'status-dot';
+                text.innerText = 'MONITOR: OFF';
+                text.style.color = '#555';
+                btn.innerText = 'START';
+                btn.style.color = '#666';
+                btn.style.borderColor = '#333';
+            }
+        }
+
+        async function updateStatus() {
+            const statusDot = document.getElementById('connection-status');
+            try {
+                // Check Monitor Status
+                const monRes = await fetch('/api/monitor/status');
+                const monData = await monRes.json();
+                setMonitorUI(monData.running);
+
+                const response = await fetch('/api/status');
+                if (!response.ok) throw new Error("HTTP " + response.status);
+                const data = await response.json();
+                if (statusDot) statusDot.className = 'status-dot online';
+                
+                document.querySelectorAll('.audio-pulse-canvas').forEach(canvas => {
+                    const ctx = canvas.getContext('2d');
+                    if (!canvas.width) { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
+                    const imgData = ctx.getImageData(1, 0, canvas.width - 1, canvas.height);
+                    ctx.putImageData(imgData, 0, 0);
+                    ctx.clearRect(canvas.width - 1, 0, 1, canvas.height);
+                    ctx.fillStyle = 'var(--color-audio)';
+                    const val = Math.random() * canvas.height;
+                    ctx.fillRect(canvas.width - 1, canvas.height - val, 1, val);
+                });
+
+                document.querySelectorAll('.data-content.tracks').forEach(el => {
+                    el.innerHTML = (data.tracks || []).map(t => `<div style="font-size:0.55rem; color:${t.status=='done'?'#0f8':'#0af'} [${t.status[0].toUpperCase()}] ${t.name}</div>`).join('');
+                });
+                document.querySelectorAll('.data-content.sim').forEach(el => {
+                    el.innerHTML = (data.messages || []).map(m => `<div style="font-size:0.55rem; border-bottom:1px solid #222"><b style="color:var(--accent)">${m.sender}</b>: ${m.topic}</div>`).join('');
+                });
+                cyInstances.forEach(cy => {
+                    (data.messages || []).forEach(msg => {
+                        const sender = msg.sender;
+                        if (cy.getElementById(sender).empty()) cy.add({ group: 'nodes', data: { id: sender } });
+                        if (msg.topic === 'handoff') {
+                            try {
+                                const payload = typeof msg.payload === 'string' ? JSON.parse(msg.payload) : msg.payload;
+                                const next = payload.next_agent;
+                                if (next && cy.getElementById(next).empty()) cy.add({ group: 'nodes', data: { id: next } });
+                                if (next && cy.getElementById(`edge-${sender}-${next}`).empty()) {
+                                    cy.add({ group: 'edges', data: { id: `edge-${sender}-${next}`, source: sender, target: next, label: 'HANDOFF' } });
+                                    cy.layout({ name: 'grid' }).run();
+                                }
+                            } catch(e) {}
+                        }
+                    });
+                    cy.resize();
+                });
+            } catch (e) {
+                console.error("V6 Status Update Failed:", e);
+                if (statusDot) statusDot.className = 'status-dot offline';
+            }
+        }
+
+        async function loadKnowledge() {
+            try {
+                const response = await fetch('/api/knowledge');
+                const data = await response.json();
+                document.querySelectorAll('.data-content.knowledge').forEach(el => {
+                    el.innerHTML = (data || []).map(k => `<div class="knowledge-entry" onclick="selectKnowledge('${(k.content||'').replace(/'/g, "\'").replace(/\n/g, ' ')}')"><span style="color:var(--accent)">[${k.category}]</span> ${k.content ? k.content.substring(0,30) : ''}</div>`).join('');
+                });
+            } catch (e) { console.error("V6 Knowledge Load Failed:", e); }
+        }
+
+        function selectKnowledge(content) {
+            const area = document.querySelector('.persona-area');
+            if (area) { area.value = "CONTEXT:\n" + content + "\n\n" + area.value; area.style.borderColor = 'var(--accent)'; setTimeout(() => area.style.borderColor = '', 500); }
+        }
+
+        async function loadPersona() { try { const response = await fetch('/api/config/persona'); const data = await response.json(); document.querySelectorAll('.persona-area').forEach(el => el.value = data.content); } catch(e){} }
+        async function savePersona(btn) { const content = btn.previousElementSibling.value; await fetch('/api/config/persona', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content }) }); }
+        async function generateReport(btn) { const area = btn.nextElementSibling; area.innerText = "Analyzing..."; const response = await fetch('/api/report'); const data = await response.json(); area.innerText = data.report; }
+        async function launchScenario() { const payload = { name: "Sim " + Date.now(), goal: "Unified Grid Verify", agents: ["scout", "coder"] }; await fetch('/api/launch', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); }
+
+        function applyPreset() {
+            if (!grid) return;
+            grid.removeAll();
+            addPanel('Tracks', 'tracks', 15, 8, 0, 0);
+            addPanel('Intent', 'intent', 30, 8, 15, 0);
+            addPanel('Agents', 'tracks', 15, 8, 45, 0);
+            addPanel('Hotspot', 'persona', 20, 12, 0, 8);
+            addPanel('Monitor', 'sim', 20, 12, 20, 8);
+            addPanel('Memory', 'knowledge', 20, 12, 40, 8);
+            addPanel('Analyzer', 'report', 60, 6, 0, 20);
+        }
+
+        function saveLayout() {
+            if (!grid) return;
+            const layout = { 
+                padding: currentPadding,
+                widgets: grid.save().map(w => {
+                    const el = document.querySelector(`[gs-id="${w.id}"]`);
+                    return { x: w.x, y: w.y, w: w.w, h: w.h, type: el?.querySelector('.panel-content')?.dataset.type || 'tracks' };
+                })
+            };
+            localStorage.setItem('clide_v6_unified', JSON.stringify(layout));
+            alert("Workspace Saved");
+        }
+
+        function resetWorkspace() {
+            localStorage.removeItem('clide_v6_unified');
+            window.location.reload();
+        }
+
+        function loadLayout() {
+            const saved = localStorage.getItem('clide_v6_unified');
+            if (!saved) return applyPreset();
+            try {
+                const layout = JSON.parse(saved);
+                currentPadding = layout.padding || 0;
+                grid.margin(currentPadding);
+                layout.widgets.forEach(w => addPanel(w.type.toUpperCase(), w.type, w.w, w.h, w.x, w.y));
+                if (!isEditMode) { isEditMode = true; toggleEditMode(); }
+            } catch (e) {
+                console.error("Failed to load saved layout, applying preset", e);
+                applyPreset();
+            }
+        }
+
+        window.onload = () => { 
+            try {
+                initDashboard(); 
+                loadLayout(); 
+                setInterval(updateStatus, 4000); 
+                setInterval(loadKnowledge, 10000); 
+                updateStatus(); 
+                document.getElementById('loading-overlay').style.display = 'none';
+            } catch (e) {
+                document.getElementById('loading-overlay').innerText = "FATAL_ERROR: " + e.message;
+                console.error(e);
+            }
+        };
+
+        function openVizModal(url, title) {
+            document.getElementById('modal-frame').src = url;
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('viz-modal').style.display = 'flex';
+        }
+
+        function closeVizModal() {
+            document.getElementById('viz-modal').style.display = 'none';
+            document.getElementById('modal-frame').src = '';
+        }
+    </script>
+</body>
+</html>

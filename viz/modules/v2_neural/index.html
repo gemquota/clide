@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gemini Neural Interface</title>
+    <script src="../../lib/cytoscape.min.js"></script>
+    <style>
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: #fdfdfd; color: #111; overflow: hidden; touch-action: none; }
+        #cluster-layer { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
+        #cy { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; z-index: 1; transition: left 0.3s ease; }
+        .ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
+        
+        /* HUD & Panels */
+        .hud-panel { 
+            pointer-events: auto; background: rgba(255, 255, 255, 0.95); 
+            border: 1px solid #ddd; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            backdrop-filter: blur(8px);
+        }
+
+        .top-bar { 
+            position: absolute; top: 0; left: 0; right: 0; height: 50px; 
+            display: flex; align-items: center; justify-content: space-between; 
+            padding: 0 20px; border-bottom: 1px solid #eee; 
+            z-index: 20; background: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Sidebar Controls */
+        .sidebar {
+            position: absolute; top: 50px; left: 0; bottom: 0;
+            width: 280px; border-right: 1px solid #ddd; 
+            overflow-y: auto; display: flex; flex-direction: column; gap: 15px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.98);
+            transform: translateX(0); transition: transform 0.3s ease;
+            z-index: 25; /* Increased z-index */
+            pointer-events: auto;
+        }
+        
+        .sidebar.closed { transform: translateX(-100%); }
+        
+        /* Toggle Button */
+        #menu-toggle {
+            margin-right: 15px; cursor: pointer; font-size: 20px; color: #555;
+            background: none; border: none; padding: 5px;
+        }
+        #menu-toggle:hover { color: #000; }
+
+        .control-group { border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .control-group:last-child { border-bottom: none; }
+        .control-header { font-size: 12px; font-weight: bold; text-transform: uppercase; color: #888; margin-bottom: 8px; }
+        
+        .toggle-row { display: flex; align-items: center; padding: 6px 8px; cursor: pointer; transition: 0.2s; border-radius: 4px; }
+        .toggle-row:hover { background: rgba(0,0,0,0.04); }
+        .checkbox { 
+            width: 14px; height: 14px; border-radius: 3px; border: 1px solid #ccc; 
+            margin-right: 10px; display: inline-block; position: relative; flex-shrink: 0;
+        }
+        .checkbox.checked::after {
+            content: ''; position: absolute; top: 2px; left: 2px; width: 8px; height: 8px;
+            background: #333; border-radius: 1px;
+        }
+        .label-text { font-size: 13px; color: #444; flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .count-badge { font-size: 10px; background: #eee; padding: 2px 6px; border-radius: 10px; color: #666; margin-left: 5px; }
+
+        /* Right Info Panel */
+        .info-panel { 
+            position: absolute; bottom: 20px; right: 20px; width: 300px; 
+            max-height: 60vh; overflow-y: auto; display: none; 
+            border-radius: 8px; border: 1px solid #ddd;
+        }
+        
+        .branding-container { display: flex; align-items: center; }
+        .branding { font-weight: 700; font-size: 14px; letter-spacing: 1px; color: #333; }
+        
+        input[type="text"] {
+            background: #fff; border: 1px solid #ddd; color: #333; 
+            padding: 6px 10px; font-family: inherit; width: 200px; outline: none;
+            transition: 0.3s; border-radius: 4px; font-size: 13px;
+        }
+        input[type="text"]:focus { border-color: #007bff; box-shadow: 0 0 0 2px rgba(0,123,255,0.1); }
+
+        button {
+            background: #fff; border: 1px solid #ddd; color: #555; 
+            padding: 6px 12px; cursor: pointer; font-family: inherit; 
+            font-size: 12px; font-weight: 600; border-radius: 4px;
+            transition: all 0.2s;
+        }
+        button:hover { background: #f8f9fa; border-color: #ccc; color: #111; }
+        button.active { background: #eef; border-color: #007bff; color: #007bff; }
+        
+        h2 { margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 10px; color: #111; font-size: 16px; }
+        .meta-tag { display: inline-block; padding: 2px 6px; border: 1px solid #ddd; font-size: 11px; margin-right: 5px; margin-bottom: 5px; background: #f9f9f9; color: #666; border-radius: 3px; }
+        #stats { font-size: 12px; color: #666; font-family: 'Consolas', monospace; }
+    </style>
+</head>
+<body>
+    <canvas id="cluster-layer"></canvas>
+    <div id="cy"></div>
+    <div class="ui-layer">
+        <div class="hud-panel top-bar">
+            <div class="branding-container">
+                <button id="menu-toggle">☰</button>
+                <div class="branding">/viz/neural_map</div>
+            </div>
+            <div>
+                <input type="text" id="search" placeholder="Filter nodes...">
+                <button id="layout-btn">RELAYOUT</button>
+                <button id="fit-btn">FIT</button>
+            </div>
+            <div id="stats">Nodes: 0 | Links: 0</div>
+        </div>
+        
+        <div class="hud-panel info-panel" id="details">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:10px;">
+                <h2 style="margin:0; border:none; padding:0;">Node Details</h2>
+                <button onclick="document.getElementById('details').style.display='none'" style="padding:2px 6px; font-size:10px;">✕</button>
+            </div>
+            <h3 id="node-title" style="margin:0 0 5px 0; font-size:14px; color:#007bff;">Node Name</h3>
+            <div id="node-meta"></div>
+            <p id="node-desc" style="line-height: 1.5; color: #555; font-size: 13px; margin-top: 10px;">Select a node to view details.</p>
+        </div>
+    </div>
+
+    <!-- SIDEBAR (Moved outside UI layer) -->
+    <div class="sidebar" id="sidebar">
+        <div class="control-group">
+            <div class="control-header">Global Filters</div>
+            <div class="toggle-row" id="toggle-meta">
+                <div class="checkbox checked"></div>
+                <span class="label-text">Show Meta/Hub Nodes</span>
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="control-header">Data Clusters</div>
+            <div id="group-toggles">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+            <div class="control-group">
+            <div class="control-header">Actions</div>
+            <button onclick="window.location.reload()" style="width:100%">Reset View</button>
+        </div>
+    </div>
+
+    <script>
+        // State
+        const state = {
+            activeGroups: new Set(),
+            showMeta: true,
+            totalGroups: 0,
+            sidebarOpen: true
+        };
+
+        // Sidebar Toggle
+        const btnToggle = document.getElementById('menu-toggle');
+        const sidebar = document.getElementById('sidebar');
+        
+        btnToggle.addEventListener('click', () => {
+            state.sidebarOpen = !state.sidebarOpen;
+            if (state.sidebarOpen) {
+                sidebar.classList.remove('closed');
+            } else {
+                sidebar.classList.add('closed');
+            }
+        });
+
+        fetch('../../data/graph_data.json')
+            .then(res => res.json())
+            .then(data => {
+                // Normalize IDs to strings
+                data.nodes.forEach(n => n.id = String(n.id));
+                data.links.forEach(l => {
+                    l.source = String(l.source);
+                    l.target = String(l.target);
+                });
+                initCy(data);
+            })
+            .catch(err => console.error(err));
+
+        function initCy(data) {
+            document.getElementById('stats').innerText = `N: ${data.nodes.length} | L: ${data.links.length}`;
+
+            // 1. Semantic Color Generation
+            function getSemanticColor(name) {
+                if (!name) return '#888888';
+                const lower = name.toLowerCase();
+                
+                // Conceptual 2D Axis
+                // X: Architecture (-1) <-> Implementation (1)
+                // Y: Infrastructure (-1) <-> User/Frontend (1)
+                let x = 0;
+                let y = 0;
+
+                // X-Axis Keywords
+                if (lower.includes('architect') || lower.includes('design') || lower.includes('plan') || lower.includes('setup')) x -= 0.8;
+                if (lower.includes('manage') || lower.includes('orchestrat')) x -= 0.5;
+                if (lower.includes('develop') || lower.includes('engineer') || lower.includes('code')) x += 0.4;
+                if (lower.includes('debug') || lower.includes('test') || lower.includes('validat')) x += 0.7;
+                if (lower.includes('deploy') || lower.includes('observability')) x += 0.9;
+
+                // Y-Axis Keywords
+                if (lower.includes('frontend') || lower.includes('ui') || lower.includes('visual') || lower.includes('accessibility')) y += 0.9;
+                if (lower.includes('doc') || lower.includes('content') || lower.includes('marketing')) y += 0.6;
+                if (lower.includes('manage') || lower.includes('conductor')) y += 0.2;
+                if (lower.includes('backend') || lower.includes('api') || lower.includes('django') || lower.includes('fastapi')) y -= 0.4;
+                if (lower.includes('data') || lower.includes('store') || lower.includes('sql')) y -= 0.7;
+                if (lower.includes('cloud') || lower.includes('infra') || lower.includes('security') || lower.includes('network')) y -= 0.9;
+
+                // Convert (x, y) to HSL
+                // Angle (Hue)
+                let angle = Math.atan2(y, x) * (180 / Math.PI); // -180 to 180
+                if (angle < 0) angle += 360; // 0 to 360
+
+                // Saturation (Magnitude) - Closer to center = grey, Edge = vibrant
+                const dist = Math.sqrt(x*x + y*y);
+                const sat = Math.min(100, Math.max(20, dist * 80));
+                
+                // Lightness - Keep distinct
+                const light = 50;
+
+                return `hsl(${Math.round(angle)}, ${Math.round(sat)}%, ${light}%)`;
+            }
+            
+            // Helper to convert HSL to Hex (for Cytoscape compatibility if needed, though styles support hsl)
+            // Actually Cytoscape supports HSL strings.
+
+            // 2. Map colors and count groups
+            const nodeDataMap = {};
+            const groupInfo = {}; // gid -> { count, label, metaNode }
+
+            // First pass: Identify group names
+            data.nodes.forEach(n => {
+                const gid = n.group !== undefined ? n.group : "99";
+                if (!groupInfo[gid]) {
+                    groupInfo[gid] = { count: 0, label: `${gid}`.replace(/_/g, ' '), metaNode: null, nameFound: false };
+                }
+                groupInfo[gid].count++;
+                
+                // Prioritize Meta Node Name
+                if (n.is_meta) {
+                    groupInfo[gid].metaNode = n;
+                    groupInfo[gid].label = n.name.replace(/_/g, ' '); 
+                    groupInfo[gid].nameFound = true;
+                }
+                // Fallback: Use group_name from data if available
+                else if (!groupInfo[gid].nameFound && n.group_name) {
+                    groupInfo[gid].label = n.group_name.replace(' Cluster', '');
+                    groupInfo[gid].nameFound = true; // Use first non-meta group name found
+                }
+            });
+
+            // Second pass: Assign colors based on resolved names
+            data.nodes.forEach(n => {
+                const gid = n.group !== undefined ? n.group : 99;
+                const groupName = groupInfo[gid].label;
+                
+                // Generate color semantically
+                const color = getSemanticColor(groupName);
+                
+                // Assign to node and group info
+                n.color = color;
+                n.gid = gid;
+                groupInfo[gid].color = color;
+                
+                nodeDataMap[n.id] = { color: color, val: n.val || 1 };
+                state.activeGroups.add(gid);
+            });
+
+            // 3. Generate Sidebar Toggles
+            const groupContainer = document.getElementById('group-toggles');
+            // Sort alphabetically by ID/Category
+            Object.keys(groupInfo).sort((a,b) => a.localeCompare(b)).forEach(gid => {
+                const info = groupInfo[gid];
+                const color = info.color;
+                
+                const row = document.createElement('div');
+                row.className = 'toggle-row';
+                row.title = info.label; // Tooltip for long names
+                row.innerHTML = `
+                    <div class="checkbox checked" style="border-color: ${color};">
+                        <div style="background:${color}; width:100%; height:100%; opacity:1.0; position:absolute; top:0; left:0;"></div>
+                    </div>
+                    <span class="label-text">${info.label}</span>
+                    <span class="count-badge">${info.count}</span>
+                `;
+                
+                // Toggle Logic
+                const checkbox = row.querySelector('.checkbox');
+                row.onclick = () => {
+                    const id = gid;
+                    if (state.activeGroups.has(id)) {
+                        state.activeGroups.delete(id);
+                        checkbox.classList.remove('checked');
+                        checkbox.querySelector('div').style.opacity = '0';
+                        row.style.opacity = '0.5';
+                    } else {
+                        state.activeGroups.add(id);
+                        checkbox.classList.add('checked');
+                        checkbox.querySelector('div').style.opacity = '1';
+                        row.style.opacity = '1';
+                    }
+                    filterGraph();
+                };
+                groupContainer.appendChild(row);
+            });
+
+            // Meta Toggle
+            const metaToggle = document.getElementById('toggle-meta');
+            metaToggle.onclick = () => {
+                state.showMeta = !state.showMeta;
+                metaToggle.querySelector('.checkbox').classList.toggle('checked');
+                filterGraph();
+            };
+
+            // Helper to blend colors
+            const blendColors = (c1, c2, ratio) => {
+                try {
+                    const parse = (c) => {
+                        if (c.startsWith('hsl')) {
+                            const m = c.match(/\d+/g);
+                            return { h: parseInt(m[0]), s: parseInt(m[1]), l: parseInt(m[2]) };
+                        }
+                        return null;
+                    };
+                    const p1 = parse(c1), p2 = parse(c2);
+                    if (p1 && p2) {
+                        // Blend in HSL space for smoother transitions
+                        const h = Math.round(p1.h * ratio + p2.h * (1 - ratio));
+                        const s = Math.round(p1.s * ratio + p2.s * (1 - ratio));
+                        const l = Math.round(p1.l * ratio + p2.l * (1 - ratio));
+                        return `hsl(${h}, ${s}%, ${l}%)`;
+                    }
+                    return c1; // Fallback to source color
+                } catch(e) { return '#ccc'; }
+            };
+
+            // 4. Transform data for Cytoscape
+            const elements = [
+                ...data.nodes.map(n => ({
+                    data: { 
+                        id: n.id, 
+                        label: n.name, 
+                        val: n.val, 
+                        group: n.gid, // Use safe gid
+                        desc: n.description,
+                        is_meta: n.is_meta,
+                        color: n.color
+                    } 
+                })),
+                ...data.links.map(l => {
+                    const src = nodeDataMap[l.source] || { color: '#888', val: 10 };
+                    const tgt = nodeDataMap[l.target] || { color: '#888', val: 10 };
+                    const totalSize = src.val + tgt.val;
+                    const ratio = totalSize > 0 ? src.val / totalSize : 0.5;
+                    const blendedColor = blendColors(src.color, tgt.color, ratio);
+
+                    return {
+                        data: { 
+                            source: l.source, 
+                            target: l.target,
+                            value: l.value,
+                            is_meta: l.is_meta,
+                            edgeColor: blendedColor
+                        } 
+                    };
+                })
+            ];
+
+            const cy = cytoscape({
+                container: document.getElementById('cy'),
+                elements: elements,
+                style: [
+                    {
+                        selector: 'node',
+                        style: {
+                            'background-color': 'data(color)',
+                            'label': 'data(label)',
+                            'color': '#333',
+                            'text-valign': 'center',
+                            'text-halign': 'center',
+                            'width': 'mapData(val, 5, 150, 8, 80)', 
+                            'height': 'mapData(val, 5, 150, 8, 80)',
+                            'font-size': '10px',
+                            'text-outline-width': 1,
+                            'text-outline-color': '#fff',
+                            'opacity': 0.9,
+                            'transition-property': 'opacity',
+                            'transition-duration': '0.2s'
+                        }
+                    },
+                    {
+                        selector: 'node.hidden',
+                        style: { 'display': 'none' }
+                    },
+                    {
+                        selector: 'node.dimmed',
+                        style: { 'opacity': 0.1 }
+                    },
+                    {
+                        selector: 'edge.hidden',
+                        style: { 'display': 'none' }
+                    },
+                    {
+                        selector: 'node.hovered',
+                        style: {
+                            'label': 'data(label)',
+                            'z-index': 9999,
+                            'opacity': 1,
+                            'text-background-color': '#fff',
+                            'text-background-opacity': 0.8,
+                            'text-background-padding': '3px',
+                            'border-width': 2,
+                            'border-color': '#333'
+                        }
+                    },
+                    {
+                        selector: 'node:selected',
+                        style: {
+                            'background-color': '#fff',
+                            'border-width': 4,
+                            'border-color': 'data(color)',
+                            'z-index': 9999
+                        }
+                    },
+                    {
+                        selector: 'node[?is_meta]',
+                        style: {
+                            'display': 'none' // Hide explicit meta nodes
+                        }
+                    },
+                    {
+                        selector: 'edge',
+                        style: {
+                            'width': 'mapData(value, 0.55, 1.0, 0.5, 4)', 
+                            'line-color': 'data(edgeColor)', 
+                            'curve-style': 'bezier',
+                            'opacity': 0.3 
+                        }
+                    },
+                    {
+                        selector: 'edge[?is_meta]',
+                        style: {
+                            'display': 'none' // Hide lines connected to meta nodes
+                        }
+                    }
+                ],
+                layout: {
+                    name: 'cose',
+                    animate: false,
+                    randomize: true,
+                    componentSpacing: 120,
+                    nodeRepulsion: 800000,
+                    idealEdgeLength: 60
+                }
+            });
+
+            // --- Cluster Rendering Layer ---
+            const canvas = document.getElementById('cluster-layer');
+            const ctx = canvas.getContext('2d');
+            
+            function resizeCanvas() {
+                const dpr = window.devicePixelRatio || 1;
+                canvas.width = window.innerWidth * dpr;
+                canvas.height = window.innerHeight * dpr;
+                canvas.style.width = window.innerWidth + 'px';
+                canvas.style.height = window.innerHeight + 'px';
+                ctx.scale(dpr, dpr);
+                requestAnimationFrame(drawClusters);
+            }
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            function drawClusters() {
+                const dpr = window.devicePixelRatio || 1;
+                
+                // Clear the entire physical canvas
+                ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform to identity
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Scale for high-DPI
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+                if (!cy) return;
+
+                // Group active nodes by cluster
+                const clusters = {};
+                cy.nodes().forEach(node => {
+                    // Skip hidden nodes or meta nodes
+                    if (node.hidden() || node.data('is_meta')) return;
+                    
+                    const gid = node.data('group');
+                    if (!state.activeGroups.has(gid)) return;
+
+                    if (!clusters[gid]) {
+                        clusters[gid] = { 
+                            nodes: [], 
+                            color: node.data('color') 
+                        };
+                    }
+                    clusters[gid].nodes.push(node);
+                });
+
+                // Draw each cluster
+                Object.values(clusters).forEach(cluster => {
+                    if (cluster.nodes.length === 0) return;
+
+                    // 1. Calculate Center and Radius (Bounding Circle)
+                    let sumX = 0, sumY = 0;
+                    cluster.nodes.forEach(n => {
+                        const pos = n.renderedPosition();
+                        sumX += pos.x;
+                        sumY += pos.y;
+                    });
+
+                    const centerX = sumX / cluster.nodes.length;
+                    const centerY = sumY / cluster.nodes.length;
+
+                    // Calculate max distance from center to encompass all nodes
+                    let maxDist = 0;
+                    cluster.nodes.forEach(n => {
+                        const pos = n.renderedPosition();
+                        const dx = pos.x - centerX;
+                        const dy = pos.y - centerY;
+                        const dist = Math.sqrt(dx*dx + dy*dy);
+                        // Add node radius to distance to fully cover it
+                        // Approximation: default node size ~20px
+                        if (dist > maxDist) maxDist = dist;
+                    });
+                    
+                    // Add padding
+                    const radius = maxDist + 40;
+
+                    // 2. Draw Radial Gradient
+                    // Use a large radial gradient to create the "hue" effect
+                    // Center is opaque, fading to transparent edges
+                    try {
+                        const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+                        
+                        // Parse color to add alpha
+                        let c = cluster.color;
+                        
+                        if (c.startsWith('#')) {
+                            const r = parseInt(c.slice(1, 3), 16);
+                            const g = parseInt(c.slice(3, 5), 16);
+                            const b = parseInt(c.slice(5, 7), 16);
+                            
+                            gradient.addColorStop(0, `rgba(${r},${g},${b}, 0.5)`);
+                            gradient.addColorStop(1, `rgba(${r},${g},${b}, 0)`);
+                        } else if (c.startsWith('hsl')) {
+                            // Convert hsl(h, s%, l%) to hsla(h, s%, l%, a)
+                            // Remove 'hsl(' and ')' and split
+                            const parts = c.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
+                            if (parts) {
+                                const h = parts[1];
+                                const s = parts[2];
+                                const l = parts[3];
+                                gradient.addColorStop(0, `hsla(${h}, ${s}%, ${l}%, 0.6)`);
+                                gradient.addColorStop(1, `hsla(${h}, ${s}%, ${l}%, 0)`);
+                            } else {
+                                // Fallback if regex fails (shouldn't happen with our generator)
+                                gradient.addColorStop(0, 'rgba(100,100,100,0.1)');
+                                gradient.addColorStop(1, 'rgba(100,100,100,0)');
+                            }
+                        } else {
+                             gradient.addColorStop(0, 'rgba(100,100,100,0.1)');
+                             gradient.addColorStop(1, 'rgba(100,100,100,0)');
+                        }
+
+                        ctx.fillStyle = gradient;
+                        ctx.beginPath();
+                        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                        ctx.fill();
+                    } catch (e) {
+                        // Fallback if gradient fails
+                    }
+                });
+            }
+
+            // Hook into Cytoscape events to redraw canvas
+            cy.on('render', drawClusters);
+            cy.on('pan zoom', drawClusters);
+            cy.on('position', drawClusters); // When nodes move
+
+            // --- End Cluster Rendering ---
+
+            // Filter Function
+            window.filterGraph = () => {
+                cy.batch(() => {
+                    cy.nodes().forEach(node => {
+                        const d = node.data();
+                        const isVisibleGroup = state.activeGroups.has(d.group);
+                        // const isMetaVisible = state.showMeta || !d.is_meta; // Meta toggling handled by style now
+                        
+                        // Main visibility check
+                        if (isVisibleGroup) {
+                            node.removeClass('hidden');
+                        } else {
+                            node.addClass('hidden');
+                        }
+                    });
+                });
+                drawClusters(); // Force redraw
+            };
+
+            // Events
+            cy.on('mouseover', 'node', function(evt){
+                evt.target.addClass('hovered');
+                document.body.style.cursor = 'pointer';
+            });
+            
+            cy.on('mouseout', 'node', function(evt){
+                evt.target.removeClass('hovered');
+                document.body.style.cursor = 'default';
+            });
+
+            cy.on('tap', 'node', function(evt){
+                const node = evt.target;
+                const d = node.data();
+                document.getElementById('details').style.display = 'block';
+                document.getElementById('node-title').innerText = d.label;
+                document.getElementById('node-desc').innerText = d.desc || "No description available.";
+                
+                const metaDiv = document.getElementById('node-meta');
+                metaDiv.innerHTML = '';
+                if(d.group !== undefined) {
+                    const tag = document.createElement('span');
+                    tag.className = 'meta-tag';
+                    tag.innerText = `CLUSTER: ${d.group}`;
+                    tag.style.borderColor = d.color;
+                    metaDiv.appendChild(tag);
+                }
+            });
+            
+            cy.on('tap', function(e) {
+                if(e.target === cy) {
+                    document.getElementById('details').style.display = 'none';
+                }
+            });
+
+            document.getElementById('layout-btn').addEventListener('click', () => {
+                cy.layout({ 
+                    name: 'cose', 
+                    animate: true,
+                    nodeRepulsion: 1000000,
+                    componentSpacing: 150
+                }).run();
+            });
+
+            document.getElementById('fit-btn').addEventListener('click', () => {
+                cy.fit();
+            });
+
+            // Search (Filter by Opacity)
+            document.getElementById('search').addEventListener('input', (e) => {
+                const val = e.target.value.toLowerCase();
+                cy.batch(() => {
+                    if(!val) {
+                        cy.nodes().removeClass('dimmed');
+                        return;
+                    }
+                    cy.nodes().forEach(ele => {
+                        if(ele.data('label').toLowerCase().includes(val)) {
+                            ele.removeClass('dimmed');
+                            ele.addClass('hovered');
+                        } else {
+                            ele.addClass('dimmed');
+                            ele.removeClass('hovered');
+                        }
+                    });
+                });
+            });
+        }
+    </script>
+</body>
+</html>

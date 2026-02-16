@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Neural Interface</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.26.0/cytoscape.min.js"></script>
+    <style>
+        body { margin: 0; font-family: 'Courier New', monospace; background: #0a0a12; color: #0f0; overflow: hidden; }
+        #cy { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; z-index: 1; }
+        .ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
+        
+        .hud-panel { 
+            pointer-events: auto; background: rgba(0, 10, 0, 0.9); 
+            border: 1px solid #33ff33; box-shadow: 0 0 15px rgba(51, 255, 51, 0.2);
+            backdrop-filter: blur(4px);
+        }
+
+        .top-bar { 
+            position: absolute; top: 0; left: 0; right: 0; height: 60px; 
+            display: flex; align-items: center; justify-content: space-between; 
+            padding: 0 20px; border-bottom: 1px solid #33ff33; border-radius: 0 0 10px 10px;
+        }
+
+        .info-panel { 
+            position: absolute; bottom: 20px; right: 20px; width: 320px; 
+            max-height: 50vh; overflow-y: auto; display: none; 
+            border-radius: 8px;
+        }
+        
+        .branding { font-weight: bold; font-size: 1.2em; letter-spacing: 2px; color: #fff; text-shadow: 0 0 5px #0f0; }
+        
+        input[type="text"] {
+            background: #001100; border: 1px solid #0f0; color: #0f0; 
+            padding: 8px 12px; font-family: inherit; width: 250px; outline: none;
+            transition: box-shadow 0.3s;
+        }
+        input[type="text"]:focus { box-shadow: 0 0 10px #0f0; }
+
+        button {
+            background: #001100; border: 1px solid #0f0; color: #0f0; 
+            padding: 8px 15px; cursor: pointer; font-family: inherit; 
+            text-transform: uppercase; font-weight: bold; margin-left: 10px;
+            transition: all 0.2s;
+        }
+        button:hover { background: #0f0; color: #000; box-shadow: 0 0 10px #0f0; }
+        
+        h2 { margin-top: 0; border-bottom: 1px dashed #0f0; padding-bottom: 10px; color: #fff; }
+        .meta-tag { display: inline-block; padding: 2px 6px; border: 1px solid #0f0; font-size: 0.75em; margin-right: 5px; margin-bottom: 5px; background: rgba(0, 255, 0, 0.1); }
+        #stats { font-size: 0.9em; color: #8f8; }
+    </style>
+</head>
+<body>
+    <div id="cy"></div>
+    <div class="ui-layer">
+        <div class="hud-panel top-bar">
+            <div class="branding">GEMINI // NEURAL_MAP_v2.1</div>
+            <div>
+                <input type="text" id="search" placeholder="Query Node...">
+                <button id="layout-btn">RELAYOUT</button>
+            </div>
+            <div id="stats">Nodes: 0 | Links: 0</div>
+        </div>
+        
+        <div class="hud-panel info-panel" id="details">
+            <h2 id="node-title">Node Name</h2>
+            <div id="node-meta"></div>
+            <p id="node-desc" style="line-height: 1.4; color: #ccc;">Select a node to view details.</p>
+        </div>
+    </div>
+
+    <script>
+        fetch('graph_data.json')
+            .then(res => res.json())
+            .then(data => {
+                initCy(data);
+            })
+            .catch(err => console.error(err));
+
+        function initCy(data) {
+            document.getElementById('stats').innerText = `NODES: ${data.nodes.length} | LINKS: ${data.links.length}`;
+
+            // 1. Define Palette (12 distinct neon/cyberpunk colors)
+            const palette = [
+                '#FF0055', // Neon Red
+                '#00FFCC', // Cyan
+                '#CCFF00', // Lime
+                '#FF9900', // Orange
+                '#9900FF', // Purple
+                '#00CCFF', // Sky Blue
+                '#FF00CC', // Magenta
+                '#FFFF00', // Yellow
+                '#00FF66', // Spring Green
+                '#6600FF', // Indigo
+                '#FF3300', // Red-Orange
+                '#00FF99'  // Mint
+            ];
+
+            // 2. Map colors and values to nodes for easy lookup
+            const nodeDataMap = {};
+            data.nodes.forEach(n => {
+                const color = (n.group !== undefined && n.group < palette.length) ? palette[n.group] : '#888';
+                n.color = color;
+                nodeDataMap[n.id] = { color: color, val: n.val || 1 };
+            });
+
+            // Helper to blend colors
+            const blendColors = (c1, c2, ratio) => {
+                const hex = (c) => parseInt(c.replace('#', ''), 16);
+                const r = (v) => (v >> 16) & 255;
+                const g = (v) => (v >> 8) & 255;
+                const b = (v) => v & 255;
+                
+                const v1 = hex(c1), v2 = hex(c2);
+                const rNew = Math.round(r(v1) * ratio + r(v2) * (1 - ratio));
+                const gNew = Math.round(g(v1) * ratio + g(v2) * (1 - ratio));
+                const bNew = Math.round(b(v1) * ratio + b(v2) * (1 - ratio));
+                
+                return '#' + ((1 << 24) + (rNew << 16) + (gNew << 8) + bNew).toString(16).slice(1);
+            };
+
+            // 3. Transform data for Cytoscape
+            const elements = [
+                ...data.nodes.map(n => ({
+                    data: { 
+                        id: n.id, 
+                        label: n.name, 
+                        val: n.val, 
+                        group: n.group,
+                        desc: n.description,
+                        is_meta: n.is_meta,
+                        color: n.color
+                    } 
+                })),
+                ...data.links.map(l => {
+                    const src = nodeDataMap[l.source] || { color: '#888', val: 10 };
+                    const tgt = nodeDataMap[l.target] || { color: '#888', val: 10 };
+                    
+                    // Proportional blend based on size (val)
+                    const totalSize = src.val + tgt.val;
+                    const ratio = totalSize > 0 ? src.val / totalSize : 0.5;
+                    const blendedColor = blendColors(src.color, tgt.color, ratio);
+
+                    return {
+                        data: { 
+                            source: l.source, 
+                            target: l.target,
+                            value: l.value,
+                            is_meta: l.is_meta,
+                            edgeColor: blendedColor
+                        } 
+                    };
+                })
+            ];
+
+            const cy = cytoscape({
+                container: document.getElementById('cy'),
+                elements: elements,
+                style: [
+                    {
+                        selector: 'node',
+                        style: {
+                            'background-color': 'data(color)', // Use specific group color
+                            // 'label': 'data(label)', // Keep hidden by default to reduce noise
+                            'color': '#fff',
+                            'text-valign': 'center',
+                            'text-halign': 'center',
+                            
+                            // RESTORED SIZE VARIANCE
+                            'width': 'mapData(val, 5, 150, 6, 80)', 
+                            'height': 'mapData(val, 5, 150, 6, 80)',
+                            
+                            'font-size': '10px',
+                            'text-outline-width': 2,
+                            'text-outline-color': '#000',
+                            'opacity': 0.9,
+                            'overlay-padding': '5px'
+                        }
+                    },
+                    {
+                        selector: 'node.hovered',
+                        style: {
+                            'label': 'data(label)',
+                            'z-index': 9999,
+                            'opacity': 1,
+                            'text-background-color': '#000',
+                            'text-background-opacity': 0.8,
+                            'text-background-padding': '3px',
+                            'border-width': 2,
+                            'border-color': '#fff'
+                        }
+                    },
+                    {
+                        selector: 'node:selected',
+                        style: {
+                            'label': 'data(label)',
+                            'background-color': '#fff',
+                            'border-width': 4,
+                            'border-color': 'data(color)', // Border matches group
+                            'z-index': 9999
+                        }
+                    },
+                    {
+                        selector: 'node[?is_meta]',
+                        style: {
+                            'label': 'data(label)',
+                            'background-color': 'data(color)', // Meta node uses group color too
+                            'shape': 'hexagon',
+                            'width': 100,
+                            'height': 100,
+                            'font-size': '16px',
+                            'font-weight': 'bold',
+                            'text-outline-width': 3,
+                            'text-outline-color': '#000',
+                            'z-index': 5,
+                            'opacity': 0.6 // Slightly transparent to see underlying nodes
+                        }
+                    },
+                    {
+                        selector: 'edge',
+                        style: {
+                            // RESTORED EDGE COLOR & WIDTH VARIANCE
+                            'width': 'mapData(value, 0.55, 1.0, 0.5, 4)', 
+                            'line-color': 'data(edgeColor)', 
+                            'curve-style': 'bezier',
+                            'opacity': 0.5 
+                        }
+                    },
+                    {
+                        selector: 'edge[?is_meta]',
+                        style: {
+                            'line-color': '#555',
+                            'width': 1,
+                            'opacity': 0.1,
+                            'line-style': 'dashed'
+                        }
+                    }
+                ],
+                layout: {
+                    name: 'cose',
+                    animate: false,
+                    randomize: true,
+                    componentSpacing: 120,
+                    nodeRepulsion: 800000,
+                    idealEdgeLength: 60,
+                    edgeElasticity: 50,
+                    nestingFactor: 5,
+                    gravity: 40,
+                    numIter: 1000,
+                    coolingFactor: 0.95
+                }
+            });
+
+            // Hover effects
+            cy.on('mouseover', 'node', function(evt){
+                evt.target.addClass('hovered');
+                document.body.style.cursor = 'pointer';
+            });
+            
+            cy.on('mouseout', 'node', function(evt){
+                evt.target.removeClass('hovered');
+                document.body.style.cursor = 'default';
+            });
+
+            cy.on('tap', 'node', function(evt){
+                const node = evt.target;
+                const d = node.data();
+                
+                document.getElementById('details').style.display = 'block';
+                document.getElementById('node-title').innerText = d.label;
+                document.getElementById('node-desc').innerText = d.desc || "No description available.";
+                
+                const metaDiv = document.getElementById('node-meta');
+                metaDiv.innerHTML = '';
+                if(d.group !== undefined) {
+                    const tag = document.createElement('span');
+                    tag.className = 'meta-tag';
+                    tag.innerText = `CLUSTER: ${d.group}`;
+                    metaDiv.appendChild(tag);
+                }
+                if(d.is_meta) {
+                    const tag = document.createElement('span');
+                    tag.className = 'meta-tag';
+                    tag.innerText = `META NODE`;
+                    tag.style.borderColor = '#f0f';
+                    metaDiv.appendChild(tag);
+                }
+            });
+            
+            cy.on('tap', function(e) {
+                if(e.target === cy) {
+                    document.getElementById('details').style.display = 'none';
+                }
+            });
+
+            document.getElementById('layout-btn').addEventListener('click', () => {
+                cy.layout({ 
+                    name: 'cose', 
+                    animate: true,
+                    nodeRepulsion: 1000000,
+                    componentSpacing: 150
+                }).run();
+            });
+
+            document.getElementById('search').addEventListener('input', (e) => {
+                const val = e.target.value.toLowerCase();
+                if(!val) {
+                    cy.elements().removeClass('hidden');
+                    cy.elements().style('opacity', 0.7); // Reset opacity
+                    cy.nodes('[?is_meta]').style('opacity', 1);
+                    return;
+                }
+                cy.batch(() => {
+                    cy.nodes().forEach(ele => {
+                        if(ele.data('label').toLowerCase().includes(val)) {
+                            ele.style('opacity', 1);
+                            ele.addClass('hovered'); // Highlight match
+                        } else {
+                            ele.style('opacity', 0.05);
+                            ele.removeClass('hovered');
+                        }
+                    });
+                    cy.edges().style('opacity', 0.02);
+                });
+            });
+        }
+    </script>
+</body>
+</html>

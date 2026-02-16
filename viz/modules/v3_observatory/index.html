@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Deep Space Observatory</title>
+    <script src="../../lib/d3.v7.min.js"></script>
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #f0f4f8; font-family: 'Segoe UI', sans-serif; }
+        
+        #observatory { width: 100%; height: 100%; cursor: crosshair; }
+        
+        /* UI Overlay */
+        .hud { position: absolute; pointer-events: none; width: 100%; height: 100%; top: 0; left: 0; }
+        .panel { 
+            position: absolute; pointer-events: auto; background: rgba(255, 255, 255, 0.9); 
+            border: 1px solid #d1d8e0; color: #2f3640; padding: 15px; 
+            backdrop-filter: blur(5px); box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        
+        .top-left { top: 20px; left: 20px; border-radius: 0 0 15px 0; border-top: none; border-left: none; }
+        .bottom-right { bottom: 20px; right: 20px; max-width: 300px; border-radius: 15px 0 0 0; border-bottom: none; border-right: none; display: none; }
+        
+        h1 { margin: 0 0 5px 0; font-size: 16px; letter-spacing: 2px; text-transform: uppercase; color: #007bff; }
+        p { margin: 0; font-size: 12px; color: #4b6584; line-height: 1.4; }
+        
+        .stat-row { display: flex; justify-content: space-between; font-size: 11px; margin-top: 5px; color: #778ca3; }
+        
+        /* SVG Styles */
+        circle.node { stroke: #fff; stroke-width: 1px; transition: all 0.3s ease; animation: twinkle 4s infinite alternate; }
+        @keyframes twinkle { 0% { opacity: 0.7; r: var(--r); } 100% { opacity: 1; r: calc(var(--r) + 1px); } }
+        circle.node:hover { stroke: #007bff; stroke-width: 2px; animation: none; opacity: 1; }
+        circle.node.meta { stroke-dasharray: 3, 2; fill-opacity: 0.1; }
+        
+        line.link { stroke: #a5b1c2; stroke-opacity: 0.2; stroke-width: 0.5px; }
+        
+        text.label { font-size: 8px; fill: #4b6584; pointer-events: none; opacity: 0; transition: opacity 0.2s; text-anchor: middle; }
+        text.label.visible { opacity: 1; }
+        text.label.meta { font-size: 12px; font-weight: bold; fill: #007bff; opacity: 0.8; }
+
+        /* Reticle effect on hover */
+        .reticle {
+            position: absolute; width: 40px; height: 40px;
+            border: 1px solid rgba(0, 123, 255, 0.3);
+            border-radius: 50%; pointer-events: none;
+            transform: translate(-50%, -50%);
+            display: none;
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.1);
+            transition: width 0.2s, height 0.2s;
+        }
+        .reticle::after {
+            content: ''; position: absolute; top: 50%; left: 50%;
+            width: 4px; height: 4px; background: #007bff;
+            transform: translate(-50%, -50%); border-radius: 50%;
+        }
+
+        /* Search Input */
+        input.search {
+            background: transparent; border: none; border-bottom: 1px solid #d1d8e0;
+            color: #2f3640; font-family: inherit; font-size: 12px;
+            padding: 5px; width: 200px; outline: none; margin-top: 10px;
+        }
+        input.search::placeholder { color: #a5b1c2; }
+    </style>
+</head>
+<body>
+
+<div id="observatory"></div>
+<div class="reticle" id="reticle"></div>
+
+<div class="hud">
+    <div class="panel top-left">
+        <h1>Gemini Observatory</h1>
+        <div class="stat-row">
+            <span>SECTOR: ALPHA</span>
+            <span id="obj-count">OBJECTS: 0</span>
+        </div>
+        <input type="text" class="search" id="search" placeholder="Scan for object..." autocomplete="off">
+    </div>
+
+    <div class="panel bottom-right" id="info-panel">
+        <h1 id="info-title">Object Name</h1>
+        <p id="info-desc">Description data...</p>
+        <div class="stat-row" style="border-top: 1px solid #34495e; padding-top: 5px; margin-top: 10px;">
+            <span id="info-type">TYPE: UNKNOWN</span>
+            <span id="info-mass">MASS: 0</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    const svg = d3.select("#observatory").append("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .style("background", "radial-gradient(circle at center, #ffffff 0%, #f0f4f8 100%)");
+
+    // Zoom Group
+    const g = svg.append("g");
+    
+    const zoom = d3.zoom()
+        .scaleExtent([0.1, 8])
+        .on("zoom", (event) => g.attr("transform", event.transform));
+    
+    svg.call(zoom);
+
+    // Load Data
+    d3.json("../../data/graph_data.json").then(data => {
+        document.getElementById('obj-count').innerText = `OBJECTS: ${data.nodes.length}`;
+
+        // Color Scale for Clusters (Scientific Spectrum)
+        const color = d3.scaleOrdinal(d3.schemeSpectral[11]);
+
+        // Simulation
+        const simulation = d3.forceSimulation(data.nodes)
+            .force("link", d3.forceLink(data.links).id(d => d.id).distance(50))
+            .force("charge", d3.forceManyBody().strength(-150))
+            .force("center", d3.forceCenter(width / 2, height / 2))
+            .force("collide", d3.forceCollide(d => d.val + 2).iterations(2));
+
+        // Links
+        const link = g.append("g")
+            .attr("class", "links")
+            .selectAll("line")
+            .data(data.links)
+            .join("line")
+            .attr("class", "link");
+
+        // Nodes
+        const node = g.append("g")
+            .attr("class", "nodes")
+            .selectAll("circle")
+            .data(data.nodes)
+            .join("circle")
+            .attr("class", d => d.is_meta ? "node meta" : "node")
+            .attr("r", d => d.val)
+            .style("--r", d => d.val + "px")
+            .attr("fill", d => d.is_meta ? "none" : color(d.group))
+            .attr("stroke", d => d.is_meta ? color(d.group) : "#fff")
+            .call(d3.drag()
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended));
+
+        // Labels
+        const label = g.append("g")
+            .attr("class", "labels")
+            .selectAll("text")
+            .data(data.nodes)
+            .join("text")
+            .attr("class", d => d.is_meta ? "label meta visible" : "label")
+            .attr("dy", d => d.val + 10)
+            .text(d => d.name);
+
+        // Simulation Tick
+        simulation.on("tick", () => {
+            link
+                .attr("x1", d => d.source.x)
+                .attr("y1", d => d.source.y)
+                .attr("x2", d => d.target.x)
+                .attr("y2", d => d.target.y);
+
+            node
+                .attr("cx", d => d.x)
+                .attr("cy", d => d.y);
+            
+            label
+                .attr("x", d => d.x)
+                .attr("y", d => d.y);
+        });
+
+        // Interactions
+        const infoPanel = document.getElementById('info-panel');
+        const reticle = document.getElementById('reticle');
+
+        node.on("mouseover", (event, d) => {
+            // Show Label
+            label.filter(l => l === d).classed("visible", true);
+            
+            // Reticle
+            reticle.style.display = 'block';
+            reticle.style.left = event.pageX + 'px';
+            reticle.style.top = event.pageY + 'px';
+            reticle.style.width = (d.val * 2.5) + 'px';
+            reticle.style.height = (d.val * 2.5) + 'px';
+
+            // Info Panel
+            infoPanel.style.display = 'block';
+            document.getElementById('info-title').innerText = d.name;
+            document.getElementById('info-desc').innerText = d.description || "No data available in archives.";
+            document.getElementById('info-type').innerText = d.is_meta ? "TYPE: CLUSTER HUB" : "TYPE: COMMAND NODE";
+            document.getElementById('info-mass').innerText = `MASS: ${Math.round(d.val)}`;
+        });
+
+        node.on("mouseout", (event, d) => {
+            label.filter(l => l === d).classed("visible", false);
+            reticle.style.display = 'none';
+        });
+        
+        // Background click to close panel
+        svg.on("click", (event) => {
+            if(event.target.tagName === 'svg') {
+                infoPanel.style.display = 'none';
+            }
+        });
+
+        // Search
+        document.getElementById('search').addEventListener('input', function(e) {
+            const term = e.target.value.toLowerCase();
+            if(!term) {
+                node.style("opacity", 1);
+                link.style("opacity", 1);
+                return;
+            }
+            
+            node.style("opacity", d => d.name.toLowerCase().includes(term) ? 1 : 0.1);
+            link.style("opacity", 0.05);
+        });
+
+        // Drag Functions
+        function dragstarted(event, d) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+
+        function dragged(event, d) {
+            d.fx = event.x;
+            d.fy = event.y;
+        }
+
+        function dragended(event, d) {
+            if (!event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+        }
+    });
+
+    // Window Resize
+    window.addEventListener('resize', () => {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        svg.attr("width", w).attr("height", h);
+    });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini V4: The Construct</title>
+    <style>
+        body { margin: 0; background-color: #f0f0f5; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #111; }
+        canvas { display: block; }
+        
+        #ui {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;
+        }
+        
+        .panel {
+            position: absolute; 
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #ddd;
+            padding: 15px;
+            pointer-events: auto;
+            box-shadow: 10px 10px 0 rgba(0,0,0,0.05);
+            color: #333;
+        }
+        
+        #stats-panel { top: 20px; left: 20px; }
+        #info-panel { bottom: 20px; right: 20px; width: 300px; display: none; }
+        
+        h1 { margin: 0 0 10px 0; font-size: 18px; color: #007bff; text-transform: uppercase; }
+        h2 { margin: 0 0 5px 0; font-size: 16px; color: #111; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
+        p { margin: 5px 0; font-size: 12px; color: #666; }
+        .tag { display: inline-block; background: #eee; padding: 2px 5px; font-size: 10px; margin-right: 5px; color: #007bff; }
+        
+        #loading {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 24px; color: #ddd; animation: blink 1s infinite;
+        }
+        
+        @keyframes blink { 50% { opacity: 0.5; } }
+    </style>
+</head>
+<body>
+
+    <div id="loading">BUILDING CONSTRUCT...</div>
+    <canvas id="city"></canvas>
+
+    <div id="ui">
+        <div class="panel" id="stats-panel">
+            <h1>The Construct [V4]</h1>
+            <p>ISO_RENDER_ENGINE_INIT</p>
+            <p id="stat-nodes">Populating...</p>
+            <p>Cam: WASD / Drag</p>
+            <p>Zoom: Scroll</p>
+        </div>
+
+        <div class="panel" id="info-panel">
+            <h2 id="node-name">Name</h2>
+            <div id="node-tags"></div>
+            <p id="node-desc">Description...</p>
+            <p id="node-val" style="color: #ffeb3b; margin-top: 10px;">HEIGHT: 0</p>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('city');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        
+        // Config
+        const TILE_SIZE = 24; // Base tile size
+        const CLUSTER_GAP = 12; // Gap between districts (in tiles)
+        const ISO_ANGLE = 0.5; // Simple 2:1 isometric
+        
+        // State
+        let nodes = [];
+        let grid = {}; // 'x,y': node
+        let camera = { x: 0, y: 0, zoom: 1 };
+        let hoveredNode = null;
+        let isDragging = false;
+        let lastMouse = { x: 0, y: 0 };
+        
+        // Colors (Solarized Dark Extended)
+        const PALETTE = [
+            '#d33682', '#6c71c4', '#268bd2', '#2aa198', '#859900', '#b58900', 
+            '#cb4b16', '#dc322f', '#657b83', '#586e75', '#839496', '#93a1a1'
+        ];
+
+        // Init
+        window.addEventListener('resize', resize);
+        resize();
+        loadData();
+
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            // Center camera roughly
+            camera.x = width / 2;
+            camera.y = height / 4;
+            draw();
+        }
+
+        function loadData() {
+            fetch('../../data/graph_data.json')
+                .then(res => res.json())
+                .then(data => {
+                    initCity(data);
+                    document.getElementById('loading').style.display = 'none';
+                    animate();
+                });
+        }
+
+        function initCity(data) {
+            // 1. Group nodes by cluster
+            const clusters = {};
+            data.nodes.forEach(n => {
+                if (n.is_meta) return; // Skip meta hubs, we are building districts
+                if (!clusters[n.group]) clusters[n.group] = [];
+                clusters[n.group].push(n);
+            });
+
+            document.getElementById('stat-nodes').innerText = `Constructs: ${data.nodes.length} | Districts: ${Object.keys(clusters).length}`;
+
+            // 2. Lay out districts
+            // We'll place districts in a larger grid (e.g., 4x3)
+            const districtsPerRow = 4;
+            let districtX = 0;
+            let districtY = 0;
+
+            Object.keys(clusters).forEach((groupId, i) => {
+                const clusterNodes = clusters[groupId];
+                // Sort by value (tallest in center)
+                clusterNodes.sort((a, b) => b.val - a.val);
+
+                // District Origin in grid coordinates
+                const dOX = (i % districtsPerRow) * (20 + CLUSTER_GAP); // 20 is arbitrary district width
+                const dOY = Math.floor(i / districtsPerRow) * (20 + CLUSTER_GAP);
+
+                // Spiral placement within district
+                placeNodesSpiral(clusterNodes, dOX, dOY);
+            });
+        }
+
+        function placeNodesSpiral(nodes, originX, originY) {
+            let x = 0, y = 0;
+            let dx = 0, dy = -1;
+            
+            for (let i = 0; i < nodes.length; i++) {
+                const n = nodes[i];
+                n.gridX = originX + x;
+                n.gridY = originY + y;
+                n.color = PALETTE[n.group % PALETTE.length] || '#888';
+                
+                // Add to spatial map for hit testing
+                grid[`${n.gridX},${n.gridY}`] = n;
+
+                // Spiral math
+                if (x === y || (x < 0 && x === -y) || (x > 0 && x === 1-y)) {
+                    let temp = dx; dx = -dy; dy = temp;
+                }
+                x += dx;
+                y += dy;
+            }
+        }
+
+        // Isometric Math
+        function toScreen(gx, gy, h) {
+            const screenX = (gx - gy) * TILE_SIZE * camera.zoom + camera.x;
+            const screenY = (gx + gy) * (TILE_SIZE * 0.5) * camera.zoom + camera.y - (h * camera.zoom);
+            return { x: screenX, y: screenY };
+        }
+
+        function draw() {
+            ctx.fillStyle = '#f0f0f5';
+            ctx.fillRect(0, 0, width, height);
+
+            // Sort nodes by depth (painter's algorithm for isometric)
+            // Depth = x + y (roughly)
+            const sortedNodes = Object.values(grid).sort((a, b) => (a.gridX + a.gridY) - (b.gridX + b.gridY));
+
+            sortedNodes.forEach(n => {
+                drawBuilding(n);
+            });
+
+            // Draw selection highlight over top
+            if (hoveredNode) {
+                drawSelection(hoveredNode);
+            }
+        }
+
+        function drawBuilding(node) {
+            // Height scaling
+            const h = Math.max(10, node.val * 2); 
+            
+            const pos = toScreen(node.gridX, node.gridY, 0); // Base position
+            const x = pos.x;
+            const y = pos.y;
+            const size = TILE_SIZE * camera.zoom;
+            const halfW = size; // Width of tile
+            const halfH = size * 0.5; // Height of tile
+            const roofH = h * camera.zoom;
+
+            // Colors
+            const baseColor = node.color;
+            const sideColor = adjustColor(baseColor, -40);
+            const frontColor = adjustColor(baseColor, -20);
+            const topColor = adjustColor(baseColor, 20);
+
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+
+            // 1. Left Face
+            ctx.fillStyle = sideColor;
+            ctx.beginPath();
+            ctx.moveTo(x, y + halfH);
+            ctx.lineTo(x - halfW, y);
+            ctx.lineTo(x - halfW, y - roofH);
+            ctx.lineTo(x, y + halfH - roofH);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // 2. Right Face
+            ctx.fillStyle = frontColor;
+            ctx.beginPath();
+            ctx.moveTo(x, y + halfH);
+            ctx.lineTo(x + halfW, y);
+            ctx.lineTo(x + halfW, y - roofH);
+            ctx.lineTo(x, y + halfH - roofH);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // 3. Top Face
+            ctx.fillStyle = topColor;
+            ctx.beginPath();
+            ctx.moveTo(x, y + halfH - roofH);
+            ctx.lineTo(x - halfW, y - roofH);
+            ctx.lineTo(x, y - halfH - roofH); // Tip
+            ctx.lineTo(x + halfW, y - roofH);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+        }
+        
+        function drawSelection(node) {
+             const h = Math.max(10, node.val * 2) + 10; // Float slightly above
+             const pos = toScreen(node.gridX, node.gridY, h);
+             
+             ctx.fillStyle = '#007bff';
+             ctx.font = `bold ${12 * camera.zoom}px Segoe UI`;
+             ctx.textAlign = 'center';
+             ctx.fillText(node.name, pos.x, pos.y - 20);
+             
+             // Arrow
+             ctx.beginPath();
+             ctx.moveTo(pos.x, pos.y);
+             ctx.lineTo(pos.x - 5, pos.y - 10);
+             ctx.lineTo(pos.x + 5, pos.y - 10);
+             ctx.fill();
+        }
+
+        // Helper for color darkening
+        function adjustColor(color, amount) {
+            let c = color.replace('#', '');
+            if (c.length === 3) c = c.split('').map(char => char + char).join('');
+            return '#' + c.replace(/../g, color => ('0'+Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2));
+        }
+
+        // Input Handling
+        // Inverse Projection is hard. Instead, we can project mouse to grid plane.
+        // Or simpler: hit test all nodes (inefficient but fine for < 2000 nodes)
+        // Optimization: Reverse map mouse screen X/Y to rough grid X/Y
+        
+        canvas.addEventListener('mousemove', e => {
+            if (isDragging) {
+                camera.x += e.clientX - lastMouse.x;
+                camera.y += e.clientY - lastMouse.y;
+                lastMouse.x = e.clientX;
+                lastMouse.y = e.clientY;
+                requestAnimationFrame(draw);
+                return;
+            }
+
+            // Hit test
+            // Approximation: Find node closest to mouse whose screen coord matches
+            // Since we know the sort order, we could do this smarter, but brute force for now.
+            // We only check nodes roughly in view? No, just check all.
+            
+            let bestDist = Infinity;
+            let bestNode = null;
+            
+            // Optimization: Only check nodes?
+            // Actually, simple tile mapping is:
+            // MouseX - CamX = (gx - gy) * W
+            // MouseY - CamY = (gx + gy) * H/2
+            // Solve for gx, gy
+            
+            const mx = (e.clientX - camera.x) / camera.zoom;
+            const my = (e.clientY - camera.y) / camera.zoom; // This ignores Z-height!
+            
+            // This mouse mapping assumes Z=0 (ground level). Buildings have height.
+            // So we can't easily click the roof without iterating.
+            
+            // Brute force iteration is safest for 3D selection
+            const nodes = Object.values(grid);
+            for (let n of nodes) {
+                const h = Math.max(10, n.val * 2);
+                // Center of the roof
+                const roofY = (n.gridX + n.gridY) * (TILE_SIZE * 0.5) - h;
+                const centerX = (n.gridX - n.gridY) * TILE_SIZE;
+                
+                // Simple box check around roof center
+                const dist = Math.hypot(mx - centerX, my - roofY);
+                if (dist < TILE_SIZE && dist < bestDist) {
+                    bestDist = dist;
+                    bestNode = n;
+                }
+            }
+
+            if (bestNode !== hoveredNode) {
+                hoveredNode = bestNode;
+                updateUI();
+                requestAnimationFrame(draw);
+            }
+        });
+
+        canvas.addEventListener('mousedown', e => {
+            isDragging = true;
+            lastMouse.x = e.clientX;
+            lastMouse.y = e.clientY;
+        });
+
+        canvas.addEventListener('mouseup', () => isDragging = false);
+        
+        canvas.addEventListener('wheel', e => {
+            const zoomSpeed = 0.001;
+            camera.zoom -= e.deltaY * zoomSpeed;
+            camera.zoom = Math.max(0.1, Math.min(5, camera.zoom));
+            requestAnimationFrame(draw);
+        });
+
+        function updateUI() {
+            const panel = document.getElementById('info-panel');
+            if (hoveredNode) {
+                panel.style.display = 'block';
+                document.getElementById('node-name').innerText = hoveredNode.name;
+                document.getElementById('node-desc').innerText = hoveredNode.description || "No Data";
+                document.getElementById('node-val').innerText = `HEIGHT: ${Math.round(hoveredNode.val)}`;
+                document.getElementById('node-tags').innerHTML = `<span class="tag">${hoveredNode.group_name || 'Cluster ' + hoveredNode.group}</span>`;
+            } else {
+                panel.style.display = 'none';
+            }
+        }
+
+        function animate() {
+            draw();
+            // requestAnimationFrame(animate); // Only redraw on event for static scene
+        }
+
+    </script>
+</body>
+</html>

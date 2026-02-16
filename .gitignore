@@ -13,3 +13,8 @@ logs.json
 
 # User-specific settings that might contain paths
 /data/data/com.termux/files/home/.gemini/settings.json
+
+# Large Files (>50MB)
+clide/memory.db
+swarm/commands/vector_registry.json
+docs/brain_graph.mmd

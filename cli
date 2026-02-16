@@ -1,2 +1,3 @@
 #!/bin/bash
-python /data/data/com.termux/files/home/meta/clide/clide_cli.py "$@"
+# CLIDE SPA Wrapper
+python -u /data/data/com.termux/files/home/openclaw/meta/clide/serve/portal.py "$@"

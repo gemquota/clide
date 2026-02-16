@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>/viz</title>
+    <style>
+        :root {
+            --primary: #00ff88;
+            --secondary: #00aaff;
+            --bg: #f5f5f5;
+            --card-bg: #ffffff;
+            --text: #111;
+        }
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            padding: 50px 0;
+        }
+        h1 {
+            font-weight: 300;
+            letter-spacing: 4px;
+            text-transform: lowercase;
+            margin-bottom: 40px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 3.5rem;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            width: 80%;
+            max-width: 1000px;
+        }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 180px;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 4px; height: 100%;
+            background: #ddd;
+            transition: 0.3s;
+        }
+        .card:hover::before {
+            background: var(--primary);
+        }
+        .card h2 {
+            margin: 0 0 10px 0;
+            font-size: 1.5rem;
+            color: #111;
+        }
+        .card p {
+            margin: 0;
+            color: #555;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .meta {
+            margin-top: 15px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #888;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: #e0e0e0;
+        }
+        .v1:hover { --primary: #ffaa00; }
+        .v2:hover { --primary: #ff0055; }
+        .v3:hover { --primary: #00aaff; }
+        .v4:hover { --primary: #aa00ff; }
+        
+        .footer {
+            margin-top: 50px;
+            color: #888;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>/viz</h1>
+
+    <div class="grid">
+        <a href="modules/v1_swarm/index.html" class="card v1">
+            <div>
+                <h2>V1: Semantic Swarm</h2>
+                <p>3D Force-Directed Graph using Three.js. Represents commands as a chaotic yet organized particle cloud. Best for structural overview.</p>
+            </div>
+            <div class="meta">
+                <span class="status">LEGACY</span>
+                <span>Tech: 3d-force-graph</span>
+            </div>
+        </a>
+
+        <a href="modules/v2_neural/index.html" class="card v2">
+            <div>
+                <h2>V2: Neural Map</h2>
+                <p>2D Cytoscape Network. Cyberpunk aesthetic with distinct cluster grouping and neon styling. Best for topological analysis.</p>
+            </div>
+            <div class="meta">
+                <span class="status">BACKUP</span>
+                <span>Tech: Cytoscape.js</span>
+            </div>
+        </a>
+
+        <a href="modules/v3_observatory/index.html" class="card v3">
+            <div>
+                <h2>V3: Deep Space</h2>
+                <p>D3.js Celestial Chart. Treating data points as star systems with gravitational lensing and orbital mechanics. Best for exploration.</p>
+            </div>
+            <div class="meta">
+                <span class="status">ACTIVE</span>
+                <span>Tech: D3.js v7</span>
+            </div>
+        </a>
+
+        <a href="modules/v4_construct/index.html" class="card v4">
+            <div>
+                <h2>V4: The Construct</h2>
+                <p>Experimental Isometric Data City. A rigid, constructed visualization of command infrastructure.</p>
+            </div>
+            <div class="meta">
+                <span class="status">BETA</span>
+                <span>Tech: Canvas API</span>
+            </div>
+        </a>
+
+        <a href="modules/v5_constellation/index.html" class="card v5">
+            <div>
+                <h2>V5: Neural Constellation</h2>
+                <p>Abstract Semantic Galaxy. 5,000+ knowledge nodes rendered as a star field with gravitational clustering. Best for abstract project feeling.</p>
+            </div>
+            <div class="meta">
+                <span class="status">NEW</span>
+                <span>Tech: Force-Graph (Canvas)</span>
+            </div>
+        </a>
+
+        <a href="modules/v6_control/index.html" class="card v6">
+            <div>
+                <h2>V6: Integrated Control</h2>
+                <p>Real-time Simulation Monitor, Agent Handoff Viewer, and System Control Center. The operational heart of CLIDE.</p>
+            </div>
+            <div class="meta">
+                <span class="status">IN-DEV</span>
+                <span>Tech: WebSockets / Polling</span>
+            </div>
+        </a>
+    </div>
+
+    <div class="footer">
+        Gemini CLI | Visualization Architecture v1.0
+    </div>
+
+</body>
+</html>

@@ -18,6 +18,7 @@ These rules define how an AI coding agent should plan, execute, verify, communic
 
 ### 1. Plan Mode Default
 - Enter plan mode for any non-trivial task (3+ steps, multi-file change, architectural decision, production-impacting behavior).
+- **Semantic Context Retrieval:** Before planning, use knowledge tools (e.g., `get_project_status`, `query_project_knowledge`, `get_recent_lessons`) to retrieve relevant facts, discoveries, and lessons from the project memory.
 - Include verification steps in the plan (not as an afterthought).
 - If new information invalidates the plan: **stop**, update the plan, then continue.
 - Write a crisp spec first when requirements are ambiguous (inputs/outputs, edge cases, success criteria).

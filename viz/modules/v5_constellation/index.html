@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CLIDE Brain: V5 Constellation</title>
+    <script src="../../lib/force-graph.min.js"></script>
+    <style>
+        body { margin: 0; background: #000; overflow: hidden; font-family: monospace; }
+        #info {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: #00ff88;
+            background: rgba(0, 20, 10, 0.8);
+            padding: 15px;
+            border: 1px solid #00ff88;
+            pointer-events: none;
+            max-width: 400px;
+            display: none;
+        }
+        #header {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #fff;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px #00ff88;
+        }
+    </style>
+</head>
+<body>
+    <div id="header">CLIDE // Neural Constellation v5.0</div>
+    <div id="graph"></div>
+    <div id="info">
+        <div id="node-name" style="font-weight: bold; margin-bottom: 5px;"></div>
+        <div id="node-content"></div>
+    </div>
+
+    <script>
+        const elem = document.getElementById('graph');
+        const info = document.getElementById('info');
+        const nodeName = document.getElementById('node-name');
+        const nodeContent = document.getElementById('node-content');
+
+        // Palette (Solarized + Neon)
+        const COLORS = [
+            '#ff0055', '#00ff88', '#00aaff', '#ffaa00', '#aa00ff', 
+            '#d33682', '#2aa198', '#b58900', '#6c71c4', '#268bd2',
+            '#cb4b16', '#859900'
+        ];
+
+        const getGroupColor = (group) => {
+            if (typeof group === 'number') return COLORS[group % COLORS.length];
+            if (!group) return '#ffffff';
+            let hash = 0;
+            const s = String(group);
+            for (let i = 0; i < s.length; i++) {
+                hash = s.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            return COLORS[Math.abs(hash) % COLORS.length];
+        };
+
+        const Graph = ForceGraph()(elem)
+            .nodeLabel(null)
+            .nodeColor(node => node.color || getGroupColor(node.group))
+            .nodeRelSize(1.5)
+            .nodeCanvasObject((node, ctx, globalScale) => {
+                const size = node.val || 3;
+                let color = node.color || getGroupColor(node.group);
+                
+                // Draw star glow
+                try {
+                    if (color.startsWith('#') || color.startsWith('rgb') || color.startsWith('hsl')) {
+                        const gradient = ctx.createRadialGradient(node.x, node.y, 0, node.x, node.y, size * 2);
+                        // Simple alpha hack
+                        let c = color;
+                        if (c.startsWith('#')) c += '44';
+                        else if (c.startsWith('hsl')) c = c.replace(')', ', 0.3)').replace('hsl', 'hsla');
+                        else if (c.startsWith('rgb')) c = c.replace(')', ', 0.3)').replace('rgb', 'rgba');
+                        
+                        gradient.addColorStop(0, c);
+                        gradient.addColorStop(1, 'transparent');
+                        ctx.fillStyle = gradient;
+                        ctx.beginPath();
+                        ctx.arc(node.x, node.y, size * 2, 0, 2 * Math.PI, false);
+                        ctx.fill();
+                    }
+                } catch(e) {}
+
+                // Draw central point
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, size / 2, 0, 2 * Math.PI, false);
+                ctx.fill();
+                
+                // Only draw labels when zoomed in
+                if (globalScale > 3) {
+                    const label = node.name || '';
+                    const fontSize = 12/globalScale;
+                    ctx.font = `${fontSize}px Sans-Serif`;
+                    ctx.fillStyle = color; // Text color matches node
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'top';
+                    ctx.fillText(label, node.x, node.y + size);
+                }
+            })
+            .linkColor(() => 'rgba(0, 255, 136, 0.05)')
+            .linkWidth(0.5)
+            .linkDirectionalParticles(0) // Disabled for performance with 16k links
+            .backgroundColor('#000000')
+            .onNodeHover(node => {
+                elem.style.cursor = node ? 'pointer' : null;
+                if (node) {
+                    info.style.display = 'block';
+                    nodeName.innerText = node.name || 'Unknown';
+                    nodeContent.innerText = node.content || '';
+                    nodeName.style.color = node.color || getGroupColor(node.group);
+                } else {
+                    info.style.display = 'none';
+                }
+            })
+            .cooldownTicks(100);
+
+        // Fetch and normalize data
+        fetch('../../data/graph_data.json')
+            .then(res => res.json())
+            .then(data => {
+                data.nodes.forEach(n => n.id = String(n.id));
+                data.links.forEach(l => {
+                    l.source = String(l.source);
+                    l.target = String(l.target);
+                });
+                Graph.graphData(data);
+            });
+
+        // Physics Tuning
+        Graph.d3Force('charge').strength(-60);
+        Graph.d3Force('link').distance(d => d.distance || 30);
+    </script>
+</body>
+</html>

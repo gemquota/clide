@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gemini Swarm | God Protocol v12.0</title>
+    <style>
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; overflow: hidden; background-color: #050510; color: #eee; touch-action: none; }
+        #graph { width: 100vw; height: 100vh; transition: height 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .hud-container { position: absolute; bottom: 0; left: 0; right: 0; height: 35px; background: rgba(10, 10, 25, 0.98); backdrop-filter: blur(30px); border-top: 1px solid rgba(0,255,136,0.5); z-index: 1000; transition: height 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; overflow: hidden; }
+        .hud-container.active { height: 50vh; }
+        .hud-header { height: 35px; min-height: 35px; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .hud-header .title { font-size: 10px; font-weight: 900; color: #00ff88; letter-spacing: 4px; }
+        .hud-content { flex-grow: 1; overflow-y: auto; padding: 12px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; }
+        .hud-section { display: flex; flex-direction: column; gap: 4px; }
+        .section-title { font-size: 7px; font-weight: 950; color: #00ff88; border-bottom: 1px solid rgba(0,255,136,0.4); padding-bottom: 2px; margin-bottom: 2px; opacity: 0.9; text-transform: uppercase; }
+        .control-group { background: rgba(255,255,255,0.02); padding: 5px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.06); }
+        .control-label { font-size: 6px; font-weight: 800; color: rgba(255,255,255,0.4); text-transform: uppercase; margin-bottom: 2px; display: flex; justify-content: space-between; }
+        .control-label span { color: #00aaff; font-family: monospace; font-size: 8px; font-weight: bold; }
+        .slider-row { display: flex; align-items: center; gap: 4px; }
+        input[type="range"] { flex-grow: 1; height: 1px; appearance: none; background: rgba(255,255,255,0.1); outline: none; }
+        input[type="range"]::-webkit-slider-thumb { appearance: none; width: 8px; height: 8px; background: #00ff88; border-radius: 50%; cursor: pointer; border: 1px solid #fff; }
+        .sq-btn { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; width: 30px; height: 20px; font-size: 12px; font-weight: bold; cursor: pointer; transition: 0.1s; color: #fff; display: flex; align-items: center; justify-content: center; user-select: none; }
+        .sq-btn:hover { background: rgba(255,255,255,0.15); border-color: #00ff88; }
+        .sq-btn:active { background: #00ff88; color: #000; transform: translateY(1px); }
+        .sq-btn.active { background: #00ff88; color: #000; }
+        select.color-menu { background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.2); padding: 2px; border-radius: 2px; font-size: 8px; font-weight: bold; color: #fff; cursor: pointer; width: 100%; }
+        #info-panel { position: absolute; top: 10px; right: 10px; width: 200px; background: rgba(10, 10, 20, 0.95); padding: 12px; border-radius: 10px; border: 1px solid rgba(0,255,136,0.3); opacity: 0; transition: 0.3s; pointer-events: none; backdrop-filter: blur(10px); z-index: 500; }
+        #info-panel.visible { opacity: 1; pointer-events: auto; }
+        .search-container { position: absolute; top: 10px; left: 10px; width: 220px; z-index: 500; }
+        input#search { background: rgba(10, 10, 25, 0.8); border: 1px solid rgba(0,255,136,0.4); padding: 10px; border-radius: 6px; width: 100%; font-size: 12px; outline: none; color: #fff; backdrop-filter: blur(5px); }
+    </style>
+    <script src="../../lib/three.min.js"></script>
+    <script src="../../lib/three-spritetext.min.js"></script>
+    <script src="../../lib/3d-force-graph.min.js"></script>
+</head>
+<body>
+    <div class="search-container"><input type="text" id="search" placeholder="Locate semantic node..." autocomplete="off"></div>
+    <div class="hud-container" id="hud">
+        <div class="hud-header" id="hud-trigger">
+            <div class="title">GOD_PROTOCOL_v12.5_DEMO_ENV</div>
+            <div style="display:flex; gap: 8px;">
+                <button id="btn-demo" class="sq-btn" style="width: auto; padding: 0 10px; color: #00ff88; border-color: #00ff88;" onclick="toggleDemo()">DEMO: OFF</button>
+                <button class="sq-btn" style="width: auto; padding: 0 10px; color: #ffaa00;" onclick="resetDefaults()">RESTORE_REALITY</button>
+                <button class="sq-btn" style="width: auto; padding: 0 10px; border-color: #00aaff;" onclick="saveAsPreset()">SAVE_PRESET</button>
+            </div>
+        </div>
+        <div class="hud-content">
+            <!-- HEAVY PHYSICS -->
+            <div class="hud-section">
+                <div class="section-title">HEAVY_PHYSICS</div>
+                <div class="control-group">
+                    <div class="control-label">Min Importance <span id="lbl-minImportance">0.0</span></div>
+                    <div class="slider-row"><button class="sq-btn" onmousedown="startAdj('minImportance', -0.1)" onmouseup="stopAdj()" onmouseleave="stopAdj()">-</button><input type="range" id="sl-minImportance" min="0" max="10" step="0.1"><button class="sq-btn" onmousedown="startAdj('minImportance', 0.1)" onmouseup="stopAdj()" onmouseleave="stopAdj()">+</button></div>
+                </div>
+                <div class="control-group">
+                    <div class="control-label">Repulsion Force <span id="lbl-repulsion">-120</span></div>
+                    <div class="slider-row"><button class="sq-btn" onmousedown="startAdj('repulsion', -10)" onmouseup="stopAdj()" onmouseleave="stopAdj()">-</button><input type="range" id="sl-repulsion" min="-10000" max="0" step="10"><button class="sq-btn" onmousedown="startAdj('repulsion', 10)" onmouseup="stopAdj()" onmouseleave="stopAdj()">+</button></div>
+                </div>
+                <div class="control-group">
+                    <div class="control-label">Adapt Intensity <span id="lbl-forceRatio">1.0</span></div>
+                    <div class="slider-row"><button class="sq-btn" onmousedown="startAdj('forceRatio', -0.1)" onmouseup="stopAdj()" onmouseleave="stopAdj()">-</button><input type="range" id="sl-forceRatio" min="0" max="10" step="0.1"><button class="sq-btn" onmousedown="startAdj('forceRatio', 0.1)" onmouseup="stopAdj()" onmouseleave="stopAdj()">+</button></div>
+                </div>
+                <div class="control-group">
+                    <div class="control-label">Reach (Max) <span id="lbl-distMax">1000</span></div>
+                    <div class="slider-row"><button class="sq-btn" onmousedown="startAdj('distMax', -100)" onmouseup="stopAdj()" onmouseleave="stopAdj()">-</button><input type="range" id="sl-distMax" min="100" max="5000" step="50"><button class="sq-btn" onmousedown="startAdj('distMax', 100)" onmouseup="stopAdj()" onmouseleave="stopAdj()">+</button></div>
+                </div>
+            </div>
+            <!-- SPACE_STRUCTURE -->
+            <div class="hud-section">
+                <div class="section-title">SPACE_STRUCTURE</div>
+                <div class="control-group">
+                    <div class="control-label">Central Gravity <span id="lbl-gravity">0.15</span></div>
+                    <div class="slider-row"><button class="sq-btn" onmousedown="startAdj('gravity', -0.05)" onmouseup="stopAdj()" onmouseleave="stopAdj()">-</button><input type="range" id="sl-gravity" min="0" max="10" step="0.01"><button class="sq-btn" onmousedown="startAdj('gravity', 0.05)" onmouseup="stopAdj()" onmouseleave="stopAdj()">+</button></div>
+                </div>
+                <div class="control-group">
+                    <div class="control-label">Bond Length <span id="lbl-bond">100</span></div>
+                    <div class="slider-row"><button class="sq-btn" onmousedown="startAdj('bond', -20)" onmouseup="stopAdj()" onmouseleave="stopAdj()">-</button><input type="range" id="sl-bond" min="0" max="2000" step="5"><button class="sq-btn" onmousedown="startAdj('bond', 20)" onmouseup="stopAdj()" onmouseleave="stopAdj()">+</button></div>
+                </div>
+                <div class="control-group">
+                    <div class="control-label">Spring Strength <span id="lbl-spring">0.50</span></div>
+                    <div class="slider-row"><button class="sq-btn" onmousedown="startAdj('spring', -0.05)" onmouseup="stopAdj()" onmouseleave="stopAdj()">-</button><input type="range" id="sl-spring" min="0" max="5" step="0.01"><button class="sq-btn" onmousedown="startAdj('spring', 0.05)" onmouseup="stopAdj()" onmouseleave="stopAdj()">+</button></div>
+                </div>
+                <div class="control-group">
+                    <div class="control-label">Collision Force <span id="lbl-collide">0.00</span></div>
+                    <div class="slider-row"><button class="sq-btn" onmousedown="startAdj('collide', -5)" onmouseup="stopAdj()" onmouseleave="stopAdj()">-</button><input type="range" id="sl-collide" min="0" max="1000" step="1"><button class="sq-btn" onmousedown="startAdj('collide', 5)" onmouseup="stopAdj()" onmouseleave="stopAdj()">+</button></div>
+                </div>
+            </div>
+            <!-- NODE_ARCHITECTURE -->
+            <div class="hud-section">
+                <div class="section-title">NODE_ARCHITECTURE</div>
+                <div class="control-group">
+                    <div class="control-label">Base Size <span id="lbl-nodeScale">20.0</span></div>
+                    <div class="slider-row"><button class="sq-btn" onmousedown="startAdj('nodeScale', -1)" onmouseup="stopAdj()" onmouseleave="stopAdj()">-</button><input type="range" id="sl-nodeScale" min="0.1" max="1000" step="0.5"><button class="sq-btn" onmousedown="startAdj('nodeScale', 1)" onmouseup="stopAdj()" onmouseleave="stopAdj()">+</button></div>
+                </div>
+                <div class="control-group">
+                    <div class="control-label">Imp Multiplier <span id="lbl-impScale">15.0</span></div>
+                    <div class="slider-row"><button class="sq-btn" onmousedown="startAdj('impScale', -0.5)" onmouseup="stopAdj()" onmouseleave="stopAdj()">-</button><input type="range" id="sl-impScale" min="0" max="500" step="0.1"><button class="sq-btn" onmousedown="startAdj('impScale', 0.5)" onmouseup="stopAdj()" onmouseleave="stopAdj()">+</button></div>
+                </div>
+                <div class="control-group">
+                    <div class="control-label">Node Opacity <span id="lbl-nodeOpacity">0.90</span></div>
+                    <div class="slider-row"><button class="sq-btn" onmousedown="startAdj('nodeOpacity', -0.05)" onmouseup="stopAdj()" onmouseleave="stopAdj()">-</button><input type="range" id="sl-nodeOpacity" min="0" max="1" step="0.01"><button class="sq-btn" onmousedown="startAdj('nodeOpacity', 0.05)" onmouseup="stopAdj()" onmouseleave="stopAdj()">+</button></div>
+                </div>
+                <div class="control-group">
+                    <div class="control-label">Glow Intensity <span id="lbl-glow">0.80</span></div>
+                    <div class="slider-row"><button class="sq-btn" onmousedown="startAdj('glow', -0.1)" onmouseup="stopAdj()" onmouseleave="stopAdj()">-</button><input type="range" id="sl-glow" min="0" max="10" step="0.05"><button class="sq-btn" onmousedown="startAdj('glow', 0.1)" onmouseup="stopAdj()" onmouseleave="stopAdj()">+</button></div>
+                </div>
+            </div>
+            <!-- ENGINE_GLOBALS -->
+            <div class="hud-section">
+                <div class="section-title">ENGINE_GLOBALS</div>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-bottom: 2px;">
+                    <button id="btn-layout" class="sq-btn" style="width: auto;" onclick="state.isDynamic = !state.isDynamic; syncUI(); updateGraph();">STATIC</button>
+                    <button id="btn-cam" class="sq-btn" style="width: auto;" onclick="state.isCameraLocked = !state.isCameraLocked; syncUI();">FREE</button>
+                    <button id="btn-glow" class="sq-btn" style="width: auto;" onclick="state.showGlow = !state.showGlow; syncUI(); updateGraph();">GLOW</button>
+                </div>
+                <select id="color-scheme" class="color-menu" onchange="state.scheme = this.value; updateGraph();">
+                    <option value="NEON">NEON_PROTOCOL</option><option value="CYBER">CYBER_PUNK</option><option value="SOLAR">SOLAR_FLARE</option><option value="GHOST">GHOST_SHELL</option>
+                </select>
+                <div id="presets-container" style="display:flex; flex-wrap:wrap; gap:3px; margin-top: 4px;"></div>
+            </div>
+        </div>
+    </div>
+    <div id="graph"></div>
+    <div id="demo-timer" style="position: absolute; top: 15px; left: 50%; transform: translateX(-50%); font-size: 20px; font-weight: bold; color: #00ff88; text-shadow: 0 0 10px #00ff88; display: none; font-family: monospace; z-index: 2000;">DEMO_SEQUENCE: 60s</div>
+    <div id="info-panel"><h1 id="p-title" style="margin:0; font-size:14px; color:#00ff88;">Node</h1><p id="p-desc" style="color:rgba(255,255,255,0.7); line-height:1.4; font-size: 10px; margin-top:6px;"></p></div>
+    <script>
+        const DEFAULTS = {
+            minImportance: 0, maxLinks: 3, repulsion: -120, forceRatio: 1.0, distMax: 1000, distMin: 10, theta: 0.9,
+            gravity: 0.15, spring: 0.5, bond: 100, springIters: 1, collide: 0, damping: 0.4, 
+            decay: 0.022, alphaTarget: 0, alphaMin: 0.001, nodeScale: 20, impScale: 15, metaScale: 60, resolution: 16, 
+            nodeOpacity: 0.9, glow: 0.8, curve: 0.5, linkOpacity: 0.4, linkWidth: 1, particles: 0, 
+            partWidth: 1, speed: 0.01, partRes: 4, warmup: 0, cooldown: 15000, scheme: 'NEON', 
+            isDynamic: false, is2D: false, isCameraLocked: false, showGlow: true, adaptiveSize: true, adaptiveLinks: true
+        };
+        let state = { ...DEFAULTS }; let rawData = { nodes: [], links: [] }; let adjInterval;
+        let isDemoMode = false; let demoTimeLeft = 60; let demoInterval; let cameraAngle = 0;
+
+        const SCHEMES = { NEON: { bg: '#050510' }, CYBER: { bg: '#000000' }, SOLAR: { bg: '#100500' }, GHOST: { bg: '#0a0a0a' } };
+        const getClusterColor = (group) => { if (!group) return '#ffffff'; let hash = 0; const str = String(group); for (let i = 0; i < str.length; i++) { hash = str.charCodeAt(i) + ((hash << 5) - hash); } return `hsl(${Math.abs(hash % 360)}, 85%, 60%)`; };
+        const blendColors = (c1, c2, w1) => {
+            const parse = c => {
+                if (c.startsWith('hsl')) {
+                    const m = c.match(/\d+/g); const h = parseInt(m[0])/360, s = parseInt(m[1])/100, l = parseInt(m[2])/100;
+                    const h2r = (p, q, t) => { if(t < 0) t += 1; if(t > 1) t -= 1; if(t < 1/6) return p + (q - p) * 6 * t; if(t < 1/2) return q; if(t < 2/3) return p + (q - p) * (2/3 - t) * 6; return p; };
+                    const q = l < 0.5 ? l * (1 + s) : l + s - l * s; const p = 2 * l - q;
+                    return [h2r(p, q, h + 1/3)*255, h2r(p, q, h)*255, h2r(p, q, h - 1/3)*255];
+                }
+                const hex = c.replace('#', ''); return [parseInt(hex.substring(0, 2), 16), parseInt(hex.substring(2, 4), 16), parseInt(hex.substring(4, 6), 16)];
+            };
+            try { const r1 = parse(c1), r2 = parse(c2), w2 = 1 - w1; return `rgb(${Math.round(r1[0]*w1 + r2[0]*w2)},${Math.round(r1[1]*w1 + r2[1]*w2)},${Math.round(r1[2]*w1 + r2[2]*w2)})`; } catch(e) { return '#ffffff'; }
+        };
+
+        const Graph = ForceGraph3D()(document.getElementById('graph'))
+            .backgroundColor(SCHEMES.NEON.bg).nodeAutoColorBy('group').nodeResolution(12)
+            .linkColor(l => blendColors(getClusterColor(l.source.group), getClusterColor(l.target.group), 0.5))
+            .onEngineTick(() => {
+                if (state.isCameraLocked) {
+                    const nodes = Graph.graphData().nodes.filter(n => state.isDynamic || (n.val >= state.minImportance || n.is_meta));
+                    if (nodes.length > 0) {
+                        const cx = nodes.reduce((s, n) => s + n.x, 0) / nodes.length;
+                        const cy = nodes.reduce((s, n) => s + n.y, 0) / nodes.length;
+                        const cz = nodes.reduce((s, n) => s + n.z, 0) / nodes.length;
+                        const c = Graph.controls(); if (c) c.target.lerp(new THREE.Vector3(cx, cy, cz), 0.1);
+                    }
+                }
+            })
+            .nodeThreeObject(node => {
+                const color = getClusterColor(node.group);
+                let base = state.nodeScale; if (state.adaptiveSize) base *= Math.max(0.1, 1 - (Graph.graphData().nodes.length / 2000));
+                const radius = node.is_meta ? state.metaScale : (base + (node.val || 5) * (state.impScale / 5));
+                const mat = new THREE.MeshStandardMaterial({ color: color, emissive: color, emissiveIntensity: state.showGlow ? state.glow : 0, transparent: true, opacity: node.is_meta ? 0.2 : state.nodeOpacity });
+                const mesh = new THREE.Mesh(new THREE.SphereGeometry(radius, state.resolution, state.resolution), mat);
+                if (node.is_meta && typeof SpriteText !== 'undefined') {
+                    const group = new THREE.Group(); group.add(mesh);
+                    const sprite = new SpriteText(node.name); sprite.color = color; sprite.textHeight = radius * 0.8; sprite.position.set(0, radius + 10, 0); group.add(sprite);
+                    return group;
+                }
+                return mesh;
+            })
+            .onNodeClick(node => {
+                if (node.is_meta) return;
+                const r = 1 + 250/Math.hypot(node.x, node.y, node.z);
+                Graph.cameraPosition({ x: node.x * r, y: node.y * r, z: node.z * r }, node, 1000);
+                document.getElementById('p-title').innerText = node.name;
+                document.getElementById('p-desc').innerText = node.description || "No metadata.";
+                document.getElementById('info-panel').classList.add('visible');
+            });
+
+        const hud = document.getElementById('hud');
+        hud.onmouseenter = () => { hud.classList.add('active'); Graph.height(window.innerHeight * 0.5); };
+        hud.onmouseleave = () => { hud.classList.remove('active'); Graph.height(window.innerHeight); };
+
+        fetch('../../data/graph_data.json').then(res => res.json()).then(data => { rawData = data; syncUI(); updateGraph(); });
+
+        function updateGraph() {
+            const s = SCHEMES[state.scheme]; Graph.backgroundColor(s.bg);
+            const nodes = rawData.nodes.filter(n => n.val >= state.minImportance || n.is_meta);
+            const ids = new Set(nodes.map(n => n.id));
+            const links = rawData.links.filter(l => {
+                const sId = typeof l.source === 'object' ? l.source.id : l.source;
+                const tId = typeof l.target === 'object' ? l.target.id : l.target;
+                return ids.has(sId) && ids.has(tId) && (l.rank <= state.maxLinks || l.is_meta);
+            });
+            const adapt = (nodes.length / Math.max(rawData.nodes.length, 100)) * state.forceRatio;
+            const rep = state.repulsion * (1 + adapt);
+            if (state.isDynamic) { Graph.d3Force('charge').strength(rep).distanceMax(state.distMax).distanceMin(state.distMin).theta(state.theta); Graph.graphData({ nodes, links }); }
+            else {
+                Graph.graphData(rawData); Graph.nodeVisibility(n => n.val >= state.minImportance || n.is_meta);
+                Graph.linkVisibility(l => {
+                    const src = typeof l.source === 'object' ? l.source : rawData.nodes.find(n => n.id === l.source);
+                    const tgt = typeof l.target === 'object' ? l.target : rawData.nodes.find(n => n.id === l.target);
+                    const visible = (src && (src.val >= state.minImportance || src.is_meta)) && (tgt && (tgt.val >= state.minImportance || tgt.is_meta));
+                    return visible && (l.rank <= state.maxLinks || l.is_meta);
+                });
+                Graph.d3Force('charge').strength(rep).distanceMax(state.distMax).distanceMin(state.distMin).theta(state.theta);
+            }
+            Graph.d3Force('center').strength(state.gravity);
+            Graph.d3Force('collide', d3.forceCollide(state.collide));
+            Graph.d3Force('link').distance(state.bond).strength(state.spring);
+            Graph.d3VelocityDecay(state.damping); Graph.d3AlphaDecay(state.decay); Graph.d3AlphaTarget(state.alphaTarget);
+            Graph.alphaMin(state.alphaMin);
+            Graph.linkWidth(state.linkWidth).linkCurvature(state.curve);
+            Graph.linkOpacity(state.linkOpacity);
+            Graph.nodeThreeObject(Graph.nodeThreeObject());
+        }
+
+        // DEMO ENGINE
+        function toggleDemo() {
+            isDemoMode = !isDemoMode;
+            document.getElementById('btn-demo').innerText = isDemoMode ? 'DEMO: ON' : 'DEMO: OFF';
+            const timerEl = document.getElementById('demo-timer');
+            
+            if (isDemoMode) {
+                timerEl.style.display = 'block';
+                demoTimeLeft = 60;
+                // SLOW PHYSICS
+                lerpState({ damping: 0.8, decay: 0.005, nodeScale: 10, repulsion: -200, scheme: 'GHOST' });
+                
+                demoInterval = setInterval(() => {
+                    demoTimeLeft--;
+                    timerEl.innerText = `DEMO_SEQUENCE: ${demoTimeLeft}s`;
+                    
+                    if (demoTimeLeft % 15 === 0) {
+                        // Change "Scene" every 15s
+                        const idx = Math.floor((60 - demoTimeLeft) / 15);
+                        const scenes = [
+                            () => lerpState({ scheme: 'NEON', minImportance: 0, nodeScale: 15 }),
+                            () => lerpState({ scheme: 'CYBER', minImportance: 5, nodeScale: 40 }),
+                            () => lerpState({ scheme: 'SOLAR', minImportance: 2, nodeScale: 10 }),
+                            () => {} 
+                        ];
+                        if (scenes[idx]) scenes[idx]();
+                    }
+
+                    if (demoTimeLeft <= 0) toggleDemo();
+                }, 1000);
+                
+                animateCamera();
+            } else {
+                timerEl.style.display = 'none';
+                clearInterval(demoInterval);
+                resetDefaults();
+            }
+        }
+
+        function animateCamera() {
+            if (!isDemoMode) return;
+            cameraAngle += 0.002; // SUPER SLOW ROTATION
+            const distance = 1000 + Math.sin(cameraAngle) * 400; // Pulsing zoom
+            Graph.cameraPosition({
+                x: distance * Math.sin(cameraAngle),
+                y: distance * Math.cos(cameraAngle * 0.5),
+                z: distance * Math.cos(cameraAngle)
+            }, { x: 0, y: 0, z: 0 }, 100);
+            
+            requestAnimationFrame(animateCamera);
+        }
+
+        function lerpState(target) {
+            const steps = 300; // MUCH slower transitions (approx 5 seconds)
+            let i = 0;
+            const start = { ...state };
+            const interval = setInterval(() => {
+                i++;
+                Object.keys(target).forEach(k => {
+                    if (typeof target[k] === 'number') state[k] = start[k] + (target[k] - start[k]) * (i / steps);
+                    else state[k] = target[k];
+                });
+                syncUI(); 
+                if (i % 2 === 0) updateGraph(); // Only update graph every 2 ticks to save CPU during long lerps
+                if (i >= steps) {
+                    clearInterval(interval);
+                    updateGraph(); // Final sync
+                }
+            }, 16);
+        }
+
+        function syncUI() {
+            Object.keys(state).forEach(k => {
+                const el = document.getElementById('sl-' + k), lbl = document.getElementById('lbl-' + k);
+                if (el) el.value = state[k]; if (lbl) lbl.innerText = typeof state[k] === 'number' ? state[k].toFixed(3).replace(/\.?0+$/, "") : state[k];
+            });
+            document.getElementById('btn-layout').style.background = state.isDynamic ? '#00ff88' : 'rgba(255,255,255,0.05)';
+            document.getElementById('btn-cam').style.background = state.isCameraLocked ? '#00aaff' : 'rgba(255,255,255,0.05)';
+            document.getElementById('btn-cam').innerText = state.isCameraLocked ? 'LOCKED' : 'FREE';
+        }
+
+                window.adj = (k, d) => {
+
+                    const el = document.getElementById('sl-' + k);
+
+                    if (el) {
+
+                        state[k] = Math.min(parseFloat(el.max), Math.max(parseFloat(el.min), state[k] + d));
+
+                        syncUI();
+
+                        updateGraph();
+
+                    }
+
+                };
+
+                window.startAdj = (k, d) => { 
+
+                    adj(k, d); 
+
+                    let count = 0; 
+
+                    adjInterval = setInterval(() => { 
+
+                        count++; 
+
+                        // Only start accelerating after 10 ticks (1 second), and do it slowly
+
+                        let factor = count > 10 ? 1 + (count - 10) * 0.2 : 1;
+
+                        adj(k, d * factor); 
+
+                    }, 100); 
+
+                };
+
+                window.stopAdj = () => { clearInterval(adjInterval); };
+        document.querySelectorAll('input[type="range"]').forEach(sl => { sl.oninput = (e) => { state[e.target.id.replace('sl-', '')] = parseFloat(e.target.value); syncUI(); updateGraph(); }; });
+        function resetDefaults() { state = { ...DEFAULTS }; Graph.cameraPosition({ x: 0, y: 0, z: 1200 }, { x: 0, y: 0, z: 0 }, 1000); syncUI(); updateGraph(); }
+        function saveAsPreset() { const name = prompt("Preset ID:"); if (!name) return; const p = JSON.parse(localStorage.getItem('swarm_presets') || '{}'); p[name] = { ...state }; localStorage.setItem('swarm_presets', JSON.stringify(p)); renderPresets(); }
+        function renderPresets() {
+            const c = document.getElementById('presets-container'); c.innerHTML = ''; const p = JSON.parse(localStorage.getItem('swarm_presets') || '{}');
+            Object.keys(p).forEach(n => {
+                const b = document.createElement('button'); b.className = 'sq-btn'; b.innerText = n;
+                b.onclick = () => { state = { ...p[n] }; syncUI(); updateGraph(); };
+                const d = document.createElement('span'); d.innerHTML = ' &times;'; d.style.marginLeft = '4px'; d.style.color = '#ff0055';
+                d.onclick = (e) => { e.stopPropagation(); delete p[n]; localStorage.setItem('swarm_presets', JSON.stringify(p)); renderPresets(); };
+                b.appendChild(del); c.appendChild(b);
+            });
+        }
+        renderPresets();
+        document.getElementById('search').oninput = (e) => {
+            const v = e.target.value.toLowerCase(); if (!v) return;
+            const m = rawData.nodes.find(n => n.name && n.name.toLowerCase().includes(v));
+            if (m && m.x) { const r = 1 + 250/Math.hypot(m.x, m.y, m.z); Graph.cameraPosition({ x: m.x * r, y: m.y * r, z: m.z * r }, m, 1000); }
+        };
+        window.onresize = () => { Graph.width(window.innerWidth).height(hud.classList.contains('active') ? window.innerHeight * 0.5 : window.innerHeight); };
+    </script>
+</body>
+</html>

@@ -24,8 +24,8 @@ Every asset is committed to a git-backed repository. This enables:
 
 ## 3. System Architecture
 
-- **`command_extractor/`**: The engine room containing intent classifiers, synthesis templates, and the monitor loop.
-- **`commands/`**: The asset library containing TOML command definitions and the `mcp_servers/` subdirectory.
+- **`clide/`**: The engine room containing intent classifiers, synthesis templates, and the monitor loop.
+- **`swarm/commands/`**: The asset library containing TOML command definitions and the `mcp_servers/` subdirectory.
 - **`vector_registry.json`**: A 32-dimensional semantic index of all tools, enabling RAG-based search and duplication detection.
 - **`docs/`**: The project's self-documenting archive, including a visual dashboard for asset management.
 

@@ -9,5 +9,11 @@
   "extraction": {
     "repetition_limit": 1000,
     "complexity_threshold": 4
+  },
+  "hotspots": {
+    "usage_threshold": 5,
+    "similarity_auto_activation": 0.85,
+    "similarity_recommendation": 0.35,
+    "max_recommendations": 5
   }
 }

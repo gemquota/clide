@@ -121,7 +121,7 @@ app.conf.update(
     task_time_limit=3600,          # Hard limit: 1 hour
     task_soft_time_limit=3000,      # Soft limit: 50 minutes
     task_acks_late=True,            # Acknowledge after completion
-    task_reject_on_worker_lost=True,
+    task_REDACTED=True,
     worker_prefetch_multiplier=1,   # Don't prefetch too many tasks
 )
 

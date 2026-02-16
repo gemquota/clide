@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Semantic Swarm</title>
+    <style>
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; overflow: hidden; background-color: #000411; color: #fff; }
+        #graph { width: 100vw; height: 100vh; }
+        
+        .controls { position: absolute; top: 20px; left: 20px; z-index: 100; }
+        input#search { 
+            padding: 5px; border: none; background: transparent; 
+            color: rgba(255, 255, 255, 0.8); width: 300px; outline: none; 
+            font-size: 18px; font-family: 'Segoe UI', sans-serif;
+            caret-color: #4af;
+        }
+        input#search::placeholder { color: rgba(255, 255, 255, 0.2); }
+
+        .top-right-controls { 
+            position: absolute; top: 20px; right: 20px; z-index: 100; 
+            display: flex; background: rgba(30, 40, 70, 0.6); 
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px;
+            backdrop-filter: blur(5px); overflow: hidden;
+        }
+        .sq-btn { 
+            width: 32px; height: 32px; 
+            background: transparent; color: #fff; border: none;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 11px;
+        }
+        .sq-btn:hover { background: rgba(255, 255, 255, 0.1); }
+        .divider { width: 1px; background: rgba(255, 255, 255, 0.1); height: 20px; align-self: center; }
+        
+        #info-panel { position: absolute; bottom: 20px; right: 20px; width: 320px; background: rgba(5, 10, 25, 0.95); padding: 25px; border-radius: 15px; border: 1px solid #224; opacity: 0; transition: 0.3s; pointer-events: none; backdrop-filter: blur(10px); }
+        #info-panel.visible { opacity: 1; pointer-events: auto; }
+    </style>
+    <!-- Load Three.js, SpriteText and 3d-force-graph from CDN -->
+    <script src="https://unpkg.com/three@0.146.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/three-spritetext@1.8.2/dist/three-spritetext.min.js"></script>
+    <script src="https://unpkg.com/3d-force-graph@1.73.0/dist/3d-force-graph.min.js"></script>
+</head>
+<body>
+    <div class="controls">
+        <input type="text" id="search" placeholder="> ..." autocomplete="off">
+    </div>
+    <div class="top-right-controls">
+        <button id="btn-dim" class="sq-btn">2D</button>
+        <div class="divider"></div>
+        <button onclick="window.location.reload()" class="sq-btn">↻</button>
+    </div>
+    <div id="graph"></div>
+    <div id="info-panel">
+        <h1 id="p-title" style="margin:0; font-size:22px; color:#4af;">Name</h1>
+        <p id="p-desc" style="color:#ccd; line-height:1.6;"></p>
+    </div>
+
+    <script>
+        console.log("Initializing Graph...");
+        let is2D = false;
+        const btnDim = document.getElementById('btn-dim');
+
+        // Verify dependencies
+        if (typeof THREE === 'undefined') console.error("Three.js failed to load!");
+        if (typeof SpriteText === 'undefined') console.error("SpriteText failed to load!");
+        if (typeof ForceGraph3D === 'undefined') console.error("3d-force-graph failed to load!");
+
+        const blendColors = (c1, c2, w1) => {
+            const hex = c => c.replace('#', '');
+            let r1, g1, b1, r2, g2, b2;
+            try {
+                const h1 = hex(c1 || '#ffffff');
+                const h2 = hex(c2 || '#ffffff');
+                const f1 = h1.length === 3 ? h1.split('').map(x => x+x).join('') : h1;
+                const f2 = h2.length === 3 ? h2.split('').map(x => x+x).join('') : h2;
+                r1 = parseInt(f1.substring(0, 2), 16) || 255;
+                g1 = parseInt(f1.substring(2, 4), 16) || 255;
+                b1 = parseInt(f1.substring(4, 6), 16) || 255;
+                r2 = parseInt(f2.substring(0, 2), 16) || 255;
+                g2 = parseInt(f2.substring(2, 4), 16) || 255;
+                b2 = parseInt(f2.substring(4, 6), 16) || 255;
+            } catch(e) { return '#ffffff'; }
+            const w2 = 1 - w1;
+            const r = Math.round(r1 * w1 + r2 * w2);
+            const g = Math.round(g1 * w1 + g2 * w2);
+            const b = Math.round(b1 * w1 + b2 * w2);
+            return `#${(1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1)}`;
+        };
+
+        const Graph = ForceGraph3D()(document.getElementById('graph'))
+            .jsonUrl('./graph_data.json')
+            .nodeLabel(node => `<div style="padding: 5px; background: rgba(0,0,0,0.8); border-radius: 4px;"><b>${node.name}</b><br/>${node.group_name || ''}</div>`)
+            .nodeAutoColorBy('group')
+            .nodeVal(node => node.is_meta ? 20 : (node.val || 5))
+            .nodeResolution(20)
+            .nodeThreeObject(node => {
+                if (node.is_meta) {
+                    const group = new THREE.Group();
+                    const sphereGeom = new THREE.SphereGeometry(node.val || 10, 32, 32);
+                    const sphereMat = new THREE.MeshPhongMaterial({
+                        color: node.color || '#444',
+                        transparent: true,
+                        opacity: 0.15,
+                        depthWrite: false
+                    });
+                    group.add(new THREE.Mesh(sphereGeom, sphereMat));
+
+                    if (typeof SpriteText !== 'undefined') {
+                        const sprite = new SpriteText(node.name);
+                        sprite.color = node.color || '#4af';
+                        sprite.textHeight = 8;
+                        sprite.position.set(0, (node.val || 10) + 5, 0);
+                        group.add(sprite);
+                    }
+                    return group;
+                }
+                return false;
+            })
+            .linkCurvature(0.5)
+            .linkWidth(l => {
+                if (l.is_meta) return 0;
+                const baseWidth = Math.log((l.source.val || 5) + (l.target.val || 5)) * 1.5;
+                const isInternal = l.source.group === l.target.group;
+                return isInternal ? baseWidth * 1.5 : baseWidth * 0.5;
+            })
+            .linkOpacity(l => l.is_meta ? 0 : 0.6)
+            .linkColor(l => {
+                if (l.is_meta) return 'rgba(0,0,0,0)';
+                // Handle cases where source/target might be strings or objects
+                const c1 = (l.source && l.source.color) ? l.source.color : '#ffffff';
+                const c2 = (l.target && l.target.color) ? l.target.color : '#ffffff';
+                return blendColors(c1, c2, 0.5);
+            })
+            .onNodeClick(node => {
+                if (node.is_meta) return; 
+                const distance = 150;
+                const distRatio = 1 + distance/Math.hypot(node.x, node.y, node.z);
+                Graph.cameraPosition({ x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio }, node, 1000);
+                document.getElementById('p-title').innerText = node.name;
+                document.getElementById('p-desc').innerText = node.description || "No metadata available.";
+                document.getElementById('info-panel').classList.add('visible');
+            });
+
+        // Search logic
+        document.getElementById('search').addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase();
+            if (!val) return;
+            const nodes = Graph.graphData().nodes;
+            const match = nodes.find(n => !n.is_meta && n.name.toLowerCase().includes(val));
+            if (match) {
+                const distance = 200;
+                const distRatio = 1 + distance/Math.hypot(match.x, match.y, match.z);
+                Graph.cameraPosition({ x: match.x * distRatio, y: match.y * distRatio, z: match.z * distRatio }, match, 1000);
+            }
+        });
+
+        // Dimension toggle
+        btnDim.addEventListener('click', () => {
+            is2D = !is2D;
+            btnDim.innerText = is2D ? "3D" : "2D";
+            Graph.numDimensions(is2D ? 2 : 3);
+        });
+
+        window.addEventListener('resize', () => {
+            Graph.width(window.innerWidth);
+            Graph.height(window.innerHeight);
+        });
+    </script>
+</body>
+</html>
