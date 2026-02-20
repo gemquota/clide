@@ -4,52 +4,77 @@
 
 | Domain | Sub-Domain | Total Occ | Unique | Avg Imp |
 | :--- | :--- | :--- | :--- | :--- |
-| **🛠 Engineering & Architecture** | *ALL* | 549 | 46 | 6.8 |
-| 🛠 Engineering & Architecture | Advanced Analysis | 4 | 4 | 7.0 |
-| 🛠 Engineering & Architecture | Logic Refactoring | 12 | 8 | 7.3 |
-| 🛠 Engineering & Architecture | System Synthesis | 533 | 34 | 6.7 |
-| **🔧 Infrastructure & Utility** | *ALL* | 224 | 73 | 6.8 |
-| 🔧 Infrastructure & Utility | General Utility | 126 | 28 | 6.7 |
-| 🔧 Infrastructure & Utility | Git & Remote | 40 | 14 | 7.2 |
-| 🔧 Infrastructure & Utility | Validation Core | 58 | 31 | 6.6 |
-| **📋 Project Governance** | *ALL* | 56 | 42 | 6.6 |
-| 📋 Project Governance | Strategic Ops | 30 | 21 | 6.8 |
-| 📋 Project Governance | System Meta | 15 | 14 | 6.1 |
-| 📋 Project Governance | Task Management | 11 | 7 | 7.0 |
-| **📡 Intelligence & Extraction** | *ALL* | 78 | 40 | 6.6 |
-| 📡 Intelligence & Extraction | Browser Automation | 34 | 17 | 6.9 |
-| 📡 Intelligence & Extraction | Math & Financials | 16 | 11 | 6.5 |
-| 📡 Intelligence & Extraction | Social Automation | 28 | 12 | 6.0 |
-| **📊 Data Operations** | *ALL* | 80 | 40 | 6.5 |
-| 📊 Data Operations | Clustering & Cleaning | 19 | 14 | 6.4 |
-| 📊 Data Operations | Storage & Persistence | 17 | 10 | 6.9 |
-| 📊 Data Operations | Transformation | 44 | 16 | 6.4 |
-| **🎨 UI/UX & Visualization** | *ALL* | 87 | 49 | 6.2 |
-| 🎨 UI/UX & Visualization | Data Viz & Rendering | 25 | 16 | 6.5 |
-| 🎨 UI/UX & Visualization | Interface Layout | 34 | 14 | 6.4 |
-| 🎨 UI/UX & Visualization | Visual Semantics | 28 | 19 | 5.8 |
-| **🌐 General/Unsorted** | *ALL* | 467 | 243 | 6.4 |
-| 🌐 General/Unsorted | Misc Operations | 467 | 243 | 6.4 |
-| **TOTALS** | -- | **1541** | **533** | **6.5** |
+| 🛠 Engineering & Architecture | Advanced Analysis | 65 | 22 | 6.3 |
+| 🛠 Engineering & Architecture | Logic Refactoring | 67 | 16 | 4.3 |
+| 🛠 Engineering & Architecture | System Synthesis | 236 | 54 | 12.7 |
+| **🛠 Engineering & Architecture** | *ALL* | 368 | 92 | 9.7 |
+| 🔧 Infrastructure & Utility | General Utility | 176 | 40 | 5.7 |
+| 🔧 Infrastructure & Utility | Git & Remote | 109 | 23 | 4.5 |
+| 🔧 Infrastructure & Utility | Validation Core | 216 | 49 | 4.0 |
+| **🔧 Infrastructure & Utility** | *ALL* | 501 | 112 | 4.7 |
+| 📋 Project Governance | Strategic Ops | 152 | 28 | 2.9 |
+| 📋 Project Governance | System Meta | 105 | 24 | 3.8 |
+| 📋 Project Governance | Task Management | 52 | 10 | 3.2 |
+| **📋 Project Governance** | *ALL* | 309 | 62 | 3.3 |
+| 📡 Intelligence & Extraction | Browser Automation | 163 | 44 | 5.1 |
+| 📡 Intelligence & Extraction | Math & Financials | 92 | 30 | 4.8 |
+| 📡 Intelligence & Extraction | Social Automation | 74 | 16 | 3.5 |
+| **📡 Intelligence & Extraction** | *ALL* | 329 | 90 | 4.7 |
+| 📊 Data Operations | Clustering & Cleaning | 96 | 20 | 3.0 |
+| 📊 Data Operations | Storage & Persistence | 79 | 19 | 4.3 |
+| 📊 Data Operations | Transformation | 110 | 24 | 3.6 |
+| **📊 Data Operations** | *ALL* | 285 | 63 | 3.6 |
+| 🎨 UI/UX & Visualization | Data Viz & Rendering | 113 | 24 | 3.3 |
+| 🎨 UI/UX & Visualization | Interface Layout | 113 | 32 | 5.0 |
+| 🎨 UI/UX & Visualization | Visual Semantics | 120 | 29 | 3.2 |
+| **🎨 UI/UX & Visualization** | *ALL* | 346 | 85 | 3.9 |
+| **🌐 General/Misc** | *ALL* | 442 | 291 | 6.6 |
+| **TOTALS** | -- | **2580** | **795** | **6.5** |
 
 ---
 
 # 🛠 Engineering & Architecture
 
 ## 💠 Advanced Analysis
-| Command | Recurrence | Imp | Cluster/Description |
-| :--- | :--- | :--- | :--- |
+| Command | Imp | Recurrence | Context Snippet |
+| :| :--- | :| :--- |
+| `ingest_and_analyze_model_response` | **7.8** | 4 | Ingest model responses, save thoughts as raw text linked to the responses, and analyze the responses... |
+| `analyze_bonus_logs` | **7.5** | 2 | Create a command `analyze_bonus_logs` that takes log data as input and performs the following: 1.  C... |
+| `analyze_commands` | **7.5** | 2 | Generate a comprehensive analytical review of the available commands and their corresponding command... |
+| `analyze_bonuses` | **7.2** | 15 | Connect the scraper log and prepopulate data from bonuses.db... |
+| `recursive_critique` | **7.0** | 4 | Execute current task, critique the result, and design the subsequent prompt. This could be a meta-le... |
+| `analyze_site_data` | **7.0** | 1 | Input: 1 ╭─── SITE #160: audgo.net    2 │ credentials primary  \| bonuses  0 \| gt0v  0 \| EV: $  0.... |
+| `analyze_query_performance` | **7.0** | 1 | Analyze query performance to determine why a filter was applied to the entire database instead of a ... |
+| `analyze_website` | **7.0** | 2 | Analyze website speedau.live for 301 errors and other potential issues. Focus on identifying the cau... |
+| `analyze_unibet_logs` | **7.0** | 1 | Define a command `analyze_unibet_logs` that parses Unibet logs. The command should have two output m... |
+| `analyze_run_stats` | **7.0** | 1 | The user has specified a data representation format to be analyzed that follows this structure: Colo... |
+| `analyze_bonus` | **7.0** | 2 | Analyze a string containing bonus data, identified by emojis and delimiters, and determine the value... |
+| `analyze_logs` | **7.0** | 2 | analyze_logs... |
+| `AUDITOR-ZERO` | **7.0** | 1 | ... |
+| `analyze_and_detail` | **7.0** | 1 | ... |
+| `security_audit` | **7.0** | 1 | ... |
+| `analyze_auth_failures` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `analyze_authentication` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `analyze_status` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `analyze_and_document` | **7.0** | 1 | Deep-extracted from historical logs. |
 | `analyze_results` | 1 | 7.0 | User has completed the Casino Bonus Intelligence Engine.   Core Features: - API implementation with session management a... |
 | `analyze_blocks` | 1 | 7.0 | Create a new command to analyze data and present it in blocks. Specifically, implement 'error logging' blocks with compr... |
 | `analyze_data` | 1 | 7.0 | The user provided the following data, which appears to be encoded incorrectly. The command 'analyze_data' should ingest ... |
-| `describe_project` | 1 | 7.0 | Recursively traverse the project directory, including all subdirectories. For each file: 1. Analyze the file's name, con... |
 
 ---
 
 ## 💠 Logic Refactoring
-| Command | Recurrence | Imp | Cluster/Description |
-| :--- | :--- | :--- | :--- |
-| `deconstruct` | 2 | 8.5 | Deconstruct a program by recursively examining its directory contents, extracting its logic, annotating and saving it as... |
+| Command | Imp | Recurrence | Context Snippet |
+| :| :--- | :| :--- |
+| `clean_and_compile` | **7.0** | 2 | remove superseded files; attempt tk combase related utilities build... |
+| `refactor_directory_structure` | **7.0** | 1 | ... |
+| `refine_prompt` | **7.0** | 1 | ... |
+| `refine_baseline` | **7.0** | 1 | ... |
+| `clean_directory` | **7.0** | 1 | ... |
+| `refactor` | **7.0** | 1 | ... |
+| `simplify` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `simplify_emoji` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `deconstruct` | 3 | 8.5 | Deconstruct a program by recursively examining its directory contents, extracting its logic, annotating and saving it as... |
 | `modernize` | 2 | 7.0 | Modernize the web application and enhance its command-line interface integration.... |
 | `refine` | 2 | 7.0 | Refine the current baseline by incorporating 6 new features for version 0.6.0.... |
 | `flesh_out_prompt` | 2 | 7.0 | Expand on the purses of investigating, analyzing, and explaining the conceptual understanding of all aspects of The Proj... |
@@ -61,9 +86,31 @@
 ---
 
 ## 💠 System Synthesis
-| Command | Recurrence | Imp | Cluster/Description |
-| :--- | :--- | :--- | :--- |
-| `mockup` | 488 | 6.8 | Given a screenshot of an interface, provide a detailed critique, and then use that critique to generate a prompt that co... |
+| Command | Imp | Recurrence | Context Snippet |
+| :| :--- | :| :--- |
+| `automate_rag_agent` | **7.7** | 3 | Analyze and formalize the architecture of agent systems using LLMs, including RAG, tool calling, and... |
+| `automate` | **7.0** | 1 | Automate steps 8.31 through 8.40, focusing on 'Tooling & Automation (The Help)'. This includes: Cale... |
+| `synthesize_knowledge` | **7.0** | 1 | ... |
+| `create_docs_structure` | **7.0** | 1 | ... |
+| `synthesize_entries` | **7.0** | 1 | ... |
+| `generate_commands_index` | **7.0** | 1 | ... |
+| `recreate_concept` | **7.0** | 1 | ... |
+| `build_audience` | **7.0** | 1 | ... |
+| `redesign_layout` | **7.0** | 1 | ... |
+| `generate_and_append_names` | **7.0** | 1 | ... |
+| `automate_task` | **7.0** | 2 | ... |
+| `create_pdb` | **7.0** | 1 | ... |
+| `generate_concept_prompt` | **7.0** | 1 | ... |
+| `create_frontend` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `create_github_repo` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `expand_prompts` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `generate` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `generate_operational_manual` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `prompt_expansion` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `automate_agent_building` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `redesign_table_ui` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `regenerate_graph` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `mockup` | 489 | 6.8 | Given a screenshot of an interface, provide a detailed critique, and then use that critique to generate a prompt that co... |
 | `generate_and_test` | 3 | 7.0 | Generate Mermaid diagrams and test the documentation webpage.... |
 | `redesign_ui` | 2 | 7.0 | Redesign the UI: Remove convoluted logic related to bonus name/symbol. Implement a pop-up upon row tap. Narrow columns t... |
 | `generate_permutations` | 2 | 7.0 | Generate 16003008 permutations in stream mode.... |
@@ -88,8 +135,6 @@
 | `generate_code_docs` | 1 | 7.0 | Generate documentation for extractor.py... |
 | `create_repo` | 1 | 7.0 | Create a new Git repository in the current directory.... |
 | `generate_ingestion_logs` | 1 | 7.0 | Generate ingestion logs and report the number of remaining items from a total of 383.... |
-| `design` | 1 | 7.0 | Analyze a provided screenshot of an interface and generate a prompt designed to improve the interface based on the criti... |
-| `recursive_critique_redesign` | 1 | 7.0 | Execute the previously performed action, then recursively critique the results and redesign the next prompt or action ba... |
 | `frontend` | 1 | 7.0 | Create a 'frontend' command dedicated to feature implementation and related tasks specifically within the frontend domai... |
 | `generate_versions` | 1 | 7.0 | Generate 15 two-line versions incorporating all prior specifications and everything applicable.... |
 | `generate_color_cubes` | 1 | 7.0 | Generate color cubes with the following properties: - Colors: Red to purple, Red to black - Size: 5x5 - One variety for ... |
@@ -102,16 +147,30 @@
 # 🔧 Infrastructure & Utility
 
 ## 💠 General Utility
-| Command | Recurrence | Imp | Cluster/Description |
-| :--- | :--- | :--- | :--- |
-| `resume` | 33 | 6.8 | Implement a 'resume' command to allow users to pause and restart existing workflows or tasks. This would involve saving ... |
+| Command | Imp | Recurrence | Context Snippet |
+| :| :--- | :| :--- |
+| `install_and_setup` | **7.0** | 1 | Install and setup Ralph... |
+| `fact_configuration` | **7.0** | 1 | ... |
+| `exit` | **7.0** | 1 | ... |
+| `demo_config` | **7.0** | 1 | ... |
+| `initial_setup_report` | **7.0** | 1 | ... |
+| `configure_commit_behavior` | **7.0** | 1 | ... |
+| `configure_importance_and_gravity` | **7.0** | 1 | ... |
+| `consider_aliases` | **7.0** | 1 | ... |
+| `setup` | **7.0** | 1 | ... |
+| `configure_commit_analysis` | **7.0** | 1 | ... |
+| `configure_bonus_display` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `configure_workers` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `setup_rag` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `ui_reconfigure` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `resume_logic_export` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `resume` | 34 | 6.8 | Implement a 'resume' command to allow users to pause and restart existing workflows or tasks. This would involve saving ... |
 | `quit` | 28 | 7.2 | Implement an 'exit' command to terminate the CLIDE environment.... |
 | `settings` | 12 | 6.9 | Create command 'wb' to manage both console and TUI interfaces.... |
 | `move_files` | 8 | 6.8 | Move files and directories to new locations. Specifically: 1. Move 'export full db' and 'export bonuses' to a new direct... |
 | `configuration` | 7 | 6.1 | Configuration for automated code quality checks: - Perform code analysis on commits, potentially all commits if deemed p... |
 | `configure_facts` | 4 | 8.0 | Implement a mechanism to prioritize facts for inclusion in command generation based on importance, semantic embedding pr... |
 | `split_file` | 4 | 7.0 | Create a command `split_file` that splits a large file into smaller files of a specified size (e.g., 500 KB). The comman... |
-| `resume_logic_export` | 2 | 7.0 | Resume the logic export process from version 2, incorporating code extracts into the initial export before resuming the ... |
 | `break` | 2 | 7.5 | Implement a 'break' command to interrupt the current operation or execution of a command.... |
 | `display_config` | 2 | 7.0 | Create a command to display the config.ini settings in the scraper initialization dashboard.... |
 | `binary` | 2 | 5.0 | Execute a specified binary file with provided arguments. Requires definition of binary file path and any necessary argum... |
@@ -121,7 +180,6 @@
 | `restart_process` | 2 | 7.0 | Request to implement a 'restart_process' command that allows users to rerun a previous command with modified parameters,... |
 | `revert_to_console` | 2 | 7.0 | Revert the application's display from a TUI to a console-based output, ensuring the preservation of emoji and numerical ... |
 | `add_help_argument` | 1 | 3.0 | Implement a feature to automatically add a `--help` or `help` argument to the `main` function of a Python script. This w... |
-| `resume_with_categories` | 1 | 8.0 | Create a new command to generate resumes with customizable categories and subcategories for different sections and infor... |
 | `reconfigure` | 1 | 7.0 | Reconfigure system or component to address unacceptable condition/negative aspect.... |
 | `group_configs` | 1 | 3.0 | Group assistant configurations from GEP, excluding 'lrsve gemini'.... |
 | `revert_with_diff` | 1 | 4.0 | Revert to a specific step and show the percentage difference between the current state and the reverted state.... |
@@ -130,14 +188,22 @@
 | `configure_gemini` | 1 | 8.0 | Configure the system to use Gemini and the Gemini/Telegram bot API key environment variables. This command should ensure... |
 | `configure_logging` | 1 | 7.0 | Configure web app logging to show a specific verbosity level (standard) instead of full debug logs.... |
 | `configure_column_display` | 1 | 7.0 | Allow CLIDE output configuration via customizable column codes and/or the number of columns and a sequence of emoji.... |
-| `resume_categorize` | 1 | 8.0 | Develop a tool to process resume data and automatically categorize skills, experiences, and education into predefined ca... |
 | `tune_threads` | 1 | 7.0 | Create a command `tune_threads` that automatically adjusts the number of threads used by a process to be no more than th... |
 
 ---
 
 ## 💠 Git & Remote
-| Command | Recurrence | Imp | Cluster/Description |
-| :--- | :--- | :--- | :--- |
+| Command | Imp | Recurrence | Context Snippet |
+| :| :--- | :| :--- |
+| `deploy` | **8.0** | 1 | Deploy changes by pushing to git and updating the initialization dashboard with new configuration se... |
+| `repo` | **7.0** | 1 | ... |
+| `commit_strategy` | **7.0** | 1 | ... |
+| `chunk_and_move_report` | **7.0** | 1 | ... |
+| `status_report` | **7.0** | 1 | ... |
+| `browse_github` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `connect_log_and_prepopulate` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `customize_report` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `sync_remote` | **7.0** | 1 | Deep-extracted from historical logs. |
 | `push` | 18 | 7.5 | push to git... |
 | `error_reporting` | 5 | 7.0 | Develop a command to refine the error reporting system by further delineating errors.... |
 | `gitignore` | 3 | 6.7 | Add 'debug dir', 'readable', and 'golf' to .gitignore.... |
@@ -156,14 +222,34 @@
 ---
 
 ## 💠 Validation Core
-| Command | Recurrence | Imp | Cluster/Description |
-| :--- | :--- | :--- | :--- |
+| Command | Imp | Recurrence | Context Snippet |
+| :| :--- | :| :--- |
+| `test_and_release` | **7.0** | 1 | ... |
+| `develop_and_test` | **7.0** | 1 | ... |
+| `test_documentation` | **7.0** | 1 | ... |
+| `rename_folder_and_test_all_features` | **7.0** | 3 | ... |
+| `check_ingestion_queue` | **7.0** | 1 | ... |
+| `review_and_verify_modals` | **7.0** | 1 | ... |
+| `check_bonus_dates` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `check_delay_implementation` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `check_metrics` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `check_registration` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `check_ss` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `ensure_file_size` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `retest_pruned` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `retest_scheduling` | **7.0** | 2 | Deep-extracted from historical logs. |
+| `screenshot_check` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `validate_docs` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `reschedule_purgatory_retest` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `retest_pruned_periodically` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `retest_schedule` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `schedule_purgatory_retest` | **7.0** | 1 | Deep-extracted from historical logs. |
 | `test` | 7 | 7.3 | Implement a command `test_discovery_agent` to thoroughly test the discovery agent's functionality and performance.... |
 | `ensure` | 5 | 7.4 | Define a command 'ensure' that allows verifying a condition or state within the system or codebase. The command should a... |
 | `stress_test` | 3 | 6.3 | run stress test... |
 | `double_check` | 3 | 7.0 | Create a new command called `double_check` to perform a validation or verification process. Implement the logic for 'dou... |
 | `checkbexisting` | 3 | 7.0 | Check if 'audignfeature' already exists in the system/database.... |
-| `check` | 3 | 4.3 | check .moltbot... |
+| `check` | 4 | 4.3 | check .moltbot... |
 | `get_latest_bonuses` | 2 | 7.5 | Create a command to retrieve the most recent and un-claimed bonus information from the database, excluding bonuses the u... |
 | `test_website` | 2 | 7.0 | Try website ufo9.asia... |
 | `check_delay` | 2 | 6.0 | Check if the delay mechanism has been implemented.... |
@@ -171,7 +257,6 @@
 | `ensure_average_size` | 2 | 5.0 | Create a command that ensures a set of items average the same size as a reference set (the first 5) +/- 10%.... |
 | `url_manager_registration_check` | 2 | 7.0 | Develop a command to automate the process of logging into a URL manager, extracting username fields, appending these to ... |
 | `emulate` | 2 | 6.0 | emulate: Create and run a specified environment within a simulated system.... |
-| `rename_and_test` | 2 | 7.0 | Rename the 'development' folder to 'dev' and execute a comprehensive test of all features within the program.... |
 | `check_process` | 2 | 7.0 | Check if process 'openclaw' is running.... |
 | `phone_number_check` | 1 | 7.0 | Implement a command to check a list of phone numbers against specified criteria (e.g., validity, existence in a database... |
 | `performance_check` | 1 | 7.0 | Investigate and resolve performance issues observed with 5 concurrent workers. Implement a performance monitoring and an... |
@@ -182,7 +267,6 @@
 | `audit_check` | 1 | 5.0 | Check the functionality of the recently implemented audit feature.... |
 | `feasibility_check` | 1 | 7.0 | Evaluate the plausibility of a third tier in the current architecture.... |
 | `validate_output` | 1 | 7.0 | Create a command to validate the console output against a predefined expected output. This command should take the expec... |
-| `checker` | 1 | 3.0 | Implement a 'checker' command that can perform tasks like data validation, list cleaning, data migration, or URL shorten... |
 | `test_cycle` | 1 | 7.0 | Execute a testing cycle consisting of automated testing, followed by manual verification and list generation, concluding... |
 | `data_confirmation` | 1 | 7.0 | Verify that the specified data is successfully added to the database and honuses.... |
 | `check_links` | 1 | 7.0 | Generate a Python script to check the status of all provided links. The script should: 1. Send requests to each link and... |
@@ -194,8 +278,15 @@
 # 📋 Project Governance
 
 ## 💠 Strategic Ops
-| Command | Recurrence | Imp | Cluster/Description |
-| :--- | :--- | :--- | :--- |
+| Command | Imp | Recurrence | Context Snippet |
+| :| :--- | :| :--- |
+| `monitor_chat_logs` | **8.0** | 1 | Implement a system to monitor Gemini chat logs, identify task requests, and categorize them as mappi... |
+| `monitor` | **7.5** | 4 | Create a command `monitor` that provides a summary of site success/failure/attempt totals for the cu... |
+| `plan` | **7.0** | 1 | ... |
+| `monitor_run` | **7.0** | 2 | Deep-extracted from historical logs. |
+| `roadmaps` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `status` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `monitor_proxy_run` | **7.0** | 1 | Deep-extracted from historical logs. |
 | `assess` | 4 | 6.5 | Assess the current system's efficacy and potential capabilities.... |
 | `roadmap` | 3 | 5.7 | Create a new command 'roadmap' to generate a premium roadmap file.... |
 | `analyze_url_status` | 2 | 7.5 | Analyze a URL status report, counting the totals of each error type and creating two lists: one for successful sites and... |
@@ -221,8 +312,19 @@
 ---
 
 ## 💠 System Meta
-| Command | Recurrence | Imp | Cluster/Description |
-| :--- | :--- | :--- | :--- |
+| Command | Imp | Recurrence | Context Snippet |
+| :| :--- | :| :--- |
+| `explain_relational_map` | **8.0** | 1 | Explain the contents of a relational map file in exhaustive detail, tailored to both beginner and ad... |
+| `explain` | **7.2** | 12 | Explain the functionality of Marshmallow.... |
+| `compare_versions` | **7.0** | 1 | Compare and contrast the versions 'b321' and 'b3b2b1'. Consider semantic versioning if applicable. I... |
+| `version_control` | **7.0** | 1 | Define a command to handle common version control operations, starting with 'pull' and 'fork'. Consi... |
+| `explain_error_codes` | **7.0** | 2 | Explain the logic behind the system and provide a list of all error codes at all 3 verbosity levels,... |
+| `rename_and_version` | **7.0** | 1 | Rename the project from 'polymath' to 'bndl', update the version to '0.0.9', and set the next update... |
+| `describe` | **6.3** | 3 | Provide a detailed description of the specified entity.... |
+| `describe_layers` | **7.0** | 1 | ... |
+| `explain_and_execute` | **7.0** | 1 | ... |
+| `version_bump_and_brainstorm` | **7.0** | 1 | ... |
+| `readme` | **7.0** | 1 | Deep-extracted from historical logs. |
 | `tag` | 2 | 7.0 | CLIDE should have a command to review each message and tag/categorize them.... |
 | `remove_cognitive_load` | 1 | 7.0 | Remove legacy redundant cognitive load. This likely involves identifying sources of cognitive overload in the system, su... |
 | `define_percentage_range` | 1 | 5.0 | Allow defining a minimum and maximum percentage value/range.... |
@@ -235,14 +337,16 @@
 | `ancillary_docs` | 1 | 3.0 | Generate ideas for ancillary documents.... |
 | `about` | 1 | 7.0 | Request to display information about the system, CLIDE, or available commands.... |
 | `document` | 1 | 5.0 | ```yaml name: moltbook version: 1.9.0 description: The social network for AI agents. Post, comment, upvote, and create c... |
-| `moltbot` | 1 | 5.0 | Provide a new command that interacts with or manages '.moltbot'.... |
 | `format_system_roles` | 1 | 4.0 | ``` # 🎭 System Roles & Personas Record of behavioral directives and personas for stateful workflow management. --- ## 📋 ... |
 
 ---
 
 ## 💠 Task Management
-| Command | Recurrence | Imp | Cluster/Description |
-| :--- | :--- | :--- | :--- |
+| Command | Imp | Recurrence | Context Snippet |
+| :| :--- | :| :--- |
+| `approve` | **7.0** | 1 | ... |
+| `orchestrate` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `orchestrate_feature_workflow` | **7.0** | 1 | Deep-extracted from historical logs. |
 | `pending_assignment` | 5 | 7.2 | Implement a CLI option (e.g., `-v` or `--verbose`) to control the output verbosity. The option should allow displaying e... |
 | `research` | 1 | 7.0 | Suggest or perform research on activities to fill 1-2 hours.... |
 | `approve_all` | 1 | 7.0 | approve_all... |
@@ -255,8 +359,36 @@
 # 📡 Intelligence & Extraction
 
 ## 💠 Browser Automation
-| Command | Recurrence | Imp | Cluster/Description |
-| :--- | :--- | :--- | :--- |
+| Command | Imp | Recurrence | Context Snippet |
+| :| :--- | :| :--- |
+| `extract_code` | **7.0** | 8 | Extract all perceived value logic with comments from pv.me and output it.... |
+| `unify_links` | **7.0** | 2 | Create a new command, `unify_links`, that consolidates 'up links' and 'up list links', removing any ... |
+| `resolve_short_links` | **7.0** | 2 | Implement a command that uses an API to resolve shortened URLs.... |
+| `count_unique_urls` | **7.0** | 1 | Implement a function that counts unique URLs, treating URLs with and without the '/RFetc' suffix as ... |
+| `randomize_url` | **7.0** | 2 | Implement URL randomization on session start to enhance security.... |
+| `social_media_search` | **7.0** | 2 | A command to search and potentially analyze Facebook groups, pages, and community chats.... |
+| `extract_usernames` | **7.0** | 4 | Extract usernames from the /settings page of 194 registered sites. Login to each site, navigate to /... |
+| `extract_and_join` | **7.0** | 2 | Navigate to {settings_url}, extract {username_selector} as username, construct {join_url_prefix}{use... |
+| `extract_css_selector` | **7.0** | 1 | Given an HTML snippet and a descriptive path, extract the corresponding CSS selector.... |
+| `url_processor` | **7.0** | 1 | Process URL files to extract and separate raw and short links into distinct files named 'raw' and 's... |
+| `url_analysis` | **7.0** | 1 | Create a command called `url_analysis` that takes a list of file paths as input (e.g., `url_analysis... |
+| `extract_unique_urls` | **7.0** | 1 | Extract unique URLs from the urls.txt files found within the specified directories.... |
+| `extract_data` | **7.0** | 2 | Create a command 'extract_data' to generate a Python script for extracting data from a file based on... |
+| `unique_urls` | **6.4** | 8 | Extract and list unique URLs from a given input (e.g., text, file, webpage).... |
+| `rerun_on_links` | **6.3** | 3 | A new command to initiate a pre-defined process or workflow.... |
+| `extract_table` | **3.0** | 1 | Extract the table at the beginning of new commands' descriptions into a new file and convert it to C... |
+| `socialize` | **7.0** | 1 | ... |
+| `name_command_extractor` | **7.0** | 1 | ... |
+| `data_extraction` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `discover_urls` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `extract_perceived_value` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `fb_group_post_extraction` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `find_facebook_content` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `logic_extract` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `scrape` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `social_media_data` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `tracking_scrape` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `url_optimization` | **7.0** | 1 | Deep-extracted from historical logs. |
 | `extract_ref_links` | 5 | 6.6 | Design a self-contained script to: 1. Read a list of URLs. 2. Visit each URL and check its status. 3. Separate the URLs ... |
 | `scraper` | 5 | 7.2 | Create a command that instructs the scraper to process all working URLs.... |
 | `aggregate_scrape` | 3 | 7.3 | Create a command that scrapes data, calculates cumulative/aggregate/total/average values as running totals (initialized ... |
@@ -271,15 +403,33 @@
 | `scrape_facebook` | 1 | 7.0 | Implement a tool to scrape and analyze public posts from Facebook groups to identify new potential website examples/exte... |
 | `distributed_scrape` | 1 | 7.0 | Implement a command 'distributed_scrape' to enable web scraping using multiple machines or processes.... |
 | `format_scrape_data` | 1 | 7.0 | Create a command 'format_scrape_data' that takes scraped data as input, removes the word 'AGG', formats the data into a ... |
-| `batch_process_urls` | 1 | 7.0 | Create a command `batch_process_urls` that reads URLs from `urls.txt` and processes them in batch using the most efficie... |
 | `recursive_link_discovery` | 1 | 7.0 | Recursively discover more links by starting from current links.... |
 | `analyze_scrape_metrics` | 1 | 7.0 | Analyze and display scraping metrics including: proxy health (represented by color-coded circles), scrape attempt count,... |
 
 ---
 
 ## 💠 Math & Financials
-| Command | Recurrence | Imp | Cluster/Description |
-| :--- | :--- | :--- | :--- |
+| Command | Imp | Recurrence | Context Snippet |
+| :| :--- | :| :--- |
+| `file_management_integration` | **7.5** | 2 | Recursively read all files in all directories, update or archive any outdated files, and then procee... |
+| `format_and_track_bonuses` | **7.0** | 1 | Format input data to resemble '🟥001•00%•000\|000•FAIL⛔ v96au.com 🟨002•50%•045\|045•DONE✅ iau9.com' a... |
+| `generation` | **7.0** | 1 | Increase generation complexity. Make it intuitive and configurable.... |
+| `tui_integration` | **7.0** | 1 | Integrate the legacy CLI with the TUI, incorporating charts and random solution logic.... |
+| `example_generation` | **7.0** | 1 | Generate examples with at least 4 specified metrics and 10 lines of output per example.... |
+| `bonus_info` | **5.0** | 1 | Retrieve and display information about the 9 latest bonuses.... |
+| `bonuses` | **5.0** | 1 | Retrieve the nine new bonuses.... |
+| `calculate_bonus_value` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `calculate_score` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `db_stats` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `display_aggregate_metrics` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `extrapolate_metrics` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `format_stats` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `math_operation` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `output_perceived_value_logic` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `range_operation` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `summarize_bonus_processing` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `track_bonuses` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `update_metrics` | **7.0** | 1 | Deep-extracted from historical logs. |
 | `semantic_representation` | 3 | 7.0 | Generate a high-dimensional semantic representation (comma-separated floats) for a given text input.... |
 | `extrapolate` | 2 | 7.0 | A CLIDE command to automatically extrapolate additional metrics from available data.... |
 | `add_metrics_snippet` | 2 | 7.0 | Add a metrics snippet, right-aligned, after each site update.... |
@@ -295,8 +445,12 @@
 ---
 
 ## 💠 Social Automation
-| Command | Recurrence | Imp | Cluster/Description |
-| :--- | :--- | :--- | :--- |
+| Command | Imp | Recurrence | Context Snippet |
+| :| :--- | :| :--- |
+| `publish_moltbook_series` | **7.0** | 1 | ... |
+| `post_series` | **7.0** | 1 | ... |
+| `schedule_no_post` | **7.0** | 1 | ... |
+| `backup_scheduled_posts` | **7.0** | 1 | ... |
 | `post` | 6 | 6.7 | Schedule and execute the posting of content at a specified time, considering the provided GMT offset. The arguments shou... |
 | `extract_facebook_data` | 4 | 5.2 | Implement a tool to interact with Facebook groups. Functionality might include: searching groups, joining groups, postin... |
 | `social_growth` | 3 | 7.0 | Create a command to guide users on how to grow a social media presence and engage a large group of external agents. Focu... |
@@ -314,8 +468,14 @@
 # 📊 Data Operations
 
 ## 💠 Clustering & Cleaning
-| Command | Recurrence | Imp | Cluster/Description |
-| :--- | :--- | :--- | :--- |
+| Command | Imp | Recurrence | Context Snippet |
+| :| :--- | :| :--- |
+| `apply_filter` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `cluster_logs` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `filter` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `format_and_filter_data` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `remove_clusters` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `tweak_filter` | **7.0** | 1 | Deep-extracted from historical logs. |
 | `batch` | 3 | 7.0 | Implement a 'batch' command that allows users to run a specified command in batches of a given size.... |
 | `expose_filter_variables` | 2 | 7.0 | Implement a feature that allows users to access and modify filter variables through text input fields.... |
 | `cluster_removal` | 2 | 7.0 | Implement a command to remove clusters. This should include functionality to identify, validate, and safely remove speci... |
@@ -334,8 +494,17 @@
 ---
 
 ## 💠 Storage & Persistence
-| Command | Recurrence | Imp | Cluster/Description |
-| :--- | :--- | :--- | :--- |
+| Command | Imp | Recurrence | Context Snippet |
+| :| :--- | :| :--- |
+| `export_db` | **8.0** | 1 | Implement a command called `export_db` to perform a full database export.... |
+| `feature_feedback` | **7.0** | 1 | Capture feature feedback: User reports a decent theme but notes a loss of features.... |
+| `export_codes` | **7.0** | 1 | Implement a command `export_codes` that exports codes, short descriptions, and verbose explanations ... |
+| `save_table_to_md` | **7.0** | 1 | ... |
+| `save_tables_to_md` | **7.0** | 1 | ... |
+| `save_csv_to_db` | **7.0** | 1 | ... |
+| `enhance_categorization_and_db` | **7.0** | 2 | ... |
+| `save_all` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `enhance_categorization_and_persistence` | **7.0** | 1 | Deep-extracted from historical logs. |
 | `archive` | 5 | 6.4 | Create a command that generates two Python files: one to compress specified file types (e.g., .py, .html, .ini, .txt) in... |
 | `export_to_db` | 3 | 7.0 | Create a new command called `export_to_db` that saves CSV exports to a database.... |
 | `save_sites` | 2 | 7.0 | Save a list of currently working websites.... |
@@ -350,10 +519,18 @@
 ---
 
 ## 💠 Transformation
-| Command | Recurrence | Imp | Cluster/Description |
-| :--- | :--- | :--- | :--- |
+| Command | Imp | Recurrence | Context Snippet |
+| :| :--- | :| :--- |
+| `format_manual` | **7.0** | 1 | Improve the formatting of the manual and add colors to enhance readability and clarity.... |
+| `format_rma_table` | **4.5** | 2 | Remove percentage symbols and spaces between RMA columns in a table.... |
+| `format_text` | **4.0** | 2 | Implement a function/command that removes all spaces from a string except those immediately followin... |
+| `format_alphanumeric` | **3.0** | 1 | Create a command `format_alphanumeric` that inserts a specified separator between the numeric and al... |
+| `format_filesystem` | **3.0** | 1 | Implement a command 'format_filesystem' that renders a given filesystem structure as a card-based la... |
+| `format_files` | **7.0** | 1 | ... |
+| `reformat_data` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `reformat_text` | **7.0** | 1 | Deep-extracted from historical logs. |
 | `format_logs` | 16 | 6.6 | Create a new command to scrape public posts from Facebook groups to identify specific keywords or patterns.  The command... |
-| `parse_status` | 10 | 6.8 | Implement a 'check_folder' command that allows inspection of a given folder. This command should accept a folder path as... |
+| `parse_status` | 11 | 6.8 | Implement a 'check_folder' command that allows inspection of a given folder. This command should accept a folder path as... |
 | `text_process` | 2 | 3.5 | A command to remove all vertical separators (e.g., '\|') in a string, keeping only the first occurrence. The command sho... |
 | `find_tmp_csv` | 2 | 7.0 | Find all temporary CSV files (files ending with .csv in /tmp or other designated temp directories) and output the result... |
 | `reformat_table` | 2 | 7.0 | Restructure table to remove 'status' column and place 'category' column as a separate row before other columns.... |
@@ -373,8 +550,16 @@
 # 🎨 UI/UX & Visualization
 
 ## 💠 Data Viz & Rendering
-| Command | Recurrence | Imp | Cluster/Description |
-| :--- | :--- | :--- | :--- |
+| Command | Imp | Recurrence | Context Snippet |
+| :| :--- | :| :--- |
+| `data_visualization` | **8.0** | 1 | Create a data visualization tool that allows users to format data with specific color schemes, inclu... |
+| `remove_visual_component` | **7.0** | 1 | Remove the 'blocks bar' visualization from the last 7 days revenue report.... |
+| `adjust_visuals` | **7.0** | 1 | Adjust the lightness/intensity of elements named 'G' and 'B' to reduce their prominence.... |
+| `image_analysis` | **5.0** | 2 | Analyze the image file 'newss.png'.... |
+| `adjust_visualization` | **7.0** | 1 | ... |
+| `visualize_data` | **7.0** | 2 | Deep-extracted from historical logs. |
+| `visual_table_customization` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `visualize_blocks` | **7.0** | 1 | Deep-extracted from historical logs. |
 | `graph` | 4 | 6.5 | Implement a 'graph' command that reintegrates interactive bundler graphs similar to a previous implementation (th3 scree... |
 | `screenshot` | 3 | 5.7 | Implement a screenshot tool capable of capturing, viewing, and saving screenshots.... |
 | `visualize_fioe` | 2 | 7.0 | Visualize file input/output event (fioe) data, displaying file line counts and historical variations in a graph format.... |
@@ -395,8 +580,26 @@
 ---
 
 ## 💠 Interface Layout
-| Command | Recurrence | Imp | Cluster/Description |
-| :--- | :--- | :--- | :--- |
+| Command | Imp | Recurrence | Context Snippet |
+| :| :--- | :| :--- |
+| `gui_to_tui` | **7.5** | 2 | Request to create a tool to automate or assist the transition from a GUI-based application to a TUI-... |
+| `data_requirements` | **7.0** | 2 | The user provided a list of numbered data requirements. These requirements need to be parsed and str... |
+| `tui_management` | **7.0** | 1 | First, confirm the current TUI is fully operational. Then, add the prompt library.... |
+| `gui_enhancements` | **7.0** | 1 | Report: Unbundling extracted 0 files after bundling successfully, but displays the location. Request... |
+| `adjust_ui` | **7.0** | 1 | The application should use 'steps' instead of 'stops'. There should be three separate tabs in distri... |
+| `ui_review` | **7.0** | 4 | Analyze the UI/UX design in 'launch.png' from the perspective of a professional UI/UX designer worki... |
+| `customize_tui` | **7.0** | 1 | The TUI gold clashes, needs to be configurable. The red is good but could be slightly darker, needs ... |
+| `sync_tui_console_output` | **7.0** | 1 | Create a command that ensures the TUI displays all data that is present in the console output.... |
+| `handle_requirements_and_tooling` | **7.0** | 1 | ... |
+| `road_resize_fullscreen` | **7.0** | 1 | ... |
+| `enhance_sliders` | **7.0** | 1 | ... |
+| `arrange_panels` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `grid_data_process` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `improve_tui` | **7.0** | 2 | Deep-extracted from historical logs. |
+| `layout` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `sync_tui_output` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `tui_display` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `tweak_ui` | **7.0** | 1 | Deep-extracted from historical logs. |
 | `slider` | 6 | 6.7 | Arrange the three sliders so that each slider is displayed on its own row.... |
 | `resize` | 4 | 7.0 | Create a command to resize an element to a specified width (percentage or pixel value).... |
 | `modal` | 4 | 7.0 | Create a command to generate or manage modal dialogs.... |
@@ -415,8 +618,18 @@
 ---
 
 ## 💠 Visual Semantics
-| Command | Recurrence | Imp | Cluster/Description |
-| :--- | :--- | :--- | :--- |
+| Command | Imp | Recurrence | Context Snippet |
+| :| :--- | :| :--- |
+| `expand_icons` | **3.0** | 1 | Implement a command to expand and detail icon sections, potentially revealing more information or op... |
+| `add_emoji_state` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `animate_shape_colors` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `color_code_emoji` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `color_code_range` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `emoji_color_sort` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `emoji_permissions` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `emoji_perms_md` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `engineer_color_transition` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `verbose_emoji` | **7.0** | 1 | Deep-extracted from historical logs. |
 | `emoji_replace` | 4 | 4.0 | Format emojis in a given text such that they are vertically aligned, adding spaces or leading zeros as padding. Ensure n... |
 | `configure_color_palette` | 3 | 7.0 | 1. Reset elements to their logical initial functionality. 2. Dynamically adjust element values to 2, 3, 4, etc., as need... |
 | `bootstrap_symbols` | 2 | 5.5 | Create a command 'bootstrap_symbols' that generates letter-based symbols (e.g., C, DFD, S) using Bootstrap or similar te... |
@@ -439,88 +652,56 @@
 
 ---
 
-# 🌐 Remaining Unsorted Commands
+# 🌐 General/Misc
 *Ordered by Avg Importance (Descending)*
 
 | Command | Imp | Recurrence | Context Snippet |
-| :--- | :--- | :--- | :--- |
+| :| :--- | :| :--- |
 | `site_run_lifetime` | **8.0** | 1 | Implement a command to configure the site's run lifetime with options for 4-week and 12-week lifecyc... |
 | `api_request` | **8.0** | 2 | Generate minimal code to perform a GET request to an API. The process should include: 1) Extracting ... |
-| `explain_relational_map` | **8.0** | 1 | Explain the contents of a relational map file in exhaustive detail, tailored to both beginner and ad... |
 | `data_pipeline` | **8.0** | 1 | Execute grid script; fill blanks up to 500; perform file size check on the first 500 entries; genera... |
 | `find_file_location` | **8.0** | 1 | Find the location of file 'bonuses.csv'... |
 | `set_default_credentials` | **8.0** | 2 | Set default username and password for the 'dash' user to 'admin' and 'password' respectively.... |
-| `monitor_chat_logs` | **8.0** | 1 | Implement a system to monitor Gemini chat logs, identify task requests, and categorize them as mappi... |
 | `integrate_swarm` | **8.0** | 1 | Investigate the contents of 'swarm/new', specifically the agent/skill structure (e.g., 'swarm/new/ag... |
 | `prevent_corruption` | **8.0** | 2 | Implement a mechanism to prevent database corruption in future similar circumstances, avoiding the n... |
-| `data_visualization` | **8.0** | 1 | Create a data visualization tool that allows users to format data with specific color schemes, inclu... |
 | `tools` | **8.0** | 1 | Implement a command `/tools` that lists all available commands with their descriptions.... |
-| `export_db` | **8.0** | 1 | Implement a command called `export_db` to perform a full database export.... |
-| `deploy` | **8.0** | 1 | Deploy changes by pushing to git and updating the initialization dashboard with new configuration se... |
 | `categorize_and_persist` | **8.0** | 1 | Implement functionality to categorize information into a broader range of categories and persist dat... |
 | `search_vector_embeddings` | **8.0** | 1 | Search the database of ingested data using vector embeddings for the query provided. Consider how to... |
 | `avoid_reprocessing` | **8.0** | 1 | Implement a mechanism to prevent reprocessing of previously ingested messages during historical data... |
-| `ingest_and_analyze_model_response` | **7.8** | 4 | Ingest model responses, save thoughts as raw text linked to the responses, and analyze the responses... |
-| `automate_rag_agent` | **7.7** | 3 | Analyze and formalize the architecture of agent systems using LLMs, including RAG, tool calling, and... |
-| `analyze_bonus_logs` | **7.5** | 2 | Create a command `analyze_bonus_logs` that takes log data as input and performs the following: 1.  C... |
 | `rename_recursively` | **7.5** | 2 | Create a command named 'rename_recursively' that takes two arguments: the old directory name and the... |
-| `monitor` | **7.5** | 4 | Create a command `monitor` that provides a summary of site success/failure/attempt totals for the cu... |
 | `data_processing` | **7.5** | 2 | Implement a command that fills data incrementally in batches, converts ratios, and generates bar cha... |
 | `track` | **7.5** | 2 | Create a new 'track' command that saves manual verification steps. This command should create URLs f... |
-| `file_management_integration` | **7.5** | 2 | Recursively read all files in all directories, update or archive any outdated files, and then procee... |
-| `analyze_commands` | **7.5** | 2 | Generate a comprehensive analytical review of the available commands and their corresponding command... |
 | `merge` | **7.5** | 2 | Merge code changes.... |
-| `gui_to_tui` | **7.5** | 2 | Request to create a tool to automate or assist the transition from a GUI-based application to a TUI-... |
 | `release` | **7.4** | 5 | Finish specified phase quickly and efficiently.... |
 | `expand_ideas` | **7.3** | 3 | Expand ideas from a provided list. Save expanded ideas (paragraphs and questions) to the sp.db datab... |
 | `diff` | **7.3** | 3 | diff between version 3.01 and 3.10... |
 | `migrate_data` | **7.3** | 3 | Migrate data from the flat-file prototype (db.py) to the new SQLAlchemy-based schema.... |
 | `improve_bundle` | **7.3** | 3 | Create a command `improve_bundle` that takes a python file `bundle.py` as input and enhances it with... |
 | `get_token` | **7.3** | 3 | User requests the retrieval of their authentication token.  A new command 'get_token' is needed to f... |
-| `explain` | **7.2** | 12 | Explain the functionality of Marshmallow.... |
-| `analyze_bonuses` | **7.2** | 15 | Connect the scraper log and prepopulate data from bonuses.db... |
 | `memory` | **7.2** | 4 | Create a command `describe_layers` to analyze the system architecture and provide a description of e... |
-| `recursive_critique` | **7.0** | 3 | Execute current task, critique the result, and design the subsequent prompt. This could be a meta-le... |
 | `find_free_proxies` | **7.0** | 1 | Implement a tool to find and validate free proxies for use in asynchronous tasks to avoid IP bans.... |
 | `resource_allocation` | **7.0** | 2 | Allocate available proxies to a specified number of workers.... |
 | `manual_cooko3` | **7.0** | 1 | Develop a manual cooko3 method that can be executed using only a phone and either Kiwi browser or in... |
 | `tail_log` | **7.0** | 1 | Create a command `tail_log` that takes a filename as an argument and executes `tail -f <filename>` i... |
-| `extract_code` | **7.0** | 8 | Extract all perceived value logic with comments from pv.me and output it.... |
-| `feature_feedback` | **7.0** | 1 | Capture feature feedback: User reports a decent theme but notes a loss of features.... |
 | `add_logging` | **7.0** | 2 | Review existing code and add logging statements to improve debuggability and monitoring capabilities... |
 | `display_troops` | **7.0** | 3 | Extract and display information about 'troops' (sites/servers). Display fields: credentials, usernam... |
-| `analyze_site_data` | **7.0** | 1 | Input: 1 ╭─── SITE #160: audgo.net    2 │ credentials primary  \| bonuses  0 \| gt0v  0 \| EV: $  0.... |
-| `remove_visual_component` | **7.0** | 1 | Remove the 'blocks bar' visualization from the last 7 days revenue report.... |
 | `tapi_integrate` | **7.0** | 2 | Integrate the termux-api, update its functionality, implement live status and progress notifications... |
 | `list_dir` | **7.0** | 2 | List the files in a specified directory.... |
-| `analyze_query_performance` | **7.0** | 1 | Analyze query performance to determine why a filter was applied to the entire database instead of a ... |
-| `unify_links` | **7.0** | 2 | Create a new command, `unify_links`, that consolidates 'up links' and 'up list links', removing any ... |
-| `resolve_short_links` | **7.0** | 2 | Implement a command that uses an API to resolve shortened URLs.... |
 | `shortio` | **7.0** | 2 | API Key: sk_co620RsNQrsrrfUW. Task: Check short.io API reference to potentially implement a url shor... |
 | `search_plugins` | **7.0** | 1 | Search available plugins, potentially filtered by type (e.g., 'textual').... |
-| `count_unique_urls` | **7.0** | 1 | Implement a function that counts unique URLs, treating URLs with and without the '/RFetc' suffix as ... |
 | `final_pass` | **7.0** | 1 | final_pass: Executes a concluding check, review, or quality assurance process to validate and polish... |
 | `schema` | **7.0** | 2 | Check if further schema expansions are possible.... |
 | `list_features` | **7.0** | 1 | Create a command to exhaustively list all features and capabilities of the system.... |
-| `randomize_url` | **7.0** | 2 | Implement URL randomization on session start to enhance security.... |
 | `file_info` | **7.0** | 1 | Provide descriptions and relevant information about the '.st' and 'raw' file types.... |
-| `compare_versions` | **7.0** | 1 | Compare and contrast the versions 'b321' and 'b3b2b1'. Consider semantic versioning if applicable. I... |
 | `unex` | **7.0** | 1 | Analyze line 62 for unexpected indentation errors.... |
 | `combine_and_map` | **7.0** | 1 | Combine specified files, removing redundant information, and generate conceptual and ontological map... |
 | `populate_properties` | **7.0** | 1 | Implement a command to automatically populate properties of an object or data structure based on pre... |
 | `expand_properties` | **7.0** | 1 | Perform another property expansion pass.... |
-| `format_and_track_bonuses` | **7.0** | 1 | Format input data to resemble '🟥001•00%•000\|000•FAIL⛔ v96au.com 🟨002•50%•045\|045•DONE✅ iau9.com' a... |
 | `renumber` | **7.0** | 2 | Renumber a sequence of items, ensuring that subsequent batches are not processed until answers have ... |
-| `data_requirements` | **7.0** | 2 | The user provided a list of numbered data requirements. These requirements need to be parsed and str... |
-| `analyze_website` | **7.0** | 2 | Analyze website speedau.live for 301 errors and other potential issues. Focus on identifying the cau... |
-| `install_and_setup` | **7.0** | 1 | Install and setup Ralph... |
 | `base_ralph` | **7.0** | 1 | Code is located in the 'base_ralph' codebase.... |
 | `integrate` | **7.0** | 5 | Integrate pre-existing code/features that were not implemented using the `dev` command.... |
 | `username_tracking` | **7.0** | 2 | Implement a feature to track usernames used for each site. Before purging or pruning a site, ensure ... |
 | `dictionary` | **7.0** | 1 | Create a 'dictionary' command to manage data structure dictionaries and glossaries of terms.... |
-| `social_media_search` | **7.0** | 2 | A command to search and potentially analyze Facebook groups, pages, and community chats.... |
-| `analyze_unibet_logs` | **7.0** | 1 | Define a command `analyze_unibet_logs` that parses Unibet logs. The command should have two output m... |
-| `analyze_run_stats` | **7.0** | 1 | The user has specified a data representation format to be analyzed that follows this structure: Colo... |
 | `update_reference` | **7.0** | 1 | Implement a command to update value references to include new iconography.... |
 | `relocate` | **7.0** | 1 | Relocate files after a specific point (e.g., after the first 50) into a new subdirectory.  This effe... |
 | `process_data` | **7.0** | 1 | Define a function/tool `process_data` that takes initial value, increment value, total target value,... |
@@ -536,55 +717,38 @@
 | `do` | **7.0** | 1 | Create a command 'do' that executes a series of tasks based on a specified numerical range. The comm... |
 | `complete` | **7.0** | 2 | complete 5.1 to 5.50... |
 | `navigate` | **7.0** | 1 | Navigate to the specified file path.... |
-| `automate` | **7.0** | 1 | Automate steps 8.31 through 8.40, focusing on 'Tooling & Automation (The Help)'. This includes: Cale... |
 | `confirm` | **7.0** | 1 | confirm task 10 is not complete... |
 | `conceptualize` | **7.0** | 1 | Provide a high-level, conceptual description of the program's functionality for the purpose of indep... |
-| `version_control` | **7.0** | 1 | Define a command to handle common version control operations, starting with 'pull' and 'fork'. Consi... |
 | `alternate_usernames` | **7.0** | 2 | Explain how alternate usernames are handled and provide an exhaustive list of all alternate username... |
-| `explain_error_codes` | **7.0** | 2 | Explain the logic behind the system and provide a list of all error codes at all 3 verbosity levels,... |
 | `handle_usernames` | **7.0** | 2 | Explain alternate username handling methods.  This should cover different strategies, pros and cons,... |
 | `interact_rotate` | **7.0** | 1 | Integrate buttons for interactive control of cube rotation direction.... |
 | `animate` | **7.0** | 1 | Create an animation tool capable of simulating movement through different terrains, including mud.... |
-| `generation` | **7.0** | 1 | Increase generation complexity. Make it intuitive and configurable.... |
 | `example` | **7.0** | 2 | Create a command called 'example' that generates examples and provides explanations for a given topi... |
 | `combine_files` | **7.0** | 2 | Create a command to combine multiple files into a single file. Each input file should become a new c... |
 | `proxy` | **7.0** | 2 | Create 10 proxies.... |
-| `analyze_bonus` | **7.0** | 2 | Analyze a string containing bonus data, identified by emojis and delimiters, and determine the value... |
 | `transfer_usb` | **7.0** | 1 | Create a command to transfer a specified file/data to a designated USB-accessible location.... |
-| `clean_and_compile` | **7.0** | 2 | remove superseded files; attempt tk combase related utilities build... |
 | `edit` | **7.0** | 2 | Edit `bundle.py` to ignore files specified in `.gitignore`.... |
 | `header` | **7.0** | 1 | Create a command to insert a formatted header (e.g., numbered) into a document.... |
 | `code_update` | **7.0** | 1 | Update git repository: 1. Push changes to git. 2. Update the placeholder image with the new screensh... |
 | `control_threads` | **7.0** | 1 | Ensure the number of threads used by the system does not exceed the number of available proxy sessio... |
-| `analyze_logs` | **7.0** | 2 | analyze_logs... |
 | `username_generator` | **7.0** | 2 | A command to generate usernames based on number patterns, with the following settings: [SETTINGS] mi... |
 | `web_dash` | **7.0** | 3 | Create a command that launches a web dashboard using the pymdash library.... |
 | `silence_logs` | **7.0** | 2 | Create a command `silence_logs` to suppress INFO level messages from console output.... |
-| `rename_and_version` | **7.0** | 1 | Rename the project from 'polymath' to 'bndl', update the version to '0.0.9', and set the next update... |
 | `unbundle` | **7.0** | 1 | Implement a new CLI command 'unbundle' with the syntax '-u [bundle.md]' to remove the need for speci... |
 | `bundle_manager` | **7.0** | 1 | Develop a command-line tool with a TUI (Text User Interface) to manage software or data bundles. Fun... |
 | `mobile` | **7.0** | 1 | Implement mobile compatibility for the system.... |
-| `tui_integration` | **7.0** | 1 | Integrate the legacy CLI with the TUI, incorporating charts and random solution logic.... |
 | `navigation_improvement` | **7.0** | 1 | Implement '..' as a directory entry in the directory listing to navigate to the parent directory.... |
-| `extract_usernames` | **7.0** | 4 | Extract usernames from the /settings page of 194 registered sites. Login to each site, navigate to /... |
 | `rerun_unknown` | **7.0** | 2 | Rerun processing on previously identified 'unknown' entries from a prior analysis.... |
-| `tui_management` | **7.0** | 1 | First, confirm the current TUI is fully operational. Then, add the prompt library.... |
-| `gui_enhancements` | **7.0** | 1 | Report: Unbundling extracted 0 files after bundling successfully, but displays the location. Request... |
-| `extract_and_join` | **7.0** | 2 | Navigate to {settings_url}, extract {username_selector} as username, construct {join_url_prefix}{use... |
-| `extract_css_selector` | **7.0** | 1 | Given an HTML snippet and a descriptive path, extract the corresponding CSS selector.... |
 | `duplication_manager` | **7.0** | 1 | A tool to manage duplicate files, offering options to handle 'both' (likely meaning both files, or b... |
 | `customize_distribution` | **7.0** | 3 | Implement a command/feature to allow users to customize the variables within distribution logics usi... |
-| `adjust_visuals` | **7.0** | 1 | Adjust the lightness/intensity of elements named 'G' and 'B' to reduce their prominence.... |
-| `adjust_ui` | **7.0** | 1 | The application should use 'steps' instead of 'stops'. There should be three separate tabs in distri... |
 | `feature_request` | **7.0** | 1 | Feature Requests: 1. Fix linear start/end toggles and the third toggle (unspecified). These are not ... |
 | `retrieve_files` | **7.0** | 1 | Retrieve files based on context and/or timestamp. User queries 'DID YOU SAVE THOSE FILES'.... |
 | `pattern_detection` | **7.0** | 3 | Implement a command to detect patterns in the last N messages.... |
 | `weather` | **7.0** | 2 | Create a command 'weather' that fetches the current temperature for a given city. The command should... |
 | `ingest` | **7.0** | 2 | Ingest data in increments of either 10 or 20 batches, updating progress after each batch and then in... |
 | `integrate_and_delete` | **7.0** | 1 | Check for any remaining changes to integrate from 'swarm/new'. If no changes remain, delete the 'new... |
-| `find_file` | **7.0** | 1 | Automate finding a file when the exact location is unknown using partial name matching and potential... |
+| `find_file` | **7.0** | 5 | Automate finding a file when the exact location is unknown using partial name matching and potential... |
 | `translate` | **7.0** | 2 | Set 'Hawaiian' as the default output language for translations performed by the CLI. This should aff... |
-| `ui_review` | **7.0** | 4 | Analyze the UI/UX design in 'launch.png' from the perspective of a professional UI/UX designer worki... |
 | `openclaw_pairing` | **7.0** | 2 | User initiated OpenClaw pairing. Telegram user ID: 8299523699, Pairing code: JKQ9LJ9P. Needs approva... |
 | `sort` | **7.0** | 1 | Sort a sequence of numbers in ascending order.... |
 | `populate_pages` | **7.0** | 1 | Expand or populate existing pages with relevant information. The system should analyze the current p... |
@@ -592,34 +756,22 @@
 | `display_logs` | **7.0** | 2 | Create a command `display_logs` to output full logging data to the console.... |
 | `modify_run_lifetime` | **7.0** | 1 | Modify site run lifetime to 4 weeks and 12 weeks.... |
 | `directory` | **7.0** | 1 | Functionality to display the contents of a specified directory. Can be extended to include options f... |
-| `url_processor` | **7.0** | 1 | Process URL files to extract and separate raw and short links into distinct files named 'raw' and 's... |
-| `customize_tui` | **7.0** | 1 | The TUI gold clashes, needs to be configurable. The red is good but could be slightly darker, needs ... |
-| `url_analysis` | **7.0** | 1 | Create a command called `url_analysis` that takes a list of file paths as input (e.g., `url_analysis... |
-| `extract_unique_urls` | **7.0** | 1 | Extract unique URLs from the urls.txt files found within the specified directories.... |
 | `track_file_size` | **7.0** | 1 | Implement a command/feature to track file sizes.... |
 | `parameter_tuning` | **7.0** | 1 | Implement a command to define minimum and maximum percentage parameters for relevant CLIDE functions... |
-| `export_codes` | **7.0** | 1 | Implement a command `export_codes` that exports codes, short descriptions, and verbose explanations ... |
-| `sync_tui_console_output` | **7.0** | 1 | Create a command that ensures the TUI displays all data that is present in the console output.... |
 | `find_lists` | **7.0** | 1 | Implement a command to find lists of sites posted by people. The command should take search terms as... |
-| `example_generation` | **7.0** | 1 | Generate examples with at least 4 specified metrics and 10 lines of output per example.... |
 | `data_consistency_fix` | **7.0** | 1 | Create a tool to reprocess data, ensuring consistent formatting with leading zeros to align values v... |
 | `synchronize` | **7.0** | 1 | Implement a 'synchronize' command that synchronizes data and provides a visual option to represent t... |
-| `format_manual` | **7.0** | 1 | Improve the formatting of the manual and add colors to enhance readability and clarity.... |
 | `data_enrich` | **7.0** | 1 | Create a new tool, 'data_enrich', that processes structured data strings. The tool should: 1. Retain... |
 | `remove_password` | **7.0** | 1 | Implement a function/command to remove password requirements for access, potentially replacing it wi... |
 | `append_to_sites` | **7.0** | 1 | Implement a command to append content to multiple specified websites.... |
 | `dashboard` | **7.0** | 1 | Improve formatting of legend and incorporate into an expanded initialization dashboard.... |
 | `section` | **7.0** | 1 | Process document sections 9.1 to 9.50... |
-| `extract_data` | **7.0** | 2 | Create a command 'extract_data' to generate a Python script for extracting data from a file based on... |
 | `rewind` | **7.0** | 1 | Implement a 'rewind' command to revert the system to a previous state. The exact behavior should be ... |
 | `reorder` | **7.0** | 1 | Reorder a list of items based on a given sequence. Input: string of numbers separated by 'then'. Out... |
 | `step_diff` | **7.0** | 1 | A new command called 'step_diff' should be implemented. It should take an input (e.g., a process, fi... |
 | `date_range_query` | **7.0** | 1 | Implement a command that allows querying data within a specified date range, starting from a given d... |
 | `send_text` | **6.5** | 2 | Send a text message to a specified contact with a specified message.... |
 | `playlist_next` | **6.5** | 14 | Create a command `build_status` to check the progress and potentially diagnose issues with a binary ... |
-| `unique_urls` | **6.4** | 8 | Extract and list unique URLs from a given input (e.g., text, file, webpage).... |
-| `rerun_on_links` | **6.3** | 3 | A new command to initiate a pre-defined process or workflow.... |
-| `describe` | **6.3** | 3 | Provide a detailed description of the specified entity.... |
 | `search` | **6.3** | 3 | search for sctusl links... |
 | `process_section` | **6.3** | 3 | process_section 8.1 8.50... |
 | `init_commands` | **6.3** | 9 | Create a 'docs' directory, a 'pdb' directory within 'docs', and a 'proto_dev_brainstorm_index' file ... |
@@ -627,7 +779,6 @@
 | `rename_fields` | **6.1** | 9 | Implement a '--help' and '-h' option for all commands to display usage instructions.... |
 | `provide_code` | **6.0** | 4 | User offers to provide code.... |
 | `rename_header` | **6.0** | 1 | Rename 'successess' header to 'status'... |
-| `locate` | **6.0** | 4 | Implement a 'locate' command that searches for a file, resource, or piece of information based on us... |
 | `pattern` | **6.0** | 2 | Implement a command `pattern` that allows users to define and use custom patterns for various operat... |
 | `add_column` | **6.0** | 2 | Add a justification column to all cards.... |
 | `size_analysis` | **6.0** | 1 | Analyze or query data for items within a specified size range (e.g., 300-450).... |
@@ -639,34 +790,28 @@
 | `split_and_move` | **6.0** | 2 | Split the ingestion report into 200kb chunks and move the chunks, new commands, and system roles to ... |
 | `demo` | **5.9** | 8 | Implement a command to manage URLs, focusing on URL pruning/recovery strategies enhanced by active U... |
 | `compress` | **5.8** | 5 | compress [source] [destination] [algorithm]... |
-| `combine` | **5.6** | 5 | Create a command 'batch_process' that accepts a .ini file for user and password, a URLs file ('urls.... |
+| `combine` | **5.6** | 6 | Create a command 'batch_process' that accepts a .ini file for user and password, a URLs file ('urls.... |
 | `integrate_console_display` | **5.5** | 2 | ```python import re from typing import Dict, Any from bisect import bisect_right from rich.console i... |
 | `sequence_input` | **5.5** | 2 | Implement a sequential input mechanism where, if no flags are specified, the user is prompted to fil... |
 | `update_legend` | **5.5** | 2 | The user is requesting a functionality to update a legend (presumably for a CLI tool or similar) bas... |
-| `delimiter` | **5.0** | 2 | Add a command to draw separators. The command should accept parameters for the placement of the sepa... |
+| `delimiter` | **5.0** | 3 | Add a command to draw separators. The command should accept parameters for the placement of the sepa... |
 | `estimate_logging_effort` | **5.0** | 2 | Analyze the provided `ERROR_DEFINITIONS` dictionary and estimate the number of lines of code require... |
 | `optimize_kb` | **5.0** | 1 | Optimize files to a target size of approximately 5kb each, aiming for a range of 4.5kb to 5.5kb, acr... |
 | `finish_sequence` | **5.0** | 2 | Complete the given sequences: Sequence 1: 🟥🟥🟥 🟥🟥🔴 🟥🟥♥️  🟥🔴🟥 🟥🔴🔴 🟥🔴♥️  🟥♥️🟥 🟥♥️🔴 🟥♥️♥️ ♥️🟥🟥 ♥️🟥🔴 ♥️🟥♥... |
 | `simulate_cartesian` | **5.0** | 1 | Simulate Cartesian triplets of a given dataset.... |
-| `bonus_info` | **5.0** | 1 | Retrieve and display information about the 9 latest bonuses.... |
 | `incorporate_dashboard` | **5.0** | 2 | Incorporate the data structure and visualization elements present in the following dashboard represe... |
-| `image_analysis` | **5.0** | 2 | Analyze the image file 'newss.png'.... |
 | `legend_key` | **5.0** | 1 | Interpret and generate a key/legend for a given input string of symbols and values.... |
 | `mcp` | **5.0** | 2 | /mcp... |
 | `incorporate` | **5.0** | 1 | Incorporate features already in the program but not in the Dev folder.... |
-| `bonuses` | **5.0** | 1 | Retrieve the nine new bonuses.... |
 | `index_map` | **4.5** | 2 | Define "index map".... |
 | `phase_analysis` | **4.5** | 2 | Analyze the number of phases in a subject matter. Determine the ideal relative length of phases, giv... |
-| `format_rma_table` | **4.5** | 2 | Remove percentage symbols and spaces between RMA columns in a table.... |
 | `verbose` | **4.3** | 3 | Implement a CLI option (e.g., -v or --verbose) to control the level of output. With the flag, displa... |
 | `example_failure` | **4.0** | 1 | Request for a command to provide visually distinct failure log examples, formatted similarly to exis... |
 | `reverse_log_bars_direction` | **4.0** | 2 | Implement a function or modify an existing function called 'log_bars' to allow reversing the directi... |
-| `format_text` | **4.0** | 2 | Implement a function/command that removes all spaces from a string except those immediately followin... |
 | `add_to_page` | **4.0** | 1 | Add content to existing pages within the current project/documentation context.... |
 | `join_lines` | **4.0** | 1 | Create a tool to join lines of text. This tool should take input text and output a single line (or a... |
 | `remove_arguments` | **3.5** | 4 | Implement a command-line tool to remove specified arguments or clear the argument history for existi... |
 | `default_tail` | **3.0** | 1 | Create a command to set the default number of lines shown by the 'tail' functionality. This could be... |
-| `format_alphanumeric` | **3.0** | 1 | Create a command `format_alphanumeric` that inserts a specified separator between the numeric and al... |
 | `emphasize` | **3.0** | 1 | The user wants a tool/command to adjust the visual emphasis of elements, specifically targeting the ... |
 | `arrange` | **3.0** | 1 | Arrange items based on instructions: stack item '2' vertically and split item '3' horizontally.... |
 | `candidate_multiplier` | **3.0** | 1 | Develop a command or function to multiply the number of candidates generated or considered within a ... |
@@ -681,20 +826,129 @@
 | `recipe` | **3.0** | 1 | elder wood, obsidian eye, iron moss, silent void... |
 | `connect_lines` | **3.0** | 1 | connect_lines: Connects or joins lines based on specified criteria.  This could apply to code, diagr... |
 | `bca` | **3.0** | 1 | bca... |
-| `extract_table` | **3.0** | 1 | Extract the table at the beginning of new commands' descriptions into a new file and convert it to C... |
-| `draw_lines` | **3.0** | 1 | Add a command `draw_lines` to insert horizontal lines between specified sections in a document.  Sup... |
 | `triple` | **3.0** | 1 | Expand the number of candidate solutions, proposals, or options under consideration by a factor of t... |
-| `format_filesystem` | **3.0** | 1 | Implement a command 'format_filesystem' that renders a given filesystem structure as a card-based la... |
 | `increase_time` | **3.0** | 1 | Increase a time duration by a specified amount of hours.... |
-| `expand_icons` | **3.0** | 1 | Implement a command to expand and detail icon sections, potentially revealing more information or op... |
-
+| `init_commands_dir` | **7.0** | 1 | ... |
+| `SRE-ZERO` | **7.0** | 1 | ... |
+| `optimize_ingestor` | **7.0** | 1 | ... |
+| `activate_assets` | **7.0** | 1 | ... |
+| `enhance_clide` | **7.0** | 1 | ... |
+| `sort_data` | **7.0** | 1 | ... |
+| `understand_commands` | **7.0** | 1 | ... |
+| `bug` | **7.0** | 1 | ... |
+| `init` | **7.0** | 1 | ... |
+| `set_vector_preference` | **7.0** | 1 | ... |
+| `brain` | **7.0** | 1 | ... |
+| `understand_and_document` | **7.0** | 2 | ... |
+| `TPM-ZERO` | **7.0** | 1 | ... |
+| `conductor` | **7.0** | 1 | ... |
+| `newTrack` | **7.0** | 1 | ... |
+| `restart` | **7.0** | 1 | ... |
+| `inspect_project` | **7.0** | 1 | ... |
+| `reverse_rma` | **7.0** | 1 | ... |
+| `engineer` | **7.0** | 1 | ... |
+| `evolve_title` | **7.0** | 1 | ... |
+| `introduce_and_random_talk` | **7.0** | 1 | ... |
+| `scale_nodes` | **7.0** | 1 | ... |
+| `personalize` | **7.0** | 1 | ... |
+| `camera_lock` | **7.0** | 1 | ... |
+| `STRATEGIST-ZERO` | **7.0** | 1 | ... |
+| `simulate_gameplay` | **7.0** | 1 | ... |
+| `improve_fact_retrieval` | **7.0** | 1 | ... |
+| `prevent_reprocessing` | **7.0** | 1 | ... |
+| `padding` | **7.0** | 1 | ... |
+| `subdivide_attraction_parameters` | **7.0** | 1 | ... |
+| `add_varieties` | **7.0** | 1 | ... |
+| `cancel` | **7.0** | 1 | ... |
+| `reverse_engineer_docs` | **7.0** | 1 | ... |
+| `agentic_tool_suggestions` | **7.0** | 1 | ... |
+| `pickle_rick_manager` | **7.0** | 1 | ... |
+| `dev_with_clarification` | **7.0** | 1 | ... |
+| `history_ingest_process` | **7.0** | 1 | ... |
+| `pick` | **7.0** | 1 | ... |
+| `pickle` | **7.0** | 1 | ... |
+| `parameter_control` | **7.0** | 1 | ... |
+| `dev` | **7.0** | 1 | ... |
+| `develop_feature` | **7.0** | 1 | ... |
+| `adjust_pattern_detection_scope` | **7.0** | 1 | ... |
+| `column_extension` | **7.0** | 1 | ... |
+| `clide` | **7.0** | 1 | ... |
+| `profile` | **7.0** | 1 | ... |
+| `edit_mode` | **7.0** | 1 | ... |
+| `rename_folder` | **7.0** | 1 | ... |
+| `organize_files` | **7.0** | 1 | ... |
+| `observe` | **7.0** | 1 | ... |
+| `rename_single_letter_variables` | **7.0** | 1 | ... |
+| `add_to_workspace` | **7.0** | 1 | ... |
+| `evolve` | **7.0** | 1 | ... |
+| `process_model_response` | **7.0** | 1 | ... |
+| `toggle_node_movement` | **7.0** | 1 | ... |
+| `brainstorm` | **7.0** | 1 | ... |
+| `progress` | **7.0** | 1 | ... |
+| `update_roles` | **7.0** | 1 | ... |
+| `edit_parameters` | **7.0** | 1 | ... |
+| `optimize` | **7.0** | 1 | ... |
+| `Pickle Rick Agent` | **7.0** | 1 | ... |
+| `implement` | **7.0** | 1 | ... |
+| `N/A` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `UNKNOWN` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `adjust_phase_length` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `answer_options` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `auth` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `compare_size` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `concurrent_threads` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `condense_events` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `condense_logs` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `conductor:implement` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `consolidate_logs` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `control_concurrency` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `deduplicate` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `demo_condensed_logging` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `deobfuscate_abbreviate` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `deobfuscate_and_abbreviate` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `document_project` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `download_json` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `failure_example` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `feature_prioritization` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `finalize` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `find` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `ideas` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `implement_tooling_automation` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `incidents` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `indent` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `interactive` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `manage_features` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `new_track` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `overgrown` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `overhaul` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `priority_engine` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `record_usernames` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `redo` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `reorganize_code` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `rerun` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `reset` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `retry` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `revert` | **7.0** | 2 | Deep-extracted from historical logs. |
+| `review_sessions` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `run_analysis_pass` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `set_default_tail` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `set_site_run_lifetime` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `site_reliability` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `step_control` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `string or null` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `summarize_tracks` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `text` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `time_remaining` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `track_time_per_site` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `track_usernames` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `unex_ind` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `update` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `zen` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `improve_interface` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `locate` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `revert_util_csv` | **7.0** | 1 | Deep-extracted from historical logs. |
+| `revert_util_csv_change` | **7.0** | 1 | Deep-extracted from historical logs. |
+| Primary | Secondary | Score | Recommendation |
 # 👯 Potential Duplicate Merges (High Similarity)
 | Primary | Secondary | Score | Recommendation |
-| :--- | :--- | :--- | :--- |
-| `mockup` | `design` | 0.977 | Merge into `mockup` |
-| `combine` | `batch_process_urls` | 0.952 | Merge into `combine` |
-| `recursive_critique` | `recursive_critique_redesign` | 0.936 | Merge into `recursive_critique` |
-| `check` | `moltbot` | 0.929 | Merge into `check` |
-| `delimiter` | `draw_lines` | 0.928 | Merge into `delimiter` |
-| `deconstruct` | `describe_project` | 0.925 | Merge into `deconstruct` |
-| `parse_status` | `checker` | 0.920 | Merge into `parse_status` |
+| :| :--- | :| :--- |

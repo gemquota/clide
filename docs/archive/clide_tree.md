@@ -77,7 +77,7 @@ docs/
 ├── specs/                    # Detailed technical specifications for new features.
 ├── architectural_synthesis_protocol.md # Guide for mapping code to conceptual pillars.
 ├── brain_graph.mmd           # Mermaid graph representation of the Project Brain.
-├── cli_ref.md                # Comprehensive CLI argument and command reference.
+├── atlas.md                  # Comprehensive ATLAS command reference.
 ├── dashboard.md              # The visual registry of all project assets.
 ├── protocols.md              # Grouped operational protocols (Design/Implementation/Governance).
 ├── README.md                 # Project vision, pillars, and architecture overview.

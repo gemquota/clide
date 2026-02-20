@@ -1,38 +1,54 @@
-# CLIDE // PROBE DOMAIN
+# [ SECTOR 01: SENSORY ] - PROBE
+Targeted extraction and precise ingestion from manual sources, URLs, and clipboard.
 
-## Tier: Basic
-- scout <url>   : Forced web scrape of a specific URL.
-- manual <path> : Targeted extraction from a local file.
-- capture       : Immediate ingest from the system clipboard.
-- crawl         : Scheduled feed ingestion (Git/RSS).
-Usage: ./cli probe {scout, manual, capture, crawl}
+The `probe` domain provides manual and automated ingestion tools for specific targets.
 
-## Tier: More
-- scout <url>   : Forced web scrape of a specific URL.
-- manual <path> : Targeted extraction from a local file.
-- capture       : Immediate ingest from the system clipboard.
-- crawl         : Scheduled feed ingestion (Git/RSS).
-Usage: ./cli probe {scout, manual, capture, crawl}
+<card>
+title: ⦗ PROBE OVERVIEW ⦘
+Capabilities: Web, File, Clipboard
+Methods: LLM Synthesis, Regex
+Targeting: Selective
+Status: OPERATIONAL
+</card>
 
-TECHNICAL ARCHITECTURE:
-Unlike the passive Watch domain, Probe initiates connections to pull data.
-- Scout uses 'requests' and 'beautifulsoup4' for DOM parsing.
-- Manual uses custom buffer reading to handle large legacy documentation files.
-- Clipboard ingestion leverages 'termux-clipboard-get' on Android.
-Primary Directory: clide/probe/
+### Commands
+*   **scout**: Analyzes a single URL using LLM synthesis for deep extraction.
+*   **ingest**: Ingests a local file or directory buffer.
+*   **capture**: Ingests content directly from the system clipboard.
+*   **crawl**: Recursively ingests a site up to a specified depth.
 
-## Tier: Full
-- scout <url>   : Forced web scrape of a specific URL.
-- manual <path> : Targeted extraction from a local file.
-- capture       : Immediate ingest from the system clipboard.
-- crawl         : Scheduled feed ingestion (Git/RSS).
-Usage: ./cli probe {scout, manual, capture, crawl}
+### Technical Specifications
+Probes are high-precision instruments for targeted data gathering.
 
-TECHNICAL ARCHITECTURE:
-Unlike the passive Watch domain, Probe initiates connections to pull data.
-- Scout uses 'requests' and 'beautifulsoup4' for DOM parsing.
-- Manual uses custom buffer reading to handle large legacy documentation files.
-- Clipboard ingestion leverages 'termux-clipboard-get' on Android.
-Primary Directory: clide/probe/
+<card>
+title: ⦗ OPERATIONAL CONTEXT ⦘
+Web: BeautifulSoup4 / Selenium
+File: Multi-buffer Regex
+Clipboard: Termux:API Integration
+</card>
 
-[EXPANSION PENDING]
+### Usage Examples
+1. Scout a target: `./cli probe scout "https://target.url"`
+2. Ingest a document: `./cli probe ingest "data.txt"`
+3. Clipboard sync: `./cli probe capture`
+4. Site crawl: `./cli probe crawl "https://site.com" --depth 2`
+
+### Architecture Internals
+The `probe` sector is modular. Each command utilizes a specific engine (e.g., `scout.py`, `crawl.py`). 
+
+<card>
+title: ⦗ NEURAL-KERNEL HOOKS ⦘
+Web Hook: clide.probe.web_driver
+Ingest Hook: clide.probe.manual.extract
+Capture Hook: clide.probe.manual.extract_from_text
+</card>
+
+### API Hooks
+*   `manual.extract_from_text(content, source)`: Direct text ingestion.
+*   `scout.scout_url(url)`: Full web analysis pipeline.
+
+### Code Reference
+- **Entry Point**: `clide/serve/portal.py` -> `cmd_probe`
+- **Scout**: `clide/probe/scout.py`
+- **Manual**: `clide/probe/manual.py`
+- **Crawl**: `clide/probe/crawl.py`

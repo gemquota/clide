@@ -1,37 +1,11 @@
-# BRAIN FORGET
+# BRAIN // FORGET (DEPRECATED)
+Legacy alias for `memory forget`.
 
-## Tier: Basic
-- Permanently removes a row from 'memory.db'.
-- Automatically cleans up any associated relationships.
-- Use when a fact was incorrectly classified or is no longer true.
-Usage: ./cli brain forget <id>
+<card>
+title: ⦗ REDIRECT NOTICE ⦘
+Status: MOVED
+New Command: ./cli memory forget
+</card>
 
-## Tier: More
-- Permanently removes a row from 'memory.db'.
-- Automatically cleans up any associated relationships.
-- Use when a fact was incorrectly classified or is no longer true.
-Usage: ./cli brain forget <id>
-
-TECHNICAL DEEP-DIVE:
-The 'forget' command performs a cascaded deletion.
-1. Pre-cleanup: Removes all rows in 'relationships' where the ID is source or target.
-2. Deletion: Executes 'DELETE FROM knowledge WHERE id = ?'.
-3. Index Update: Triggers a sync to the 'vector_registry.json' to remove the stale vector.
-4. Logging: Records the deletion event in the system audit log.
-The primary tool for 'Knowledge Pruning' and entropy management.
-
-## Tier: Full
-- Permanently removes a row from 'memory.db'.
-- Automatically cleans up any associated relationships.
-- Use when a fact was incorrectly classified or is no longer true.
-Usage: ./cli brain forget <id>
-
-TECHNICAL DEEP-DIVE:
-The 'forget' command performs a cascaded deletion.
-1. Pre-cleanup: Removes all rows in 'relationships' where the ID is source or target.
-2. Deletion: Executes 'DELETE FROM knowledge WHERE id = ?'.
-3. Index Update: Triggers a sync to the 'vector_registry.json' to remove the stale vector.
-4. Logging: Records the deletion event in the system audit log.
-The primary tool for 'Knowledge Pruning' and entropy management.
-
-[EXPANSION PENDING]
+This command has been moved to the **MEMORY** sector.
+Please use `./cli memory forget` to delete knowledge nodes.

@@ -1,37 +1,27 @@
-# WATCH START
+# WATCH // START
+Initiates the high-frequency background monitoring daemon.
 
-## Tier: Basic
-- Spawns a dedicated process to observe filesystem changes.
-- Initializes the Watchdog Observer on the project's temporary directory.
-- Use 'watch status' to verify the process is alive.
-Usage: ./cli watch start
+Launches the project's background monitor for real-time ingestion.
 
-## Tier: More
-- Spawns a dedicated process to observe filesystem changes.
-- Initializes the Watchdog Observer on the project's temporary directory.
-- Use 'watch status' to verify the process is alive.
-Usage: ./cli watch start
+<card>
+title: ⦗ OPERATION: START ⦘
+Daemon: Watchdog
+State: Initializing...
+Target: /ingestion_logs/
+</card>
 
-TECHNICAL DEEP-DIVE:
-The 'start' command invokes the 'ClideExtractor.run()' method within 'clide/watch/stream.py'.
-1. Environment Setup: Reads GEMINI_TMP_DIR to locate session logs.
-2. Threading: Renders the Watchdog observer into a non-blocking background thread.
-3. Persistence: Updates 'state.json' with the new process start time.
-4. Error Handling: Gracefully exits if the directory is inaccessible or another monitor is already running.
-This is the foundational entry point for passive knowledge acquisition in the SPA.
+### Usage
+`./cli watch start`
 
-## Tier: Full
-- Spawns a dedicated process to observe filesystem changes.
-- Initializes the Watchdog Observer on the project's temporary directory.
-- Use 'watch status' to verify the process is alive.
-Usage: ./cli watch start
+### Technical Details
+Checks for existing PIDs before spawning. If already running, returns status.
 
-TECHNICAL DEEP-DIVE:
-The 'start' command invokes the 'ClideExtractor.run()' method within 'clide/watch/stream.py'.
-1. Environment Setup: Reads GEMINI_TMP_DIR to locate session logs.
-2. Threading: Renders the Watchdog observer into a non-blocking background thread.
-3. Persistence: Updates 'state.json' with the new process start time.
-4. Error Handling: Gracefully exits if the directory is inaccessible or another monitor is already running.
-This is the foundational entry point for passive knowledge acquisition in the SPA.
+<card>
+title: ⦗ START SEQUENCE ⦘
+1. Lock check
+2. Stream init
+3. Enrichment hook bind
+</card>
 
-[EXPANSION PENDING]
+### Code Internals
+Calls `stream.ClideExtractor().run()`. Spawns a background process if not already detached.

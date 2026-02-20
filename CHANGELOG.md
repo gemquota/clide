@@ -6,7 +6,7 @@
 - **Skill Support**: Direct integration with `gemini skills` for local asset installation.
 - **Brain Janitor**: Added `./clide todo clean` to automatically prune outdated or completed tasks from `memory.db` and `todo.md`.
 - **Enhanced UI**: New ASCII banner and informative default output for the CLIDE entry point.
-- **CLI Reference**: Comprehensive `docs/cli_ref.md` detailing all system arguments.
+- **ATLAS**: Comprehensive `docs/atlas.md` detailing all system arguments.
 
 ## [0.6.0] - 2026-02-01
 ### Added

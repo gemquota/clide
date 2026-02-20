@@ -168,7 +168,7 @@ def stop_monitor():
     except Exception as e:
         print(f"Error stopping monitor: {e}")
 
-def tail_logs(follow=False):
+def tail_logs(follow=False, limit=10):
     """Prints the enriched ingestion logs."""
     from rich.console import Console
     from rich.text import Text
@@ -199,7 +199,7 @@ def tail_logs(follow=False):
     with open(log_file, "r") as f:
         try:
             data = json.load(f)
-            for entry in data[-20:]: # Show last 20
+            for entry in data[-limit:]: # Show last N
                 print_log_entry(entry)
         except: pass
 

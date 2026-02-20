@@ -1,63 +1,54 @@
-# CLIDE // INDEX DOMAIN
+# [ SECTOR 02: COGNITIVE ] - INDEX
+Vector lifecycle management, indexing telemetry, and registry optimization.
 
-## Tier: Basic
-DETAILED USAGE
-- './cli index full' is required after upgrading to 768D vectors.
-- './cli index near <id>' helps identify candidates for merging or deduplication.
-- './cli index stat' provides metadata on registry health and storage size.
+The `index` domain manages the health and performance of the vector registry.
 
-## Tier: More
-DETAILED USAGE
-- './cli index full' is required after upgrading to 768D vectors.
-- './cli index near <id>' helps identify candidates for merging or deduplication.
-- './cli index stat' provides metadata on registry health and storage size.
+<card>
+title: INDEX OVERVIEW
+Lifecycle: Rebuild, Cluster, Prune
+Telemetry: Volume, Dimension
+Integrity: Self-Optimizing
+Status: HEALTHY
+</card>
 
-TECHNICAL ARCHITECTURE: INDEX
-====================================
+### Commands
+*   **rebuild**: Performs a total rebuild of the vector registry using latest models.
+*   **cluster**: Identifies knowledge hotspots and topical clusters.
+*   **prune**: Evicts low-importance nodes from the registry.
+*   **optimize**: Deduplicates entries and performs ID hot-swapping.
+*   **stats**: Displays system telemetry and dimensionality metrics.
 
-1. VECTORIZATION (memory.py)
-----------------------------
-Uses 'models/gemini-embedding-001' to create semantic anchors.
-- Dimensionality: Exactly 768 (Full resolution).
-- Normality: Vectors are normalized before Cosine Similarity calculation.
+### Technical Specifications
+Indexing operations are heavy and should be run during maintenance cycles.
 
-2. SEARCH ENGINE
-----------------
-Performs a flat-file scan of 'vector_registry.json' using optimized Python math.
-- Logic: dot_product(v1, v2) / (norm(v1) * norm(v2)).
-- Performance: Registry is kept in JSON for portability but cached in memory during search.
+<card>
+title: OPERATIONAL CONTEXT
+Model: Gemini-001 (Legacy) / text-embedding-004 (Current)
+Clustering: K-Means / DBSCAN
+Importance Threshold: 3 (Pruning)
+</card>
 
-3. OPTIMIZATION (tools/janitor.py)
-----------------------------------
-- Clustering: Identifies semantic 'hotspots' using nearest-neighbor logic.
-- Pruning: Evicts vectors with low confidence or redundant content.
-- Deduplication: Merges overlapping assets created by the Forge.
+### Usage Examples
+1. System Stats: `./cli index stats`
+2. Optimization: `./cli index optimize`
+3. Rebuild (Long): `./cli index rebuild`
 
-## Tier: Full
-DETAILED USAGE
-- './cli index full' is required after upgrading to 768D vectors.
-- './cli index near <id>' helps identify candidates for merging or deduplication.
-- './cli index stat' provides metadata on registry health and storage size.
+### Dependency Notes
+Requires significant CPU/GPU resources for local rebuilds. Gemini API is used for cloud rebuilds.
 
-TECHNICAL ARCHITECTURE: INDEX
-====================================
+### Architecture Internals
+The index lifecycle is managed in `memory.py`. Optimization involves re-syncing the `SQLite` metadata with the `JSON` vector buffers.
 
-1. VECTORIZATION (memory.py)
-----------------------------
-Uses 'models/gemini-embedding-001' to create semantic anchors.
-- Dimensionality: Exactly 768 (Full resolution).
-- Normality: Vectors are normalized before Cosine Similarity calculation.
+<card>
+title: NEURAL-KERNEL HOOKS
+Rebuild Hook: scripts.batch_indexer.run_full_index
+Cluster Hook: clide.brain.memory.cluster_registry
+Optimize Hook: clide.brain.memory.optimize_registry
+</card>
 
-2. SEARCH ENGINE
-----------------
-Performs a flat-file scan of 'vector_registry.json' using optimized Python math.
-- Logic: dot_product(v1, v2) / (norm(v1) * norm(v2)).
-- Performance: Registry is kept in JSON for portability but cached in memory during search.
+### API Hooks
+*   `memory.get_registry_stats()`: Core telemetry source.
+*   `memory.prune_registry(min_importance)`: Registry sanitation.
 
-3. OPTIMIZATION (tools/janitor.py)
-----------------------------------
-- Clustering: Identifies semantic 'hotspots' using nearest-neighbor logic.
-- Pruning: Evicts vectors with low confidence or redundant content.
-- Deduplication: Merges overlapping assets created by the Forge.
-
-[EXPANSION PENDING]
+### Legacy Notes
+`indexstats` was formerly a root-level script. It is now fully integrated into the `index` domain.

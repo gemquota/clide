@@ -6,6 +6,7 @@ import json
 import importlib
 import subprocess
 import threading
+import markdown
 
 PORT = 8080
 DIRECTORY = "viz"
@@ -23,9 +24,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         super().__init__(*args, directory=DIRECTORY, **kwargs)
 
     def do_POST(self):
+        global monitor_process
         # ... existing endpoints ...
         if self.path == '/api/monitor/start':
-            global monitor_process
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
@@ -44,7 +45,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return
 
         if self.path == '/api/monitor/stop':
-            global monitor_process
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
@@ -100,6 +100,71 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return
 
     def do_GET(self):
+        if self.path == '/api/docs/tree':
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            
+            docs_root = os.path.join(os.getcwd(), 'docs', 'cli')
+            tree = {}
+            top_level = []
+            
+            if os.path.exists(os.path.join(os.getcwd(), 'docs', 'atlas.md')):
+                top_level.append({'name': 'ATLAS (Master)', 'path': 'atlas.md', 'type': 'file'})
+            
+            for root, dirs, files in os.walk(docs_root):
+                rel_path = os.path.relpath(root, docs_root)
+                if rel_path == '.':
+                    for f in sorted(files):
+                        if f.endswith('.md'):
+                            top_level.append({'name': f, 'path': os.path.join('cli', f), 'type': 'file'})
+                else:
+                    sector = rel_path.split(os.sep)[0]
+                    if sector not in tree: tree[sector] = []
+                    for f in sorted(files):
+                        if f.endswith('.md'):
+                            full_rel = os.path.join('cli', rel_path, f)
+                            tree[sector].append({'name': f.replace('.md', ''), 'path': full_rel, 'type': 'file'})
+
+            self.wfile.write(json.dumps({'top': top_level, 'sectors': tree}).encode())
+            return
+
+        if self.path.startswith('/api/docs/content'):
+            from urllib.parse import urlparse, parse_qs
+            query = parse_qs(urlparse(self.path).query)
+            file_path = query.get('path', [None])[0]
+            
+            if not file_path:
+                self.send_error(400, "Missing path parameter")
+                return
+                
+            full_path = os.path.join(os.getcwd(), 'docs', file_path)
+            docs_root = os.path.join(os.getcwd(), 'docs')
+            
+            # Security check
+            if not os.path.abspath(full_path).startswith(docs_root):
+                 self.send_error(403, "Access denied")
+                 return
+
+            if not os.path.exists(full_path):
+                self.send_error(404, "File not found")
+                return
+
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            
+            try:
+                with open(full_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                    html = markdown.markdown(content, extensions=['fenced_code', 'tables'])
+                    self.wfile.write(html.encode())
+            except Exception as e:
+                self.wfile.write(f"<h1>Error rendering markdown</h1><p>{str(e)}</p>".encode())
+            return
+
         if self.path == '/api/monitor/status':
             global monitor_process
             self.send_response(200)
@@ -109,60 +174,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             is_running = monitor_process is not None and monitor_process.poll() is None
             self.wfile.write(json.dumps({"running": is_running}).encode())
             return
-
-        if self.path == '/api/status':
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
             
-            try:
-                sys.path.append(os.getcwd())
-                # Use centralized db_manager for status too if possible, 
-                # but state_manager has more project-wide info.
-                state_manager = force_import('swarm.core.state_manager')
-                messages = state_manager.get_messages(limit=20, status=None)
-                messages.reverse() 
-                status_summary = state_manager.get_project_status()
-
-                tracks = []
-                try:
-                    with open('conductor/tracks.md', 'r') as f:
-                        lines = f.readlines()
-                        for line in lines:
-                            if line.startswith('- ['):
-                                status_char = line[3]
-                                track_name = line.split('**Track: ')[1].split('**')[0]
-                                tracks.append({"name": track_name, "status": "done" if status_char == 'x' else "in-progress" if status_char == '~' else "todo"})
-                except: pass
-                
-                response = {
-                    "messages": messages,
-                    "status_summary": status_summary,
-                    "tracks": tracks
-                }
-                self.wfile.write(json.dumps(response).encode())
-            except Exception as e:
-                self.wfile.write(json.dumps({"error": str(e)}).encode())
-            return
-            
-        if self.path == '/api/knowledge':
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
-            try:
-                sys.path.append(os.path.join(os.getcwd(), 'clide'))
-                db_manager = force_import('db_manager')
-                nodes = db_manager.get_knowledge(limit=50)
-                # Convert sqlite rows to list of dicts
-                result = [dict(row) for row in nodes]
-                self.wfile.write(json.dumps(result).encode())
-            except Exception as e:
-                self.wfile.write(json.dumps({"error": str(e)}).encode())
-            return
-
-        # Fallback to original
         return super().do_GET()
 
 def start_server():

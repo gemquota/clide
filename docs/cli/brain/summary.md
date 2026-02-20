@@ -1,37 +1,27 @@
-# BRAIN SUMMARY
+# BRAIN // SUMMARY
+Generates a high-level executive report of the system's current state.
 
-## Tier: Basic
-- Summarizes the last 50-100 ingested knowledge units.
-- Highlights major milestones, pending TODOs, and new technical discoveries.
-- Uses the LLM to synthesize disparate facts into a coherent narrative.
-Usage: ./cli brain summary
+Synthesizes recent activities, facts, and lessons into a coherent Markdown report.
 
-## Tier: More
-- Summarizes the last 50-100 ingested knowledge units.
-- Highlights major milestones, pending TODOs, and new technical discoveries.
-- Uses the LLM to synthesize disparate facts into a coherent narrative.
-Usage: ./cli brain summary
+<card>
+title: ⦗ EXECUTIVE REPORT ⦘
+Source: Last 30 Nodes
+Format: Markdown / Console
+Focus: Accomplishments & TODOs
+</card>
 
-TECHNICAL DEEP-DIVE:
-The 'summary' command is the 'Executive Layer' of project awareness.
-1. Context Gathering: Aggregates the most important (Imp > 7) units from the last 7 days.
-2. Synthesis: Passes the raw knowledge units to 'gemini-2.0-flash' with a 'Project Manager' instruction set.
-3. Categorization: Breaks the summary into 'Accomplishments', 'Roadblock/TODOs', and 'System Changes'.
-4. Export: Saves the resulting text to 'ingestion_logs/theorycrafting_report.md' for persistent tracking.
-This command turns raw logs into actionable project status.
+### Usage
+`./cli brain summary`
 
-## Tier: Full
-- Summarizes the last 50-100 ingested knowledge units.
-- Highlights major milestones, pending TODOs, and new technical discoveries.
-- Uses the LLM to synthesize disparate facts into a coherent narrative.
-Usage: ./cli brain summary
+### Technical Details
+Constructs a prompt with the content of the last 30 knowledge nodes and asks the LLM to summarize key developments.
 
-TECHNICAL DEEP-DIVE:
-The 'summary' command is the 'Executive Layer' of project awareness.
-1. Context Gathering: Aggregates the most important (Imp > 7) units from the last 7 days.
-2. Synthesis: Passes the raw knowledge units to 'gemini-2.0-flash' with a 'Project Manager' instruction set.
-3. Categorization: Breaks the summary into 'Accomplishments', 'Roadblock/TODOs', and 'System Changes'.
-4. Export: Saves the resulting text to 'ingestion_logs/theorycrafting_report.md' for persistent tracking.
-This command turns raw logs into actionable project status.
+<card>
+title: ⦗ SYNTHESIS LOGIC ⦘
+Context: 30 Nodes
+Prompt: Executive Summary Template
+Model: Gemini-1.5-Pro
+</card>
 
-[EXPANSION PENDING]
+### Code Internals
+Calls `atlas.generate_brain_summary()`. Uses `clide.brain.model.call_llm`.

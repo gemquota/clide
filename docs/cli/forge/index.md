@@ -1,77 +1,52 @@
-# CLIDE // FORGE DOMAIN
+# [ SECTOR 04: EXECUTIVE ] - FORGE
+Agentic synthesis and iterative tool development.
 
-## Tier: Basic
-DETAILED USAGE
-- './cli forge tool scan_logs "Find error patterns"' builds a complete MCP file.
-- './cli forge test <id>' executes 'pytest' within the tool's package directory.
-- './cli forge design "Database wrapper"' generates a technical blueprint without code.
+The `forge` domain is the birthplace of system capabilities and visual designs.
 
-## Tier: More
-DETAILED USAGE
-- './cli forge tool scan_logs "Find error patterns"' builds a complete MCP file.
-- './cli forge test <id>' executes 'pytest' within the tool's package directory.
-- './cli forge design "Database wrapper"' generates a technical blueprint without code.
+<card>
+title: FORGE OVERVIEW
+Capabilities: Tools, Skills, UI
+Iteration: AST Refinement
+Synthesis: LLM-Driven
+Status: CREATIVE
+</card>
 
-TECHNICAL ARCHITECTURE: FORGE
-====================================
+### Commands
+*   **tool**: Synthesizes a new Python or MCP tool from a prompt.
+*   **evolve**: Iteratively refines existing assets based on instructions.
+*   **design**: Generates UI/UX layouts and visual components.
+*   **skill**: Creates modular capabilities for system agents.
+*   **persona**: Defines system-prompt identities for specific roles.
+*   **test**: Validates tool integrity via automated Pytest suites.
+*   **bench**: Measures execution timings and performance.
+*   **archive**: Safely stores deprecated or unstable assets.
 
-1. THE SYNTHESIS PIPELINE (master.py)
--------------------------------------
-Manufacturing follows a strictly gated sequence:
-[INTENT] -> [BLUEPRINT] -> [ASSET] -> [TEST] -> [VERIFY] -> [DEPLOY]
+### Technical Specifications
+Forge uses an iterative loop: **Prompt -> Synthesize -> Test -> Evolve**.
 
-2. CODE GENERATION (asset.py)
------------------------------
-Generates PEP 723 compatible Python scripts.
-- Dependencies: Automatically detected and added to the script header.
-- Framework: Standardizes on 'fastmcp' for maximum Gemini CLI compatibility.
-- Context Injection: Injects the latest 10 facts from Domain [02] into the tool logic.
+<card>
+title: OPERATIONAL CONTEXT
+Language: Python 3.12 (AST-Aware)
+UI Style: Rich / Material / Cyber
+Testing: Pytest / Benchmark.py
+</card>
 
-3. VERIFICATION & SAFETY
-------------------------
-- Verification: deployment is blocked if 'pytest' returns non-zero.
-- Security: 'audit.py' scans for 'os.system', 'eval', and other dangerous calls.
-- Manual Gate: All automated creations require manual review via 'manual' domain.
+### Architecture Internals
+The forge uses the `SynthesisOrchestrator` in `master.py`. It leverages the `asset.py` templates for standardized asset generation.
 
-4. EVOLUTION (refine.py)
-------------------------
-Assets are treated as living artifacts.
-- Logic Refinement: Re-prompts the LLM with the current code + user fix instruction.
-- Documentation: Re-generates README.md and docstrings to match updated logic.
-- Benchmarking: Measures tool latency and token consumption in a simulated run.
+<card>
+title: NEURAL-KERNEL HOOKS
+Forge Hook: clide.forge.master.SynthesisOrchestrator
+Evolve Hook: clide.forge.master.evolve_tool
+Design Hook: clide.forge.master.generate_design
+</card>
 
-## Tier: Full
-DETAILED USAGE
-- './cli forge tool scan_logs "Find error patterns"' builds a complete MCP file.
-- './cli forge test <id>' executes 'pytest' within the tool's package directory.
-- './cli forge design "Database wrapper"' generates a technical blueprint without code.
+### API Reference
+*   `process_tool_request(name, prompt)`: The core synthesis entry.
+*   `run_tests(id)`: Automated validation hook.
+*   `archive_asset(id)`: System cleanup and relocation.
 
-TECHNICAL ARCHITECTURE: FORGE
-====================================
-
-1. THE SYNTHESIS PIPELINE (master.py)
--------------------------------------
-Manufacturing follows a strictly gated sequence:
-[INTENT] -> [BLUEPRINT] -> [ASSET] -> [TEST] -> [VERIFY] -> [DEPLOY]
-
-2. CODE GENERATION (asset.py)
------------------------------
-Generates PEP 723 compatible Python scripts.
-- Dependencies: Automatically detected and added to the script header.
-- Framework: Standardizes on 'fastmcp' for maximum Gemini CLI compatibility.
-- Context Injection: Injects the latest 10 facts from Domain [02] into the tool logic.
-
-3. VERIFICATION & SAFETY
-------------------------
-- Verification: deployment is blocked if 'pytest' returns non-zero.
-- Security: 'audit.py' scans for 'os.system', 'eval', and other dangerous calls.
-- Manual Gate: All automated creations require manual review via 'manual' domain.
-
-4. EVOLUTION (refine.py)
-------------------------
-Assets are treated as living artifacts.
-- Logic Refinement: Re-prompts the LLM with the current code + user fix instruction.
-- Documentation: Re-generates README.md and docstrings to match updated logic.
-- Benchmarking: Measures tool latency and token consumption in a simulated run.
-
-[EXPANSION PENDING]
+### Code Reference
+- **Entry Point**: `clide/serve/portal.py` -> `cmd_forge`
+- **Implementation**: `clide/forge/master.py`
+- **Asset Logic**: `clide/forge/asset.py`

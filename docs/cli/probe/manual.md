@@ -1,37 +1,26 @@
-# PROBE MANUAL
+# PROBE // MANUAL (INGEST)
+Manually ingests a local file or directory buffer into the knowledge base.
 
-## Tier: Basic
-- Reads the content of a local text or markdown file.
-- Performs a deep-scan for missed facts or technical insights.
-- Bypasses the passive monitor for immediate ingestion.
-Usage: ./cli probe manual <path>
+Reads a local file, analyzes its content, and categorizes it as a knowledge node.
 
-## Tier: More
-- Reads the content of a local text or markdown file.
-- Performs a deep-scan for missed facts or technical insights.
-- Bypasses the passive monitor for immediate ingestion.
-Usage: ./cli probe manual <path>
+<card>
+title: ⦗ INGEST OPERATION ⦘
+Source: Local File System
+Method: Read + Analyze
+Dest: Vector Registry
+</card>
 
-TECHNICAL DEEP-DIVE:
-The 'manual' command provides a high-priority injection path for existing data.
-1. Buffer Management: Uses memory-efficient reading to handle files up to 50MB.
-2. Encoding: Automatically detects and handles UTF-8 vs ASCII encodings.
-3. Processing: Pipes file content into the classification pipeline, treating every paragraph as a potential knowledge unit.
-4. Indexing: Re-vectorizes the file content to ensure it's available for semantic search.
-This command is essential for 'priming' a new project with existing documentation or requirements.
+### Usage
+`./cli probe ingest "path/to/file.txt"`
 
-## Tier: Full
-- Reads the content of a local text or markdown file.
-- Performs a deep-scan for missed facts or technical insights.
-- Bypasses the passive monitor for immediate ingestion.
-Usage: ./cli probe manual <path>
+### Technical Details
+Supports text-based formats (.txt, .md, .py, .json). Binary files are ignored.
 
-TECHNICAL DEEP-DIVE:
-The 'manual' command provides a high-priority injection path for existing data.
-1. Buffer Management: Uses memory-efficient reading to handle files up to 50MB.
-2. Encoding: Automatically detects and handles UTF-8 vs ASCII encodings.
-3. Processing: Pipes file content into the classification pipeline, treating every paragraph as a potential knowledge unit.
-4. Indexing: Re-vectorizes the file content to ensure it's available for semantic search.
-This command is essential for 'priming' a new project with existing documentation or requirements.
+<card>
+title: ⦗ FILE HANDLING ⦘
+Mode: Read-Only (r)
+Limit: 3000 chars (Sample)
+</card>
 
-[EXPANSION PENDING]
+### Code Internals
+Calls `manual.extract_from_file(path)`.

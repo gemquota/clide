@@ -1,64 +1,50 @@
-# SHORTCUTS // POWER COMBINATIONS
+# SHORTCUTS // POWER USER REFERENCE
 
-## Tier: Basic
-[DATA CLEANUP]
-- ./cli manual task list --stale : Find old TODOs.
-- ./cli index prune --force : Aggressive registry deduplication.
+Efficiency in CLIDE is achieved by combining domain-specific commands into cohesive workflows. This document outlines common shortcuts, aliases, and "Power-Workflows" used for advanced project management.
 
-[ENVIRONMENT CONTROL]
-- ./cli hotswap skill:coder : Instant engineering persona.
-- ./cli morph : Relaunch Gemini with current hotspot.
+### Common Aliases
+The CLI includes several top-level aliases for frequently used commands:
 
-## Tier: More
-[DATA CLEANUP]
-- ./cli manual task list --stale : Find old TODOs.
-- ./cli index prune --force : Aggressive registry deduplication.
+<card>
+title: COMMAND SHORTCUTS
+dash: ./cli system dash (TUI Dashboard)
+help: ./cli help (Intelligence Portal)
+atlas: ./cli atlas (Structural Map)
+? [query]: ./cli search [query]
+</card>
 
-[ENVIRONMENT CONTROL]
-- ./cli hotswap skill:coder : Instant engineering persona.
-- ./cli morph : Relaunch Gemini with current hotspot.
+### Power-User Workflows
 
-[PRO-WORKFLOWS]
-1. THE KNOWLEDGE LOOP:
-   ./cli watch start && ./cli probe scout <url>
-   (Monitor pulls logs while scout pulls docs)
+#### 1. The Synthesis Gate (Build & Verify)
+Rapidly create a tool and ensure it's production-ready in one sequence:
+`./cli forge tool <name> <prompt> && ./cli forge test <name>`
+*(Note: Successful tool synthesis automatically triggers testing and indexing).*
 
-2. THE SYNTHESIS GATE:
-   ./cli forge tool <n> <p> && ./cli forge test <id>
-   (Build and immediately verify logic)
+#### 2. The Maintenance Cycle (Total System Hygiene)
+Run this sequence weekly to keep the brain clean and the registry optimized:
+`./cli maintain audit && ./cli maintain clean && ./cli index optimize`
+- **Audit**: Detects semantic collisions.
+- **Clean**: Trims metadata and removes junk.
+- **Optimize**: Deduplicates and sorts the vector registry.
 
-3. SEMANTIC MERGE:
-   ./cli index near <id> --merge
-   (Find nearest redundant tool and initiate synthesis)
+#### 3. Strategic Execution
+Synchronize your plan before starting a deep-work session:
+`./cli auto plan && ./cli run sync && ./cli run task list`
+- **Plan**: Ranks todos by project importance.
+- **Sync**: Rebuilds `todo.md`.
+- **List**: Displays your prioritized roadmap.
 
-4. TOTAL SYSTEM AUDIT:
-   ./cli brain verify && ./cli auto audit && ./cli index optimize
-   (Repair DB -> Detect Contradictions -> Compact Vectors)
+#### 4. The Ingestion Loop (Active Research)
+Combine background monitoring with active data gathering:
+`./cli watch go && ./cli probe scout "https://docs.api.com"`
+- **Watch**: Monitors your terminal/filesystem.
+- **Scout**: Performs deep LLM synthesis on documentation.
 
-## Tier: Full
-[DATA CLEANUP]
-- ./cli manual task list --stale : Find old TODOs.
-- ./cli index prune --force : Aggressive registry deduplication.
+### Environment Control
+- **`./cli system backup`**: Always run before major refactors.
+- **`./cli system config`**: Quick check of API keys and pathing.
+- **`./cli watch off`**: Silences the sensory monitor.
 
-[ENVIRONMENT CONTROL]
-- ./cli hotswap skill:coder : Instant engineering persona.
-- ./cli morph : Relaunch Gemini with current hotspot.
-
-[PRO-WORKFLOWS]
-1. THE KNOWLEDGE LOOP:
-   ./cli watch start && ./cli probe scout <url>
-   (Monitor pulls logs while scout pulls docs)
-
-2. THE SYNTHESIS GATE:
-   ./cli forge tool <n> <p> && ./cli forge test <id>
-   (Build and immediately verify logic)
-
-3. SEMANTIC MERGE:
-   ./cli index near <id> --merge
-   (Find nearest redundant tool and initiate synthesis)
-
-4. TOTAL SYSTEM AUDIT:
-   ./cli brain verify && ./cli auto audit && ./cli index optimize
-   (Repair DB -> Detect Contradictions -> Compact Vectors)
-
-[EXPANSION PENDING]
+### System Overrides
+- **`./cli memory forget <id>`**: Use this for sensitive data that should never be in the LLM context.
+- **`./cli index rebuild`**: Forces a fresh ingestion of shell history.

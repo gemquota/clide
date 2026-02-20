@@ -58,6 +58,18 @@ class TodoManager:
             print(f"[!] TODO #{todo_id} not found.")
         conn.close()
 
+    def complete_todo(self, todo_id):
+        """Marks a TODO as COMPLETED (changes category)."""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.execute("UPDATE knowledge SET category = 'COMPLETED' WHERE id = ? AND category = 'TODO'", (todo_id,))
+        if cursor.rowcount > 0:
+            print(f"[v] Completed TODO #{todo_id}")
+            conn.commit()
+            self.sync_to_file()
+        else:
+            print(f"[!] TODO #{todo_id} not found or already completed.")
+        conn.close()
+
     def sync_to_file(self):
         """Rebuilds todo.md from the current database state."""
         conn = sqlite3.connect(self.db_path)

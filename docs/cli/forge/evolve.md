@@ -1,37 +1,24 @@
 # FORGE EVOLVE
 
-## Tier: Basic
-- Refactors code based on user feedback or bug reports.
-- Preserves existing function signatures while improving internal logic.
-- Automatically re-runs unit tests after the refactor.
-Usage: ./cli forge evolve <id> <instruction>
+- Iteratively refines existing forged tools based on natural language instructions.
+- Allows for bug fixes, feature additions, or UI improvements without manual editing.
+- (Status: Implementation in progress).
+Usage: ./cli forge evolve <asset_id> "instruction"
 
-## Tier: More
-- Refactors code based on user feedback or bug reports.
-- Preserves existing function signatures while improving internal logic.
-- Automatically re-runs unit tests after the refactor.
-Usage: ./cli forge evolve <id> <instruction>
+- Iteratively refines existing forged tools based on natural language instructions.
+- Allows for bug fixes, feature additions, or UI improvements without manual editing.
+- (Status: Implementation in progress).
+Usage: ./cli forge evolve <asset_id> "instruction"
 
 TECHNICAL DEEP-DIVE:
-The 'evolve' command implements 'Semantic Code Evolution'.
-1. Context: Reads the current content of the .py or .toml file.
-2. Prompting: Sends [Current Code] + [User Instruction] to the LLM.
-3. Patching: Overwrites the target file with the improved logic.
-4. Regression: Executes 'forge test' to ensure no functional breakage.
-This allows CLIDE to 'Learn' and 'Correct' its own creations over time.
+The `evolve` command is implemented in `clide.forge.master.SynthesisOrchestrator.evolve_tool`.
 
-## Tier: Full
-- Refactors code based on user feedback or bug reports.
-- Preserves existing function signatures while improving internal logic.
-- Automatically re-runs unit tests after the refactor.
-Usage: ./cli forge evolve <id> <instruction>
+### Intended Workflow
+1. **Source Loading**: Reads the current source code from `swarm/commands/mcp_servers/<asset_id>/`.
+2. **Contextual Prompting**: Sends the [Existing Code] + [User Instruction] + [Project Facts] to the LLM.
+3. **AST Patching**: The LLM generates a refined version of the logic.
+4. **Validation Loop**: Triggers `run_tests()` on the new version. If tests fail, the refactor is aborted or retried.
 
-TECHNICAL DEEP-DIVE:
-The 'evolve' command implements 'Semantic Code Evolution'.
-1. Context: Reads the current content of the .py or .toml file.
-2. Prompting: Sends [Current Code] + [User Instruction] to the LLM.
-3. Patching: Overwrites the target file with the improved logic.
-4. Regression: Executes 'forge test' to ensure no functional breakage.
-This allows CLIDE to 'Learn' and 'Correct' its own creations over time.
-
-[EXPANSION PENDING]
+### Code Reference
+- **Entry Point**: `clide/serve/portal.py` -> `cmd_forge` (evolve)
+- **Implementation**: `clide/forge/master.py` -> `evolve_tool` (Stubbed)

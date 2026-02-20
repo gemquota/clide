@@ -1,23 +1,366 @@
 graph TD
-    1["(DISCOVERY) Building complex, high-quality..."]
-    2["(FACT) The 'clide' command is the pro..."]
-    3["(TODO) Create a 'commands' directory ..."]
-    4["(FACT) Project Roles: The client is i..."]
-    5["(FACT) Project Architecture: Utilize ..."]
-    6["(TODO) Update project version to 0.4...."]
-    7["(TODO) Bump the project version to 0...."]
-    8["(TODO) Perform a comprehensive audit ..."]
-    9["(FACT) The project must be managed us..."]
-    10["(FACT) Project git remote: gemquota/c..."]
-    11["(FACT) The 'clide' command (Command L..."]
-    12["(TODO) Generate a 'commands' director..."]
-    13["(LESSON) Within the CLIDE/meta-system, ..."]
-    14["(LESSON) Clarification of terminology: ..."]
-    15["(FACT) - Behavioral Policy: CLIDE is ..."]
-    16["(FACT) Architectural Preference: Use ..."]
-    17["(FACT) Current project version is set..."]
-    18["(TODO) Verify that all command files ..."]
-    19["(TODO) Ensure the project is maintain..."]
-    20["(FACT) Always confirm with the user b..."]
-    21["(DISCOVERY) The following commands utilize..."]
-    13 ---|80%| 14
+    2275["(SHELL_HISTORY) # Fake Sparkline for visual fl..."]
+    2276["(SHELL_HISTORY) /* --- PANES --- */\..."]
+    2277["(SHELL_HISTORY) self.query_one('#stat-fail').u..."]
+    2278["(SHELL_HISTORY) tel = Table(box=box.SIMPLE, ex..."]
+    2279["(SKILL) Test web applications with scr..."]
+    2280["(SKILL) Conduct WCAG 2.2 accessibility..."]
+    2281["(SKILL) Create production-ready FastAP..."]
+    2282["(SKILL) Master REST and GraphQL API de..."]
+    2283["(SKILL) Implement proven backend archi..."]
+    2284["(SKILL) Implement Command Query Respon..."]
+    2285["(SKILL) Design and implement event sto..."]
+    2286["(SKILL) Design microservices architect..."]
+    2287["(SKILL) Build read models and projecti..."]
+    2288["(SKILL) Implement saga patterns for di..."]
+    2289["(SKILL) Test Temporal workflows with p..."]
+    2290["(SKILL) Design durable workflows with ..."]
+    2291["(SKILL) Implement DeFi protocols with ..."]
+    2292["(SKILL) Implement NFT standards (ERC-7..."]
+    2293["(SKILL) Master smart contract security..."]
+    2294["(SKILL) Test smart contracts comprehen..."]
+    2295["(SKILL) Transform data into compelling..."]
+    2296["(SKILL) Design effective KPI dashboard..."]
+    2297["(SKILL) Design multi-stage CI/CD pipel..."]
+    2298["(SKILL) Create production-ready GitHub..."]
+    2299["(SKILL) Build GitLab CI/CD pipelines w..."]
+    2300["(SKILL) Implement secure secrets manag..."]
+    2301["(SKILL) Optimize cloud costs through r..."]
+    2302["(SKILL) Configure secure, high-perform..."]
+    2303["(SKILL) Configure Istio traffic manage..."]
+    2304["(SKILL) Implement Linkerd service mesh..."]
+    2305["(SKILL) Configure mutual TLS (mTLS) fo..."]
+    2306["(SKILL) Design multi-cloud architectur..."]
+    2307["(SKILL) Implement comprehensive observ..."]
+    2308["(SKILL) Build reusable Terraform modul..."]
+    2309["(SKILL) Use this skill when working wi..."]
+    2310["(SKILL) Use this skill when creating, ..."]
+    2311["(SKILL) Use this skill when implementi..."]
+    2312["(SKILL) Build production Apache Airflo..."]
+    2313["(SKILL) Implement data quality validat..."]
+    2314["(SKILL) Master dbt (data build tool) f..."]
+    2315["(SKILL) Optimize Apache Spark jobs wit..."]
+    2316["(SKILL) Design a PostgreSQL-specific s..."]
+    2317["(SKILL) Master authentication and auth..."]
+    2318["(SKILL) Optimize Bazel builds for larg..."]
+    2319["(SKILL) Master effective code review p..."]
+    2320["(SKILL) Master systematic debugging te..."]
+    2321["(SKILL) Master end-to-end testing with..."]
+    2322["(SKILL) Master error handling patterns..."]
+    2323["(SKILL) Master advanced Git workflows ..."]
+    2324["(SKILL) Master monorepo management wit..."]
+    2325["(SKILL) Configure and optimize Nx mono..."]
+    2326["(SKILL) Master SQL query optimization,..."]
+    2327["(SKILL) Configure Turborepo for effici..."]
+    2328["(SKILL) Write and maintain Architectur..."]
+    2329["(SKILL) Automate changelog generation ..."]
+    2330["(SKILL) Generate and maintain OpenAPI ..."]
+    2331["(SKILL) Master C#/.NET backend develop..."]
+    2332["(SKILL) Migrate from AngularJS to Angu..."]
+    2333["(SKILL) Execute database migrations ac..."]
+    2334["(SKILL) Manage major dependency versio..."]
+    2335["(SKILL) Upgrade React applications to ..."]
+    2336["(SKILL) Master Next.js 14+ App Router ..."]
+    2337["(SKILL) Build production React Native ..."]
+    2338["(SKILL) Master modern React state mana..."]
+    2339["(SKILL) Build scalable design systems ..."]
+    2340["(SKILL) Master Godot 4 GDScript patter..."]
+    2341["(SKILL) Master Unity ECS (Entity Compo..."]
+    2342["(SKILL) Create employment contracts, o..."]
+    2343["(SKILL) Implement GDPR-compliant data ..."]
+    2344["(SKILL) Create structured incident res..."]
+    2345["(SKILL) Master on-call shift handoffs ..."]
+    2346["(SKILL) Write effective blameless post..."]
+    2347["(SKILL) Implement comprehensive testin..."]
+    2348["(SKILL) Master ES6+ features including..."]
+    2349["(SKILL) Build production-ready Node.js..."]
+    2350["(SKILL) Master TypeScript's advanced t..."]
+    2351["(SKILL) Implement GitOps workflows wit..."]
+    2352["(SKILL) Design, organize, and manage H..."]
+    2353["(SKILL) Create production-ready Kubern..."]
+    2354["(SKILL) Implement Kubernetes security ..."]
+    2355["(SKILL) Select and optimize embedding ..."]
+    2356["(SKILL) Combine vector and keyword sea..."]
+    2357["(SKILL) Design LLM applications using ..."]
+    2358["(SKILL) Implement comprehensive evalua..."]
+    2359["(SKILL) Master advanced prompt enginee..."]
+    2360["(SKILL) Build Retrieval-Augmented Gene..."]
+    2361["(SKILL) Implement efficient similarity..."]
+    2362["(SKILL) Optimize vector index performa..."]
+    2363["(SKILL) Build end-to-end MLOps pipelin..."]
+    2364["(SKILL) Implement distributed tracing ..."]
+    2365["(SKILL) Create and manage production G..."]
+    2366["(SKILL) Set up Prometheus for comprehe..."]
+    2367["(SKILL) Define and implement Service L..."]
+    2368["(SKILL) Build automated billing system..."]
+    2369["(SKILL) Integrate PayPal payment proce..."]
+    2370["(SKILL) Implement PCI DSS compliance r..."]
+    2371["(SKILL) Implement Stripe payment proce..."]
+    2372["(SKILL) Master Python asyncio, concurr..."]
+    2373["(SKILL) Common Python anti-patterns to..."]
+    2374["(SKILL) Python background job patterns..."]
+    2279 ---|76%| 2280
+    2280 ---|75%| 2347
+    2281 ---|76%| 2339
+    2281 ---|77%| 2344
+    2281 ---|81%| 2349
+    2281 ===|87%| 2372
+    2281 ---|79%| 2374
+    2282 ---|79%| 2283
+    2282 ---|75%| 2286
+    2282 ---|77%| 2296
+    2282 ---|78%| 2317
+    2282 ===|88%| 2330
+    2282 ---|75%| 2348
+    2283 ---|77%| 2284
+    2283 ---|76%| 2285
+    2283 ===|87%| 2286
+    2283 ---|78%| 2287
+    2283 ---|75%| 2290
+    2283 ---|82%| 2296
+    2283 ---|78%| 2301
+    2283 ---|78%| 2315
+    2283 ---|76%| 2331
+    2283 ---|80%| 2337
+    2283 ---|75%| 2341
+    2283 ---|81%| 2348
+    2283 ---|78%| 2349
+    2284 ---|79%| 2286
+    2284 ---|75%| 2310
+    2284 ---|77%| 2341
+    2285 ---|77%| 2286
+    2285 ---|82%| 2287
+    2285 ---|76%| 2290
+    2285 ---|81%| 2296
+    2285 ---|75%| 2301
+    2285 ---|79%| 2306
+    2285 ---|75%| 2344
+    2286 ---|75%| 2287
+    2286 ---|77%| 2290
+    2286 ---|75%| 2291
+    2286 ---|76%| 2301
+    2286 ---|75%| 2306
+    2286 ---|75%| 2307
+    2286 ---|75%| 2322
+    2286 ---|76%| 2331
+    2286 ---|76%| 2344
+    2286 ---|79%| 2349
+    2286 ---|75%| 2354
+    2286 ---|79%| 2364
+    2286 ---|75%| 2367
+    2287 ---|80%| 2290
+    2287 ---|78%| 2296
+    2287 ---|76%| 2303
+    2287 ---|77%| 2312
+    2287 ---|75%| 2354
+    2287 ---|77%| 2364
+    2288 ===|86%| 2290
+    2288 ---|76%| 2307
+    2288 ---|76%| 2351
+    2289 ---|83%| 2290
+    2289 ---|75%| 2294
+    2289 ---|78%| 2297
+    2289 ---|76%| 2299
+    2289 ---|76%| 2344
+    2289 ---|81%| 2347
+    2289 ---|76%| 2358
+    2289 ---|77%| 2372
+    2290 ---|77%| 2308
+    2290 ---|76%| 2312
+    2290 ---|76%| 2344
+    2290 ---|80%| 2351
+    2290 ---|75%| 2352
+    2290 ---|78%| 2353
+    2290 ---|77%| 2354
+    2290 ---|77%| 2357
+    2290 ---|75%| 2364
+    2291 ---|82%| 2292
+    2291 ---|77%| 2294
+    2291 ---|78%| 2342
+    2291 ---|76%| 2372
+    2291 ---|75%| 2374
+    2293 ---|81%| 2294
+    2294 ---|78%| 2321
+    2294 ---|84%| 2347
+    2294 ---|75%| 2348
+    2295 ---|77%| 2340
+    2295 ---|80%| 2347
+    2295 ---|81%| 2358
+    2296 ---|82%| 2301
+    2296 ---|76%| 2306
+    2296 ---|75%| 2308
+    2296 ---|75%| 2310
+    2296 ---|77%| 2322
+    2296 ---|80%| 2328
+    2296 ---|79%| 2337
+    2296 ---|77%| 2340
+    2296 ---|78%| 2344
+    2296 ---|78%| 2348
+    2296 ---|76%| 2353
+    2296 ---|83%| 2365
+    2297 ===|86%| 2298
+    2297 ===|85%| 2299
+    2297 ---|79%| 2308
+    2297 ---|76%| 2312
+    2297 ---|79%| 2314
+    2297 ---|78%| 2321
+    2297 ---|75%| 2344
+    2297 ---|78%| 2351
+    2297 ---|79%| 2363
+    2298 ===|85%| 2299
+    2298 ---|77%| 2321
+    2299 ---|77%| 2321
+    2301 ---|76%| 2302
+    2301 ---|78%| 2303
+    2301 ===|86%| 2306
+    2301 ---|78%| 2307
+    2301 ---|75%| 2308
+    2301 ---|81%| 2315
+    2301 ---|76%| 2322
+    2301 ---|77%| 2326
+    2301 ---|75%| 2344
+    2301 ---|76%| 2365
+    2301 ---|76%| 2367
+    2302 ---|79%| 2304
+    2302 ---|77%| 2306
+    2302 ---|76%| 2308
+    2302 ---|79%| 2322
+    2302 ---|77%| 2344
+    2302 ---|75%| 2359
+    2303 ---|82%| 2304
+    2303 ---|75%| 2306
+    2303 ===|86%| 2307
+    2303 ---|77%| 2308
+    2303 ---|78%| 2310
+    2303 ---|78%| 2312
+    2303 ---|78%| 2344
+    2303 ---|79%| 2345
+    2303 ---|78%| 2351
+    2303 ===|86%| 2352
+    2303 ---|83%| 2354
+    2303 ---|75%| 2365
+    2303 ---|77%| 2367
+    2304 ---|75%| 2344
+    2306 ---|77%| 2307
+    2306 ---|84%| 2308
+    2306 ---|75%| 2312
+    2306 ---|75%| 2322
+    2306 ---|76%| 2328
+    2306 ---|80%| 2344
+    2306 ---|77%| 2365
+    2307 ---|75%| 2312
+    2307 ---|78%| 2344
+    2307 ---|79%| 2345
+    2307 ---|79%| 2351
+    2307 ---|80%| 2353
+    2307 ---|78%| 2354
+    2307 ---|79%| 2365
+    2307 ---|81%| 2366
+    2307 ===|85%| 2367
+    2308 ---|79%| 2322
+    2308 ---|75%| 2340
+    2308 ===|85%| 2344
+    2308 ---|79%| 2352
+    2308 ---|76%| 2354
+    2308 ---|75%| 2365
+    2308 ---|75%| 2373
+    2309 ---|79%| 2310
+    2310 ---|79%| 2311
+    2310 ---|75%| 2345
+    2310 ---|75%| 2358
+    2310 ---|75%| 2359
+    2311 ---|78%| 2329
+    2311 ---|75%| 2347
+    2311 ---|79%| 2359
+    2312 ---|77%| 2313
+    2312 ---|80%| 2314
+    2312 ---|81%| 2318
+    2312 ---|77%| 2322
+    2312 ---|75%| 2328
+    2312 ---|76%| 2354
+    2312 ---|75%| 2363
+    2313 ---|82%| 2314
+    2313 ---|77%| 2320
+    2314 ---|77%| 2321
+    2314 ---|76%| 2322
+    2314 ---|75%| 2340
+    2314 ---|75%| 2344
+    2314 ---|77%| 2363
+    2317 ---|82%| 2334
+    2317 ---|78%| 2347
+    2317 ---|75%| 2349
+    2318 ---|78%| 2322
+    2318 ---|76%| 2327
+    2319 ---|75%| 2320
+    2319 ---|78%| 2321
+    2319 ---|78%| 2322
+    2319 ---|77%| 2323
+    2320 ---|75%| 2322
+    2320 ---|76%| 2326
+    2320 ---|76%| 2346
+    2320 ---|75%| 2364
+    2321 ---|82%| 2347
+    2321 ---|76%| 2358
+    2322 ---|78%| 2326
+    2322 ---|78%| 2328
+    2322 ---|76%| 2344
+    2322 ---|77%| 2359
+    2322 ---|76%| 2361
+    2322 ---|76%| 2364
+    2324 ---|76%| 2325
+    2328 ---|79%| 2330
+    2328 ---|75%| 2344
+    2328 ---|76%| 2353
+    2328 ---|75%| 2365
+    2329 ---|77%| 2330
+    2329 ---|78%| 2347
+    2329 ---|75%| 2363
+    2330 ===|86%| 2353
+    2330 ---|81%| 2357
+    2331 ---|80%| 2348
+    2331 ---|76%| 2372
+    2332 ---|77%| 2333
+    2332 ---|78%| 2334
+    2332 ---|82%| 2335
+    2334 ---|75%| 2357
+    2335 ---|78%| 2339
+    2335 ---|84%| 2348
+    2336 ===|85%| 2348
+    2337 ---|79%| 2348
+    2339 ---|75%| 2348
+    2343 ---|79%| 2370
+    2344 ---|77%| 2345
+    2344 ---|78%| 2352
+    2344 ---|77%| 2354
+    2344 ---|76%| 2364
+    2345 ---|76%| 2359
+    2346 ---|80%| 2364
+    2347 ---|80%| 2358
+    2347 ---|77%| 2372
+    2348 ---|75%| 2349
+    2348 ---|75%| 2359
+    2348 ---|81%| 2372
+    2351 ---|76%| 2353
+    2351 ---|75%| 2357
+    2351 ---|78%| 2363
+    2353 ---|78%| 2354
+    2355 ===|87%| 2356
+    2355 ---|76%| 2359
+    2355 ---|81%| 2361
+    2355 ---|80%| 2362
+    2356 ---|76%| 2359
+    2356 ---|78%| 2360
+    2356 ===|88%| 2361
+    2356 ---|78%| 2362
+    2356 ---|77%| 2364
+    2357 ---|75%| 2363
+    2359 ---|80%| 2360
+    2359 ---|81%| 2361
+    2361 ---|78%| 2362
+    2361 ---|79%| 2364
+    2364 ---|82%| 2367
+    2365 ---|83%| 2366
+    2365 ---|76%| 2373
+    2368 ---|79%| 2371
+    2369 ---|77%| 2371
+    2372 ---|84%| 2374

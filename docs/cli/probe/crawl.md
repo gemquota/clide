@@ -1,37 +1,27 @@
-# PROBE CRAWL
+# PROBE // CRAWL
+Recursively ingests a website up to a specified depth.
 
-## Tier: Basic
-- Regularly checks RSS, Git logs, or other external feeds.
-- Keeps project context updated with latest changes.
-- Requires configuration in the 'probe' section of .cliderc.
-Usage: ./cli probe crawl
+Crawls a target domain, following internal links and ingesting content.
 
-## Tier: More
-- Regularly checks RSS, Git logs, or other external feeds.
-- Keeps project context updated with latest changes.
-- Requires configuration in the 'probe' section of .cliderc.
-Usage: ./cli probe crawl
+<card>
+title: ⦗ CRAWL OPERATION ⦘
+Target: Domain Root
+Depth: User Defined
+Limit: Safety Cap (50 pages)
+</card>
 
-TECHNICAL DEEP-DIVE:
-The 'crawl' command automates the monitoring of dynamic project sources.
-1. Feed Parsing: Uses 'feedparser' or raw Git API calls to fetch recent entries.
-2. Delta Detection: Compares the latest entry ID against 'state.json' to prevent duplicate ingestion.
-3. Synthesis: Converts feed entries into 'DISCOVERY' nodes within the project brain.
-4. Automation: Designed to be run via 'cron' or as a low-priority background thread in the monitor.
-This ensures the brain stays synchronized with external repositories and dependencies.
+### Usage
+`./cli probe crawl "https://site.com" --depth 2`
 
-## Tier: Full
-- Regularly checks RSS, Git logs, or other external feeds.
-- Keeps project context updated with latest changes.
-- Requires configuration in the 'probe' section of .cliderc.
-Usage: ./cli probe crawl
+### Technical Details
+Uses a breadth-first search (BFS) algorithm to traverse links. Respects `robots.txt` where possible.
 
-TECHNICAL DEEP-DIVE:
-The 'crawl' command automates the monitoring of dynamic project sources.
-1. Feed Parsing: Uses 'feedparser' or raw Git API calls to fetch recent entries.
-2. Delta Detection: Compares the latest entry ID against 'state.json' to prevent duplicate ingestion.
-3. Synthesis: Converts feed entries into 'DISCOVERY' nodes within the project brain.
-4. Automation: Designed to be run via 'cron' or as a low-priority background thread in the monitor.
-This ensures the brain stays synchronized with external repositories and dependencies.
+<card>
+title: ⦗ TRAVERSAL LOGIC ⦘
+Queue: FIFO
+Filter: Same-Domain Only
+Delay: 1s (Politeness)
+</card>
 
-[EXPANSION PENDING]
+### Code Internals
+Calls `crawl.crawl_site(url, depth)`. Manages a `visited` set to prevent cycles.

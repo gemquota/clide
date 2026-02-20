@@ -1,56 +1,36 @@
-# ARCHITECTURE // SINGLE PURPOSE (SPA)
+# ARCHITECTURE // SYSTEM DESIGN
 
-## Tier: Basic
-DOMAIN ISOLATION:
-- kernel : Storage logic.
-- brain  : Reasoning logic.
-- watch  : Ingestion logic.
-- forge  : Synthesis logic.
-- tools  : Actuator logic.
-- serve  : Interface logic.
+CLIDE is built on the **Single Purpose Architecture (SPA)** pattern, emphasizing strict domain isolation and unidirectional data flow. This modularity ensures that intelligence layers can be upgraded or replaced without compromising the core persistence engine.
 
-This prevents circular dependencies and allows for 'hot-swappable' intelligence modules.
+### Structural Domains (The Sectors)
+The system is divided into four high-level sectors, each containing specialized modules:
 
-## Tier: More
-DOMAIN ISOLATION:
-- kernel : Storage logic.
-- brain  : Reasoning logic.
-- watch  : Ingestion logic.
-- forge  : Synthesis logic.
-- tools  : Actuator logic.
-- serve  : Interface logic.
+<card>
+title: DOMAIN REGISTRY
+Sensory: watch, probe (Data Ingestion)
+Cognitive: brain, index, map (Processing & Retrieval)
+State: memory, run, maintain (Persistence & Execution)
+Executive: forge, system (Synthesis & Operations)
+</card>
 
-This prevents circular dependencies and allows for 'hot-swappable' intelligence modules.
+### The Intelligence Pipeline
+Data flows through the system in a linear, predictable sequence:
 
-THE DATA PIPELINE (SEQUENCE):
-1. SENSORY [WATCH/PROBE]: Filesystem events or active scrapes pull raw text.
-2. COGNITIVE [BRAIN]: 2.0-flash classifies the text into SPA categories.
-3. PERSISTENCE [KERNEL]: storage.py saves the formalized result to memory.db.
-4. INDEXING [INDEX]: Vector registry creates a 768D anchor for search.
-5. MANUFACTURING [FORGE]: Synthesis engine builds tools based on the DB.
-6. ACTUATION [TOOLS]: Hotswapper injects the tool into the Gemini runtime.
+1.  **SENSORY [WATCH/PROBE]**: Detects external changes (filesystem events, URL scouts, clipboard captures) and extracts raw text.
+2.  **COGNITIVE [BRAIN]**: Analyzes raw input using LLM synthesis to classify intent into SPA categories (FACT, TODO, LESSON).
+3.  **PERSISTENCE [KERNEL]**: Saves the formalized knowledge to the SQLite `memory.db` via `storage.py`.
+4.  **INDEXING [INDEX]**: Generates a 768D semantic embedding using `gemini-embedding-001` and anchors it in `vector_registry.json`.
+5.  **MANUFACTURING [FORGE]**: Synthesizes functional Python/MCP tools based on project context and stored knowledge.
+6.  **ACTUATION [TOOLS]**: Executes the forged capabilities, providing immediate feedback to the user or system.
 
-By isolating these phases, CLIDE can scale its intelligence without breaking the core storage engine.
+### Technical Implementation
+*   **Decoupled Logic**: Modules communicate via standardized APIs in the `kernel` and `brain` packages.
+*   **Hot-Swapping**: New logic can be injected into the `swarm/` directory and indexed in real-time without restarting the core daemon.
+*   **Documentation-Driven**: The system interface (CLI help and Atlas Navigator) is generated directly from these Markdown files, ensuring parity between documentation and code reality.
 
-## Tier: Full
-DOMAIN ISOLATION:
-- kernel : Storage logic.
-- brain  : Reasoning logic.
-- watch  : Ingestion logic.
-- forge  : Synthesis logic.
-- tools  : Actuator logic.
-- serve  : Interface logic.
-
-This prevents circular dependencies and allows for 'hot-swappable' intelligence modules.
-
-THE DATA PIPELINE (SEQUENCE):
-1. SENSORY [WATCH/PROBE]: Filesystem events or active scrapes pull raw text.
-2. COGNITIVE [BRAIN]: 2.0-flash classifies the text into SPA categories.
-3. PERSISTENCE [KERNEL]: storage.py saves the formalized result to memory.db.
-4. INDEXING [INDEX]: Vector registry creates a 768D anchor for search.
-5. MANUFACTURING [FORGE]: Synthesis engine builds tools based on the DB.
-6. ACTUATION [TOOLS]: Hotswapper injects the tool into the Gemini runtime.
-
-By isolating these phases, CLIDE can scale its intelligence without breaking the core storage engine.
-
-[EXPANSION PENDING]
+### Module Map
+- `clide/kernel/`: SQLite schema management and configuration.
+- `clide/brain/`: LLM integration, semantic clustering, and relationship mapping.
+- `clide/watch/`: Real-time filesystem observers and log enrichment.
+- `clide/forge/`: AST-aware code synthesis and testing.
+- `clide/serve/`: TUI rendering, help systems, and visualization APIs.

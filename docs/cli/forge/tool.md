@@ -1,39 +1,30 @@
 # FORGE TOOL
 
-## Tier: Basic
-- Generates PEP 723 compatible Python code.
-- Includes automatic dependency detection.
-- Injects the latest 10 project facts for context-aware logic.
-Usage: ./cli forge tool <name> <prompt>
+- Synthesizes a production-ready Python MCP (Model Context Protocol) server from a natural language prompt.
+- Automatically handles logic generation, dependency detection, and TUI template application.
+- Injects project-specific context (top 10 facts) to ensure the tool is relevant to your codebase.
+Usage: ./cli forge tool <name> "description of functionality"
 
-## Tier: More
-- Generates PEP 723 compatible Python code.
-- Includes automatic dependency detection.
-- Injects the latest 10 project facts for context-aware logic.
-Usage: ./cli forge tool <name> <prompt>
+- Synthesizes a production-ready Python MCP (Model Context Protocol) server from a natural language prompt.
+- Automatically handles logic generation, dependency detection, and TUI template application.
+- Injects project-specific context (top 10 facts) to ensure the tool is relevant to your codebase.
+Usage: ./cli forge tool <name> "description of functionality"
 
 TECHNICAL DEEP-DIVE:
-The 'tool' command is the 'Production Factory' of CLIDE.
-1. Intelligence: Sends the user prompt to 'gemini-2.0-flash'.
-2. Templating: Applies the 'mcp_generator.get_python_mcp_template'.
-3. Facts: Fetches top 10 facts using 'clide.brain.memory.get_extracted_facts'.
-4. Verification: Triggers 'forge test' automatically before indexing.
-5. Result: A functional, indexed MCP server ready for use in the Gemini CLI.
-Primary Directory: swarm/commands/mcp_servers/.
+The `tool` command is implemented in `clide.forge.master.SynthesisOrchestrator.process_tool_request`.
 
-## Tier: Full
-- Generates PEP 723 compatible Python code.
-- Includes automatic dependency detection.
-- Injects the latest 10 project facts for context-aware logic.
-Usage: ./cli forge tool <name> <prompt>
+### Logic Flow
+1. **Context Harvesting**: `asset.get_extracted_facts()` performs a hybrid search (70% semantic similarity, 30% importance) to retrieve the 10 most relevant project facts.
+2. **Logic Synthesis**: `asset.generate_logic()` prompts the LLM to write a Python function `name(args: str) -> str` using the harvested facts.
+3. **Dependency Mapping**: `asset.extract_dependencies()` uses an LLM to identify required PyPI packages from the generated logic.
+4. **Templating**: `asset.get_python_mcp_template()` wraps the logic in a PEP 723 script block with `fastmcp`.
+5. **Persistence**: `asset.save_mcp_server()` creates a package directory in `swarm/commands/mcp_servers/` containing:
+   - `{name}.py`: The core server.
+   - `README.md`: Basic usage docs.
+   - `test_{name}.py`: Auto-generated Pytest suite.
+6. **Validation**: Automatically triggers `run_tests()`. If passed, the tool is indexed in `vector_registry.json`.
 
-TECHNICAL DEEP-DIVE:
-The 'tool' command is the 'Production Factory' of CLIDE.
-1. Intelligence: Sends the user prompt to 'gemini-2.0-flash'.
-2. Templating: Applies the 'mcp_generator.get_python_mcp_template'.
-3. Facts: Fetches top 10 facts using 'clide.brain.memory.get_extracted_facts'.
-4. Verification: Triggers 'forge test' automatically before indexing.
-5. Result: A functional, indexed MCP server ready for use in the Gemini CLI.
-Primary Directory: swarm/commands/mcp_servers/.
-
-[EXPANSION PENDING]
+### Code Reference
+- **Entry Point**: `clide/serve/portal.py` -> `cmd_forge`
+- **Implementation**: `clide/forge/master.py`
+- **Asset Logic**: `clide/forge/asset.py`

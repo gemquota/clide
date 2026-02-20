@@ -1,44 +1,34 @@
-```python
 import pytest
-from mcp.server.fastmcp import FastMCP
-import asyncio
-from io import StringIO
-import sys
+from test_tool import test_tool
+import datetime
+import re
 
-# Capture stdout for testing print statements
-@pytest.fixture
-def capture_stdout(monkeypatch):
-    buffer = StringIO()
-    monkeypatch.setattr(sys.stdout, 'buffer', buffer)
-    return buffer
-
-def test_tool_output(capture_stdout):
-    """Tests that the test_tool function prints 'hello' to stdout."""
-
-    # Initialize FastMCP server synthesized by CLIDE - minimal implementation for testing
-    class MockFastMCP:
-        def __init__(self, tool_name):
-            self.tool_name = tool_name
-            self.tools = {}
-
-        def tool(self):
-            def decorator(func):
-                self.tools[func.__name__] = func
-                return func
-            return decorator
-        
-        def run(self):
-            if "test_tool" in self.tools:
-                self.tools["test_tool"]()
+def test_test_tool_success():
+    """Test the standard success case of the test_tool function."""
+    result = test_tool("any_input")
+    assert isinstance(result, str)
+    # Check if the result is in ISO format (YYYY-MM-DDTHH:MM:SS.ffffff)
+    assert re.match(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}$", result) or re.match(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$", result)
 
 
-    mcp = MockFastMCP("test_tool")
+def test_test_tool_empty_input():
+    """Test the case where an empty string is passed as input."""
+    result = test_tool("")
+    assert isinstance(result, str)
+    # Check if the result is in ISO format (YYYY-MM-DDTHH:MM:SS.ffffff)
+    assert re.match(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}$", result) or re.match(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$", result)
 
-    @mcp.tool()
-    def test_tool() -> None:
-        print('hello')
-
-    mcp.run()
-
-    assert capture_stdout.getvalue().strip() == 'hello'
-```
+def test_test_tool_large_input():
+    """Test the case where a large string is passed as input."""
+    large_input = "a" * 1000
+    result = test_tool(large_input)
+    assert isinstance(result, str)
+    # Check if the result is in ISO format (YYYY-MM-DDTHH:MM:SS.ffffff)
+    assert re.match(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}$", result) or re.match(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$", result)
+    
+def test_test_tool_timezone():
+    """Test the case where timezone information is provided"""
+    result = test_tool("timezone_test")
+    assert isinstance(result, str)
+    # Check if the result is in ISO format (YYYY-MM-DDTHH:MM:SS.ffffff)
+    assert re.match(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}$", result) or re.match(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$", result)

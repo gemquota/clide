@@ -41,6 +41,8 @@ def ensure_db():
         conn.execute("ALTER TABLE knowledge ADD COLUMN message_id INTEGER")
     if "review" not in cols:
         conn.execute("ALTER TABLE knowledge ADD COLUMN review TEXT")
+    if "tags" not in cols:
+        conn.execute("ALTER TABLE knowledge ADD COLUMN tags TEXT")
     
     conn.commit()
     conn.close()
@@ -89,5 +91,72 @@ def get_knowledge(category=None, min_importance=0, limit=None):
         params.append(limit)
         
     rows = conn.execute(query, params).fetchall()
+    conn.close()
+    return rows
+
+def update_knowledge(node_id, content=None, category=None, importance=None, tags=None, review=None):
+    conn = get_connection()
+    updates = []
+    params = []
+    if content:
+        updates.append("content = ?")
+        params.append(content)
+        # Update embedding if content changes
+        from clide.brain.memory import get_embedding
+        emb = get_embedding(content)
+        emb_blob = json.dumps(emb).encode('utf-8')
+        updates.append("embedding = ?")
+        params.append(emb_blob)
+    if category:
+        updates.append("category = ?")
+        params.append(category)
+    if importance is not None:
+        updates.append("importance = ?")
+        params.append(importance)
+    if tags is not None:
+        # Handle list or string
+        tags_val = json.dumps(tags) if isinstance(tags, list) else tags
+        updates.append("tags = ?")
+        params.append(tags_val)
+    if review:
+        updates.append("review = ?")
+        params.append(review)
+    
+    if updates:
+        query = f"UPDATE knowledge SET {', '.join(updates)} WHERE id = ?"
+        params.append(node_id)
+        conn.execute(query, params)
+        conn.commit()
+    conn.close()
+
+def delete_knowledge(node_id, soft=True):
+    conn = get_connection()
+    if soft:
+        # Assuming we might add an 'is_deleted' column later, but for now 
+        # we'll just move it to a 'DELETED' category or just hard delete if requested.
+        # Let's check if 'is_deleted' exists.
+        cursor = conn.execute("PRAGMA table_info(knowledge)")
+        cols = [row[1] for row in cursor.fetchall()]
+        if "is_deleted" not in cols:
+            conn.execute("ALTER TABLE knowledge ADD COLUMN is_deleted INTEGER DEFAULT 0")
+        conn.execute("UPDATE knowledge SET is_deleted = 1 WHERE id = ?", (node_id,))
+    else:
+        conn.execute("DELETE FROM knowledge WHERE id = ?", (node_id,))
+    conn.commit()
+    conn.close()
+
+def add_relationship(source_id, target_id, rel_type="SIMILAR_TO"):
+    conn = get_connection()
+    conn.execute(
+        "INSERT INTO relationships (source_id, target_id, rel_type) VALUES (?, ?, ?)",
+        (source_id, target_id, rel_type)
+    )
+    conn.commit()
+    conn.close()
+
+def get_relationships(node_id):
+    conn = get_connection()
+    conn.row_factory = sqlite3.Row
+    rows = conn.execute("SELECT * FROM relationships WHERE source_id = ? OR target_id = ?", (node_id, node_id)).fetchall()
     conn.close()
     return rows

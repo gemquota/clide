@@ -1,37 +1,20 @@
-# WATCH STATUS
+# WATCH // STATUS
+Retrieves health and connectivity metrics for the background monitor.
 
-## Tier: Basic
-- Returns real-time metrics including process ID and uptime.
-- Checks connectivity to the 'memory.db' ground truth.
-- Reports the last time a Gemini log was successfully ingested.
-Usage: ./cli watch status
+Displays whether the monitor is active and its current performance.
 
-## Tier: More
-- Returns real-time metrics including process ID and uptime.
-- Checks connectivity to the 'memory.db' ground truth.
-- Reports the last time a Gemini log was successfully ingested.
-Usage: ./cli watch status
+<card>
+title: ⦗ MONITOR HEALTH ⦘
+PID: [Active]
+Uptime: HH:MM:SS
+Status: OPERATIONAL
+</card>
 
-TECHNICAL DEEP-DIVE:
-The 'status' command queries the system environment and internal state files.
-1. Process Detection: Uses 'ps' or 'proc' to verify if the monitor PID is active.
-2. Heartbeat Analysis: Reads 'ingestion_logs/progress.md' to extract the 'Last Heartbeat' timestamp.
-3. DB Integrity: Performs a quick 'SELECT 1' on the 'knowledge' table to ensure storage readiness.
-4. Latency Metrics: Calculates the delta between the current time and the last ingestion event.
-This command is critical for verifying the reliability of the passive sensory layer.
+### Usage
+`./cli watch status`
 
-## Tier: Full
-- Returns real-time metrics including process ID and uptime.
-- Checks connectivity to the 'memory.db' ground truth.
-- Reports the last time a Gemini log was successfully ingested.
-Usage: ./cli watch status
+### Technical Details
+Reads from the PID lock file and checks `psutil` for process existence.
 
-TECHNICAL DEEP-DIVE:
-The 'status' command queries the system environment and internal state files.
-1. Process Detection: Uses 'ps' or 'proc' to verify if the monitor PID is active.
-2. Heartbeat Analysis: Reads 'ingestion_logs/progress.md' to extract the 'Last Heartbeat' timestamp.
-3. DB Integrity: Performs a quick 'SELECT 1' on the 'knowledge' table to ensure storage readiness.
-4. Latency Metrics: Calculates the delta between the current time and the last ingestion event.
-This command is critical for verifying the reliability of the passive sensory layer.
-
-[EXPANSION PENDING]
+### Code Internals
+Calls `stream.get_monitor_status()`.

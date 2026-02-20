@@ -5,7 +5,7 @@ import os
 def get_extracted_facts(query=""):
     import sqlite3
     import json
-    from vector_registry import get_embedding, cosine_similarity
+    from clide.brain.memory import get_embedding, cosine_similarity
     
     query_emb = get_embedding(query)
     facts = []
@@ -49,7 +49,7 @@ def generate_tool_metadata(tool_name, logic_code):
     facts = get_extracted_facts(f"{tool_name} {logic_code}")
 
     prompt = f"""
-Generate a professional Python docstring and suggest a type-hinted function signature for this logic:
+Generate a professional Python docstring for this logic:
 Logic: {logic_code}
 Tool Name: {tool_name}
 
@@ -59,13 +59,14 @@ Tool Name: {tool_name}
 ### EXTRACTED PROJECT CONTEXT (FACTS)
 {facts}
 
-    Return ONLY the docstring and the signature line (e.g. def tool(args: str) -> str:).
+Return ONLY the docstring.
 """
     try:
-        from llm_utils import call_llm
-        return call_llm(prompt)
+        from clide.brain.model import call_llm
+        res = call_llm(prompt)
+        return strip_markdown(res)
     except:
-        return f'def {tool_name}(args: str) -> str:\n    """Logic for {tool_name}"""'
+        return f'"""Logic for {tool_name}"""'
 
 def extract_dependencies(logic_code):
     """Uses Gemini to detect required external libraries."""
@@ -77,19 +78,81 @@ Code:
 Return ONLY a comma-separated list of package names (e.g., "requests,beautifulsoup4"). If none, return "None".
 """
     try:
-        from llm_utils import call_llm
+        from clide.brain.model import call_llm
         deps = call_llm(prompt)
         if deps.lower() == "none": return []
         return [d.strip() for d in deps.split(",")]
     except:
         return []
+
+def refine_logic(name, old_code, instruction):
+    """Uses Gemini to refine existing Python logic based on instructions."""
+    facts = get_extracted_facts(f"{name} {instruction}")
+    
+    full_prompt = f"""
+Refine the following Python code for the tool '{name}'.
+Instruction: {instruction}
+
+### CURRENT CODE
+{old_code}
+
+### PROJECT CONTEXT
+{facts}
+
+Requirements:
+1. Maintain the existing interface '{name}(args: str) -> str'.
+2. Incorporate the new instruction while preserving core functionality.
+3. Improve error handling and documentation if applicable.
+4. Return ONLY the updated code (no markdown, no preamble).
+"""
+    try:
+        from clide.brain.model import call_llm
+        res = call_llm(full_prompt)
+        return strip_markdown(res)
+    except Exception as e:
+        print(f"[!] Refinement error: {e}")
+        return None
+
+def generate_logic(name, prompt):
+    """Uses Gemini to generate the Python logic for a requested tool."""
+    facts = get_extracted_facts(f"{name} {prompt}")
+    
+    full_prompt = f"""
+Generate clean, production-ready Python logic for a tool named '{name}'.
+Task: {prompt}
+
+### PROJECT CONTEXT
+{facts}
+
+Requirements:
+1. Define a function '{name}(args: str) -> str'.
+2. Handle potential errors gracefully.
+3. Return a helpful string result.
+4. Use standard libraries where possible.
+5. Include a professional docstring inside the function.
+6. Return ONLY the function definition (no markdown, no preamble).
+"""
+    try:
+        from clide.brain.model import call_llm
+        res = call_llm(full_prompt)
+        return strip_markdown(res)
+    except Exception as e:
+        return f"def {name}(args: str) -> str:\n    return 'Error: Logic generation failed.'"
+
 def get_python_mcp_template(server_name, description, tool_name, tool_description, logic_code):
-    metadata = generate_tool_metadata(tool_name, logic_code)
     deps = extract_dependencies(logic_code)
     # Always include fastmcp if it's the framework used
     if "mcp" not in [d.lower() for d in deps]: deps.append("mcp[cli]")
     
     dep_string = "\n".join([f'#   "{d}",' for d in deps])
+    
+    # Extract imports from logic_code
+    lines = logic_code.split("\n")
+    imports = [l for l in lines if l.startswith("import ") or l.startswith("from ")]
+    logic_body = [l for l in lines if not (l.startswith("import ") or l.startswith("from "))]
+    
+    import_string = "\n".join(imports)
+    logic_string = "\n".join(logic_body)
     
     return f'''# /// script
 # requires-python = ">=3.10"
@@ -99,18 +162,33 @@ def get_python_mcp_template(server_name, description, tool_name, tool_descriptio
 # ///
 import asyncio
 from mcp.server.fastmcp import FastMCP
+{import_string}
 
 # Initialize FastMCP server synthesized by CLIDE
 mcp = FastMCP("{server_name}")
 
 @mcp.tool()
-{metadata}
-    # {tool_description}
-    {logic_code}
+{logic_string}
 
 if __name__ == "__main__":
     mcp.run()
 '''
+
+def strip_markdown(text):
+    """Removes markdown code blocks if present."""
+    if "```" in text:
+        # Match ```python ... ``` or just ``` ... ```
+        lines = text.split("\n")
+        content = []
+        capture = False
+        for line in lines:
+            if line.strip().startswith("```"):
+                capture = not capture
+                continue
+            if capture:
+                content.append(line)
+        return "\n".join(content)
+    return text
 
 def generate_tests(tool_name, logic_code):
     """Uses Gemini to generate a robust unit test for the logic."""
@@ -120,15 +198,18 @@ Logic: {logic_code}
 Function Name: {tool_name}
 
 Requirements:
-1. Test standard success cases.
-2. Test at least one edge case (e.g. empty input, large input).
-3. Test failure modes (e.g. invalid types).
-4. Use 'pytest' style.
-5. Return ONLY the code (no markdown, no preamble).
+1. The test will be saved in the same directory as the module '{tool_name}.py'.
+2. Use 'from {tool_name} import {tool_name}' to import the function.
+3. Test standard success cases.
+4. Test at least one edge case (e.g. empty input, large input).
+5. Test failure modes (e.g. invalid types).
+6. Use 'pytest' style.
+7. Return ONLY the code (no markdown, no preamble).
 """
     try:
-        from llm_utils import call_llm
-        return call_llm(prompt)
+        from clide.brain.model import call_llm
+        res = call_llm(prompt)
+        return strip_markdown(res)
     except:
         return f"# Manual test required for {tool_name}"
 

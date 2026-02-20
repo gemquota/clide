@@ -1,37 +1,20 @@
-# WATCH STOP
+# WATCH // STOP
+Gracefully terminates the background monitor.
 
-## Tier: Basic
-- Sends a termination signal to the active Watchdog process.
-- Ensures all pending log lines are flushed to the database before exiting.
-- Cleans up temporary lock files in the 'watch' domain.
-Usage: ./cli watch stop
+Stops the background extraction and monitoring processes.
 
-## Tier: More
-- Sends a termination signal to the active Watchdog process.
-- Ensures all pending log lines are flushed to the database before exiting.
-- Cleans up temporary lock files in the 'watch' domain.
-Usage: ./cli watch stop
+<card>
+title: ⦗ OPERATION: STOP ⦘
+Method: SIGTERM
+State: Shutdown...
+Target: ClideExtractor
+</card>
 
-TECHNICAL DEEP-DIVE:
-The 'stop' command performs a graceful shutdown of the 'ClideExtractor' instance.
-1. Signal Handling: Triggers 'observer.stop()' within the Watchdog loop.
-2. Resource Cleanup: Closes active SQLite connections in the 'kernel' domain.
-3. Thread Join: Waits for the background shell-polling thread to finalize its current batch.
-4. State Update: Marks the monitor as 'offline' in the system status telemetry.
-This command ensures data integrity by preventing partial ingestion during process termination.
+### Usage
+`./cli watch stop`
 
-## Tier: Full
-- Sends a termination signal to the active Watchdog process.
-- Ensures all pending log lines are flushed to the database before exiting.
-- Cleans up temporary lock files in the 'watch' domain.
-Usage: ./cli watch stop
+### Technical Details
+Sends a termination signal to the PID found in the lock file. Cleans up temporary resources.
 
-TECHNICAL DEEP-DIVE:
-The 'stop' command performs a graceful shutdown of the 'ClideExtractor' instance.
-1. Signal Handling: Triggers 'observer.stop()' within the Watchdog loop.
-2. Resource Cleanup: Closes active SQLite connections in the 'kernel' domain.
-3. Thread Join: Waits for the background shell-polling thread to finalize its current batch.
-4. State Update: Marks the monitor as 'offline' in the system status telemetry.
-This command ensures data integrity by preventing partial ingestion during process termination.
-
-[EXPANSION PENDING]
+### Code Internals
+Calls `stream.stop_monitor()`. Ensures file handles are closed properly.

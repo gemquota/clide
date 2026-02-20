@@ -1,12 +1,10 @@
 # FORGE DESIGN
 
-## Tier: Basic
 - Creates a Markdown specification outlining functions and dependencies.
 - Useful for complex tools where multi-step logic is required.
 - Acts as the 'Strategic Roadmap' for subsequent build commands.
 Usage: ./cli forge design <description>
 
-## Tier: More
 - Creates a Markdown specification outlining functions and dependencies.
 - Useful for complex tools where multi-step logic is required.
 - Acts as the 'Strategic Roadmap' for subsequent build commands.
@@ -20,7 +18,6 @@ The 'design' command is the 'Architectural Layer' of the Forge.
 4. Persistence: Saves the blueprint to 'conductor/tracks/' for phased implementation.
 Essential for 'High-Order Engineering' tasks that exceed single-prompt synthesis.
 
-## Tier: Full
 - Creates a Markdown specification outlining functions and dependencies.
 - Useful for complex tools where multi-step logic is required.
 - Acts as the 'Strategic Roadmap' for subsequent build commands.

@@ -1,51 +1,31 @@
 # PHILOSOPHY // DATABASE: EVERYTHING
 
-## Tier: Basic
-THE EPHEMERAL INTENT GAP:
-Standard development creates a gap between 'what you said to the AI' and 'what ended up in the code'.
-CLIDE closes this by capturing the 'Neural Stream' (logs) and 'Operational Stream' (shell).
+CLIDE is built on the premise that in an AI-driven development environment, **context is the most valuable asset**. Standard development creates an "Ephemeral Intent Gap"—a disconnect between the high-level intent discussed with an AI and the low-level code that results. CLIDE closes this gap by transforming every interaction into structured, permanent knowledge.
 
-PURPOSE:
-- Eliminate manual documentation debt.
-- Provide RAG context for future agents.
-- Automate tool creation based on repeating patterns.
+### The Ephemeral Intent Gap
+When you collaborate with an LLM, valuable insights, design decisions, and project lessons are often lost in transient chat logs. CLIDE captures the "Neural Stream" (your interactions) and the "Operational Stream" (your shell activity), formalizing them into a retrieval-augmented registry.
 
-## Tier: More
-THE EPHEMERAL INTENT GAP:
-Standard development creates a gap between 'what you said to the AI' and 'what ended up in the code'.
-CLIDE closes this by capturing the 'Neural Stream' (logs) and 'Operational Stream' (shell).
+### Core Principles
 
-PURPOSE:
-- Eliminate manual documentation debt.
-- Provide RAG context for future agents.
-- Automate tool creation based on repeating patterns.
+<card>
+title: THE FOUR PILLARS
+Passive Observation: Ingest data without changing user workflow.
+Semantic Permanence: Every insight is embedded and indexed for future RAG.
+Agentic Synergy: Synthesize tools that are context-aware of recent facts.
+Entropy Reduction: Proactively prune noise and categorize chaos.
+</card>
 
-[CORE PRINCIPLES]
-1. PASSIVE OBSERVATION: Never require the user to change their workflow.
-2. SEMANTIC PERMANENCE: Every message is embedded (768D) and indexed.
-3. AGENTIC SYNERGY: Forge tools that are context-aware of recent facts.
-4. ENTROPY REDUCTION: Use 'auto' and 'manual' domains to prune the noise.
+#### 1. Passive Observation
+The system operates primarily in the background. By monitoring filesystem events and shell history, CLIDE learns from what you *do*, not just what you *tell* it to document.
 
-Logic: raw_interaction -> intelligence_analysis -> structured_persistence.
-This transforms a directory into a living Knowledge Operating System.
+#### 2. Semantic Permanence
+We treat every piece of project knowledge as a vector in 768D semantic space. This allows the system to recall relevant lessons or facts exactly when they are needed by future agents, eliminating the need for manual context-setting.
 
-## Tier: Full
-THE EPHEMERAL INTENT GAP:
-Standard development creates a gap between 'what you said to the AI' and 'what ended up in the code'.
-CLIDE closes this by capturing the 'Neural Stream' (logs) and 'Operational Stream' (shell).
+#### 3. Agentic Synergy
+Tools forged by CLIDE are not generic. They are "Project-Aware," meaning they automatically inherit the latest project context, coding styles, and architectural decisions stored in the database.
 
-PURPOSE:
-- Eliminate manual documentation debt.
-- Provide RAG context for future agents.
-- Automate tool creation based on repeating patterns.
+#### 4. Entropy Reduction
+Raw data is chaotic. CLIDE utilizes automated cleanup cycles (`maintain`) and strategic prioritization (`run`) to ensure the knowledge base remains high-fidelity. We prefer a small, accurate brain over a massive, contradictory one.
 
-[CORE PRINCIPLES]
-1. PASSIVE OBSERVATION: Never require the user to change their workflow.
-2. SEMANTIC PERMANENCE: Every message is embedded (768D) and indexed.
-3. AGENTIC SYNERGY: Forge tools that are context-aware of recent facts.
-4. ENTROPY REDUCTION: Use 'auto' and 'manual' domains to prune the noise.
-
-Logic: raw_interaction -> intelligence_analysis -> structured_persistence.
-This transforms a directory into a living Knowledge Operating System.
-
-[EXPANSION PENDING]
+### The Mission
+To transform a static project directory into a **Living Knowledge Operating System** where the gap between intent and implementation is zero.

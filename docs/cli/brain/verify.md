@@ -1,37 +1,27 @@
-# BRAIN VERIFY
+# BRAIN // VERIFY
+Audits the knowledge base for factual contradictions and integrity.
 
-## Tier: Basic
-- Checks for broken relationships or orphaned nodes.
-- Validates that every entry has a valid 768D embedding.
-- Repairs indices in the SQLite 'memory.db'.
-Usage: ./cli brain verify
+Cross-references `FACT` and `LESSON` nodes to ensure consistency.
 
-## Tier: More
-- Checks for broken relationships or orphaned nodes.
-- Validates that every entry has a valid 768D embedding.
-- Repairs indices in the SQLite 'memory.db'.
-Usage: ./cli brain verify
+<card>
+title: ⦗ INTEGRITY CHECK ⦘
+Target: FACT / LESSON
+Check: Contradiction Detection
+Action: Flag / Report
+</card>
 
-TECHNICAL DEEP-DIVE:
-The 'verify' command is a structural health check.
-1. DB Check: Runs 'PRAGMA integrity_check' on the SQLite database.
-2. Embedding Validation: Scans the 'embedding' column for nulls or malformed binary blobs.
-3. Relationship Sync: Ensures 'source_id' and 'target_id' in the relationship table actually exist in 'knowledge'.
-4. Schema Check: Confirms all required SPA columns are present.
-Essential for recovering from unexpected process termination or filesystem errors.
+### Usage
+`./cli brain verify`
 
-## Tier: Full
-- Checks for broken relationships or orphaned nodes.
-- Validates that every entry has a valid 768D embedding.
-- Repairs indices in the SQLite 'memory.db'.
-Usage: ./cli brain verify
+### Technical Details
+Retrieves all nodes categorized as FACT or LESSON and checks for semantic conflicts (e.g., "The sky is blue" vs "The sky is green").
 
-TECHNICAL DEEP-DIVE:
-The 'verify' command is a structural health check.
-1. DB Check: Runs 'PRAGMA integrity_check' on the SQLite database.
-2. Embedding Validation: Scans the 'embedding' column for nulls or malformed binary blobs.
-3. Relationship Sync: Ensures 'source_id' and 'target_id' in the relationship table actually exist in 'knowledge'.
-4. Schema Check: Confirms all required SPA columns are present.
-Essential for recovering from unexpected process termination or filesystem errors.
+<card>
+title: ⦗ VERIFICATION LOGIC ⦘
+Scope: Global Registry
+Method: LLM Evaluation
+Threshold: High Confidence
+</card>
 
-[EXPANSION PENDING]
+### Code Internals
+Calls `atlas.verify_facts()`.

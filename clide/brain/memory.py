@@ -174,3 +174,114 @@ def optimize_registry():
         json.dump(optimized, f, indent=2)
     
     return len(registry) - len(optimized)
+
+def prune_registry(min_importance=3):
+    """Removes assets with importance below threshold from the registry."""
+    if not os.path.exists(VECTOR_DB_PATH): return 0
+    
+    with open(VECTOR_DB_PATH, "r") as f:
+        registry = json.load(f)
+        
+    initial_count = len(registry)
+    pruned = [item for item in registry if item.get('metadata', {}).get('importance', 5) >= min_importance]
+    
+    if len(pruned) != initial_count:
+        with open(VECTOR_DB_PATH, "w") as f:
+            json.dump(pruned, f, indent=2)
+            
+    return initial_count - len(pruned)
+
+def cluster_registry(threshold=0.85):
+    """
+    Performs a density-based clustering (Leader Algorithm) on the registry.
+    Returns a list of clusters: [{'centroid': id, 'members': [id, ...], 'size': N, 'topic': '...'}]
+    """
+    if not os.path.exists(VECTOR_DB_PATH): return []
+    try:
+        import numpy as np
+    except ImportError:
+        print("[!] NumPy required for clustering.")
+        return []
+
+    with open(VECTOR_DB_PATH, "r") as f:
+        registry = json.load(f)
+
+    # Extract vectors and IDs
+    ids = []
+    vectors = []
+    descriptions = []
+    
+    for item in registry:
+        ids.append(item['id'])
+        desc = item.get('metadata', {}).get('description') or item.get('metadata', {}).get('desc') or item['id']
+        descriptions.append(desc)
+        v = item.get('embedding', [])
+        if not v: v = [0.0] * 768
+        vectors.append(v)
+    
+    if not vectors: return []
+    
+    # Ensure consistent dimensionality (likely 768)
+    target_dim = 768
+    sanitized_vectors = []
+    for v in vectors:
+        if len(v) == target_dim:
+            sanitized_vectors.append(v)
+        elif len(v) > target_dim:
+            sanitized_vectors.append(v[:target_dim])
+        else:
+            # Pad with zeros
+            sanitized_vectors.append(v + [0.0] * (target_dim - len(v)))
+    
+    X = np.array(sanitized_vectors, dtype=np.float32)
+    # Normalize for cosine similarity (dot product of normalized vectors)
+    norms = np.linalg.norm(X, axis=1, keepdims=True)
+    norms[norms == 0] = 1.0
+    X = X / norms
+    
+    clusters = [] # List of {centroid_idx, members: [indices]}
+    
+    # Simple Leader Algorithm
+    # 1. Shuffle or iterate (order matters for Leader, but okay for rough clustering)
+    # We'll just iterate to be deterministic for now
+    
+    assigned = np.zeros(len(X), dtype=bool)
+    
+    print(f"[*] Clustering {len(X)} assets with threshold {threshold}...")
+    
+    for i in range(len(X)):
+        if assigned[i]: continue
+        
+        # New cluster leader
+        current_vector = X[i]
+        
+        # Compute similarities to all UNASSIGNED points (optimization: check all, filter later)
+        # Actually, let's just compute against all to find members, but only mark unassigned ones
+        # For strict partition, we only look at unassigned.
+        # But maybe overlapping is okay? Let's stick to partition.
+        
+        # We need to find all unassigned points close to this leader
+        # Identifying candidates: we can't easily mask the dot product without computing it
+        # So we compute dot product against ALL, then filter by `assigned` mask
+        
+        sims = np.dot(X, current_vector)
+        
+        # Find indices where sim > threshold AND not assigned
+        members = np.where((sims > threshold) & (~assigned))[0]
+        
+        # If no other members (just itself), checking if it fits better in an existing cluster?
+        # The Leader algo says it forms a new cluster.
+        
+        if len(members) > 0:
+            assigned[members] = True
+            clusters.append({
+                "centroid_id": ids[i],
+                "centroid_desc": descriptions[i],
+                "members": [ids[m] for m in members],
+                "size": len(members)
+            })
+            
+    # Sort by size
+    clusters.sort(key=lambda x: x['size'], reverse=True)
+    return clusters
+

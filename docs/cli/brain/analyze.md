@@ -1,37 +1,28 @@
-# BRAIN ANALYZE
+# BRAIN // ANALYZE
+Initiates deep semantic analysis of the current knowledge base.
 
-## Tier: Basic
-- Re-reads log history and shell batches.
-- Uses advanced classification prompts to find logic the passive monitor might have skipped.
-- Useful after updating your 'agents.md' constitution or classifier logic.
-Usage: ./cli brain analyze
+Scans recent knowledge nodes to identify hidden patterns, cross-sector dependencies, and thematic clusters.
 
-## Tier: More
-- Re-reads log history and shell batches.
-- Uses advanced classification prompts to find logic the passive monitor might have skipped.
-- Useful after updating your 'agents.md' constitution or classifier logic.
-Usage: ./cli brain analyze
+<card>
+title: ⦗ DEEP ANALYSIS ⦘
+Target: Recent Nodes (100)
+Method: Semantic Clustering
+Output: Relationship Index
+</card>
 
-TECHNICAL DEEP-DIVE:
-The 'analyze' command performs a 'Deep Sweep' of existing telemetry.
-1. Cold Reading: Iterates through all *.json and .zsh_history files in the archive.
-2. Batching: Groups text into 100-line windows to preserve context.
-3. Re-classification: Calls 'brain.reason.classify_intent' with a 'retrospective' persona that prioritizes discovery over filtering.
-4. Deduplication: Compares new findings against existing DB entries using 768D similarity to prevent double-entry.
-This ensures that the project brain evolves as the reasoning engine becomes more sophisticated.
+### Usage
+`./cli brain analyze`
 
-## Tier: Full
-- Re-reads log history and shell batches.
-- Uses advanced classification prompts to find logic the passive monitor might have skipped.
-- Useful after updating your 'agents.md' constitution or classifier logic.
-Usage: ./cli brain analyze
+### Technical Details
+Fetches the latest 100 nodes and performs a cosine-similarity matrix calculation to find related concepts that are not explicitly linked.
 
-TECHNICAL DEEP-DIVE:
-The 'analyze' command performs a 'Deep Sweep' of existing telemetry.
-1. Cold Reading: Iterates through all *.json and .zsh_history files in the archive.
-2. Batching: Groups text into 100-line windows to preserve context.
-3. Re-classification: Calls 'brain.reason.classify_intent' with a 'retrospective' persona that prioritizes discovery over filtering.
-4. Deduplication: Compares new findings against existing DB entries using 768D similarity to prevent double-entry.
-This ensures that the project brain evolves as the reasoning engine becomes more sophisticated.
+<card>
+title: ⦗ ANALYSIS PIPELINE ⦘
+1. Fetch Vectors
+2. Compute Similarity
+3. Cluster (DBSCAN)
+4. Update Metadata
+</card>
 
-[EXPANSION PENDING]
+### Code Internals
+Calls `atlas.run_deep_analysis()`. Utilizes `clide.brain.memory.search_registry` for vector operations.

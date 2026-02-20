@@ -1,37 +1,27 @@
-# PROBE CAPTURE
+# PROBE // CAPTURE
+Ingests content directly from the system clipboard (Termux/Android).
 
-## Tier: Basic
-- Grabs text directly from your clipboard.
-- Ideal for quick snippets or ideas found in a browser or other app.
-- Immediately processes and embeds the captured data.
-Usage: ./cli probe capture
+Rapidly saves clipboard contents as a knowledge node.
 
-## Tier: More
-- Grabs text directly from your clipboard.
-- Ideal for quick snippets or ideas found in a browser or other app.
-- Immediately processes and embeds the captured data.
-Usage: ./cli probe capture
+<card>
+title: ⦗ CLIPBOARD SYNC ⦘
+Source: Termux API
+Method: termux-clipboard-get
+Latency: < 200ms
+</card>
 
-TECHNICAL DEEP-DIVE:
-The 'capture' command bridges the gap between external apps and the project brain.
-1. Integration: Leverages 'termux-clipboard-get' on Android or 'pbpaste/xclip' on desktop.
-2. Sanitization: Removes leading/trailing whitespace and non-printable characters.
-3. Analysis: Triggers the full intent classification loop on the captured string.
-4. Notification: Prints a summary of what was found (e.g. '1 TODO detected').
-This provides an 'Immediate Ingest' path for transient thoughts and snippets.
+### Usage
+`./cli probe capture`
 
-## Tier: Full
-- Grabs text directly from your clipboard.
-- Ideal for quick snippets or ideas found in a browser or other app.
-- Immediately processes and embeds the captured data.
-Usage: ./cli probe capture
+### Technical Details
+Executes the `termux-clipboard-get` shell command via subprocess to retrieve text.
 
-TECHNICAL DEEP-DIVE:
-The 'capture' command bridges the gap between external apps and the project brain.
-1. Integration: Leverages 'termux-clipboard-get' on Android or 'pbpaste/xclip' on desktop.
-2. Sanitization: Removes leading/trailing whitespace and non-printable characters.
-3. Analysis: Triggers the full intent classification loop on the captured string.
-4. Notification: Prints a summary of what was found (e.g. '1 TODO detected').
-This provides an 'Immediate Ingest' path for transient thoughts and snippets.
+<card>
+title: ⦗ API BRIDGE ⦘
+Shell: subprocess.run
+Command: termux-clipboard-get
+Fallback: None (Req: Termux:API)
+</card>
 
-[EXPANSION PENDING]
+### Code Internals
+Calls `manual.extract_from_text(content, source="clipboard")`.

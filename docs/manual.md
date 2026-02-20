@@ -81,3 +81,14 @@ Ensure your shell is writing to `~/.zsh_history` immediately. You can add `setop
 
 ### Permission Errors
 On Android/Termux, ensure you have given storage permissions if you are working outside the home directory.
+
+---
+
+## 📚 Documentation Single Source of Truth (SSoT)
+
+To ensure absolute consistency across all system interfaces, CLIDE follows a strict SSoT protocol for documentation:
+
+1.  **Primary Source:** All help and reference documentation MUST reside in `docs/cli/`.
+2.  **CLI Interface:** The `./cli help` command parses these markdown files for high-fidelity terminal rendering.
+3.  **Web Interface:** The **V7: ATLAS Navigator** (hosted in the `/viz` dashboard) consumes the same source files via the Documentation API (`viz/serve.py`).
+4.  **Parity Maintenance:** When updating documentation, verify the rendering in both the CLI and the Web SPA to ensure compatibility and visual parity.

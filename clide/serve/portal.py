@@ -2,6 +2,7 @@ import sys
 import os
 import json
 import argparse
+from art import tprint
 
 # Add project root to sys.path
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -10,106 +11,111 @@ if BASE_DIR not in sys.path:
 
 from clide.brain.memory import search_registry
 from clide.kernel.settings import get_path, load_config
-from clide.serve import guide
+from clide.serve import guide, atlas
 
 # --- HELP & REF INTERCEPTOR ---
 
 def intercept_info_requests(argv):
-    from art import tprint
     # Primary info keywords
-    primary_info = ["help", "?", "ref", "atlas", "map"]
-    # Modifiers that only count if a primary is present
-    modifiers = ["more", "all", "full"]
+    primary_info = ["help", "?", "ref", "atlas"]
     
     if not any(k in argv for k in primary_info):
         return None
     
-    print("\033[38;5;196m", end="")
-    tprint("CLIDE", font="small")
-    print("\033[0m", end="")
-    
     is_ref = any(k in argv for k in ["ref", "atlas", "map"])
-    level = "basic"
     
-    if "all" in argv:
-        if "full" in argv: level = "all_full"
-        elif "more" in argv: level = "all_more"
-        else: level = "all"
-    elif "full" in argv: level = "full"
-    elif "more" in argv: level = "more"
-    
-    cleaned_args = [a for a in argv[1:] if a not in primary_info and a not in modifiers]
+    # Remove primary info keywords from args to find domain/command
+    cleaned_args = [a for a in argv[1:] if a not in primary_info]
     domain = cleaned_args[0] if cleaned_args else None
+    
+    # Special case for './cli help help'
     if not domain and argv.count("help") > 1: domain = "help"
+    
     command = cleaned_args[1] if len(cleaned_args) > 1 else None
     
-    if is_ref: guide.show_ref(domain, command, level)
-    else: guide.show_help(domain, command, level)
+    if is_ref: guide.show_ref(domain, command)
+    else: guide.show_help(domain, command)
     sys.exit(0)
 
-# --- DOMAIN HANDLERS ---
+# --- SECTOR 01: SENSORY ---
 
-def cmd_system(args):
-    if args.sys_cmd == "status":
-        from scripts import ingestion_stats
-        ingestion_stats.show_ingestion_stats()
-    elif args.sys_cmd == "config":
-        print("[v] Configuration view pending implementation.")
+def cmd_watch(args):
+    from clide.watch import stream
+    if args.watch_cmd == "go": stream.ClideExtractor().run()
+    elif args.watch_cmd == "off": stream.stop_monitor()
+    elif args.watch_cmd == "status": print(f"Monitor Status: {stream.get_monitor_status()}")
+    elif args.watch_cmd == "logs": stream.tail_logs(follow=args.tail, limit=args.limit)
 
-def cmd_manual(args):
-    from clide.kernel import storage
-    from clide.tools import janitor
-    if args.manual_cmd == "node":
-        if args.op == "get": print(json.dumps(dict(storage.get_knowledge_by_id(args.id)), indent=2))
-        elif args.op == "move": storage.update_node_category(args.id, args.cat)
-        elif args.op == "delete": storage.delete_knowledge(args.id)
-        elif args.op == "tag": storage.update_node_tags(args.id, args.tags)
-    elif args.manual_cmd == "task":
-        mgr = janitor.TodoManager()
-        if args.op == "list": mgr.list_todos()
-        elif args.op == "add": mgr.add_todo(args.content)
-        elif args.op == "remove": mgr.remove_todo(args.id)
+def cmd_probe(args):
+    from clide.probe import scout, manual, crawl
+    import subprocess
+    
+    if args.probe_cmd == "scout": scout.scout_url(args.url)
+    elif args.probe_cmd == "ingest": manual.extract_from_file(args.path)
+    elif args.probe_cmd == "crawl": crawl.crawl_site(args.url, depth=args.depth)
+    elif args.probe_cmd == "capture":
+        print("[Probe] Accessing system clipboard...")
+        try:
+            # Check for termux-api
+            res = subprocess.run(["termux-clipboard-get"], capture_output=True, text=True)
+            if res.returncode == 0:
+                content = res.stdout.strip()
+                if content:
+                    manual.extract_from_text(content, source="clipboard")
+                else:
+                    print("[!] Clipboard is empty.")
+            else:
+                print("[!] API Error: Ensure Termux:API is installed and authorized.")
+        except FileNotFoundError:
+            print("[!] 'termux-clipboard-get' not found. Is Termux:API package installed?")
+        except Exception as e:
+            print(f"[!] Capture failed: {e}")
+
+# --- SECTOR 02: COGNITIVE ---
+
+def cmd_search(args):
+    results = search_registry(args.query)
+    print(f"\n--- Search Results for '{args.query}' ---")
+    for sim, item in results:
+        print(f"({sim:.2f}) {item['id']}: {item['metadata'].get('desc', 'No description')}")
 
 def cmd_brain(args):
     from clide.serve import atlas
-    from clide.kernel import storage
-    if args.brain_cmd == "query":
-        results = search_registry(args.q)
-        print(f"\n--- Brain Query Results for '{args.q}' ---")
-        for sim, item in results:
-            print(f"({sim:.2f}) {item['id']}: {item['metadata'].get('desc', 'No description')}")
+    from clide.brain import auto
+    if args.brain_cmd == "analyze": atlas.run_deep_analysis()
     elif args.brain_cmd == "summary": atlas.generate_brain_summary()
-    elif args.brain_cmd == "list": atlas.list_brain_units()
-    elif args.brain_cmd == "merge":
-        from scripts import merge_logs
-        merge_logs.run_log_merge()
-    elif args.brain_cmd == "cloud":
-        from scripts import command_cloud
-        # Pass relevant args to the cloud generator
-        # We manually bridge the argparse results
-        import sys
-        # To avoid re-parsing in the script if possible, but the script is standalone too.
-        # Let's just call the main with custom sys.argv or just use the args directly
-        command_cloud.data = command_cloud.get_data(min_count=args.min, top_n=args.top)
-        if args.html: command_cloud.generate_html(command_cloud.data)
-        elif args.live: command_cloud.generate_live(command_cloud.data)
-        else: command_cloud.generate_static(command_cloud.data)
-    elif args.brain_cmd == "connect":
-        storage.add_relationship(args.id1, args.id2)
-        print(f"[v] Linked Node {args.id1} -> Node {args.id2}")
-    elif args.brain_cmd == "forget": storage.delete_knowledge(args.id)
-    elif args.brain_cmd == "graph":
+    elif args.brain_cmd == "verify": atlas.verify_facts()
+    elif args.brain_cmd == "approve": auto.approve_proposals()
+
+def cmd_map(args):
+    from clide.serve import atlas
+    # map graph, cloud, trace, stats
+    if args.map_cmd == "graph":
         nodes = atlas.get_brain_data(limit=100)
-        mmd_path = os.path.join(BASE_DIR, "docs/brain_graph.mmd")
-        with open(mmd_path, "w", encoding="utf-8") as f: f.write(atlas.generate_mermaid_graph(nodes))
-        print(f"[v] Graph exported to {mmd_path}")
+        if getattr(args, "mermaid", False):
+            mmd_path = os.path.join(BASE_DIR, "docs/brain_graph.mmd")
+            with open(mmd_path, "w", encoding="utf-8") as f: f.write(atlas.generate_mermaid_graph(nodes))
+            print(f"[v] Mermaid graph exported to {mmd_path}")
+        else:
+            atlas.render_ascii_graph(nodes)
+    elif args.map_cmd == "cloud":
+        from scripts import command_cloud
+        data = command_cloud.get_data(min_count=args.min, top_n=args.top)
+        if args.html: command_cloud.generate_html(data)
+        elif args.live: command_cloud.generate_live(data)
+        else: command_cloud.generate_static(data)
+    elif args.map_cmd == "trace":
+        atlas.render_trace_tree(args.id)
+    elif args.map_cmd == "stats":
+        atlas.render_stats_table()
 
 def cmd_index(args):
     from clide.brain import memory
     from rich.table import Table
     from rich.console import Console
     console = Console()
-    if args.index_cmd == "stat":
+    
+    if args.index_cmd == "stats":
         stats = memory.get_registry_stats()
         table = Table(title="Index Registry Metrics", header_style="bold red")
         table.add_column("Metric", style="white")
@@ -120,169 +126,304 @@ def cmd_index(args):
         for t, count in stats['distribution'].items():
             table.add_row(f"Type: {t}", str(count))
         console.print(table)
-    elif args.index_cmd == "full":
+    elif args.index_cmd == "rebuild":
         from scripts import batch_indexer
         batch_indexer.run_full_index()
-    elif args.index_cmd == "near":
-        registry = []
-        with open(memory.VECTOR_DB_PATH, "r") as f: registry = json.load(f)
-        target = next((item for item in registry if item["id"] == args.id), None)
-        if not target:
-            print(f"Error: Asset '{args.id}' not found.")
-            return
-        results = []
-        for item in registry:
-            if item["id"] == args.id: continue
-            sim = memory.cosine_similarity(target["embedding"], item["embedding"])
-            results.append((sim, item))
-        results.sort(key=lambda x: x[0], reverse=True)
-        print(f"\n--- Neighbors of '{args.id}' ---")
-        for sim, item in results[:5]: print(f"({sim:.3f}) {item['id']}: {item['metadata'].get('desc', '...')[:50]}")
+    elif args.index_cmd == "archives":
+        from scripts import rebuild_archives
+        rebuild_archives.run_archive_rebuild()
+    elif args.index_cmd == "cluster":
+        clusters = memory.cluster_registry(threshold=0.85)
+        
+        print(f"\n--- Knowledge Clusters (Threshold: 0.85) ---")
+        if not clusters:
+            print("[!] No significant clusters found.")
+        else:
+            for i, c in enumerate(clusters[:10]): # Top 10
+                print(f"Cluster {i+1}: {c['size']} items")
+                desc = c.get('centroid_desc', 'Unknown')
+                print(f"  Topic: {desc[:60]}...")
+                members = c.get('members', [])
+                print(f"  Sample: {', '.join(members[:3])}...")
+                print("")
+    elif args.index_cmd == "prune":
+        count = memory.prune_registry(min_importance=3)
+        print(f"[v] Pruned {count} low-importance entries from the vector registry.")
     elif args.index_cmd == "optimize":
         pruned = memory.optimize_registry()
         print(f"[v] Registry optimized. Removed {pruned} duplicate/orphaned entries.")
 
-def cmd_watch(args):
-    from clide.watch import stream
-    if args.watch_cmd == "start": stream.ClideExtractor().run()
-    elif args.watch_cmd == "stop": stream.stop_monitor()
-    elif args.watch_cmd == "status": print(f"Monitor Status: {stream.get_monitor_status()}")
-    elif args.watch_cmd == "logs": stream.tail_logs(follow=args.tail)
+# --- SECTOR 03: STATE ---
+
+def cmd_memory(args):
+    from clide.kernel import storage
+    from clide.serve import atlas
+    # list, create, edit, delete, connect, merge, forget
+    if args.mem_cmd == "list":
+        atlas.list_brain_units(limit=args.limit)
+    elif args.mem_cmd == "create":
+        # Manual node init
+        storage.save_knowledge(args.category, args.content, "Manual CLI addition")
+        print(f"[v] Created {args.category} node.")
+    elif args.mem_cmd == "edit":
+        # Contextual CRUD
+        storage.update_knowledge(args.id, content=args.content)
+        print(f"[v] Updated node {args.id}")
+    elif args.mem_cmd == "delete":
+        storage.delete_knowledge(args.id, soft=True)
+        print(f"[v] Soft-deleted node {args.id}")
+    elif args.mem_cmd == "connect":
+        storage.add_relationship(args.id1, args.id2)
+        print(f"[v] Linked Node {args.id1} -> Node {args.id2}")
+    elif args.mem_cmd == "merge":
+        from scripts import merge_logs
+        merge_logs.run_log_merge()
+    elif args.mem_cmd == "forget":
+        storage.delete_knowledge(args.id, soft=False)
+        print(f"[v] Hard-deleted node {args.id}")
+
+def cmd_run(args):
+    from clide.brain import auto
+    from clide.tools import janitor
+    # plan, task, sync
+    if args.run_cmd == "plan":
+        auto.auto_prioritize_tasks()
+    elif args.run_cmd == "task":
+        mgr = janitor.TodoManager()
+        if args.op == "list": mgr.list_todos()
+        elif args.op == "add": mgr.add_todo(args.content)
+        elif args.op == "remove": mgr.remove_todo(args.id)
+        elif args.op == "complete": mgr.complete_todo(args.id)
+    elif args.run_cmd == "sync":
+        auto.auto_sync_todos()
+
+def cmd_maintain(args):
+    from clide.brain import auto, governance
+    # tag, clean, audit, strategist
+    if args.main_cmd == "tag": auto.auto_tag_nodes()
+    elif args.main_cmd == "clean": auto.auto_clean_metadata()
+    elif args.main_cmd == "audit": auto.auto_audit_brain()
+    elif args.main_cmd == "strategist": governance.run_strategist()
+
+# --- SECTOR 04: EXECUTIVE ---
 
 def cmd_forge(args):
-    from clide.gen import master
+    from clide.forge import master
     orch = master.SynthesisOrchestrator()
     if args.forge_cmd == "tool": orch.process_tool_request(args.name, args.prompt)
+    elif args.forge_cmd == "evolve": orch.evolve_tool(args.id, args.instruction)
+    elif args.forge_cmd == "design": orch.generate_design(args.name, args.desc)
+    elif args.forge_cmd == "skill": orch.create_skill(args.name, args.description)
+    elif args.forge_cmd == "persona": orch.define_persona(args.name, args.description, args.directive)
     elif args.forge_cmd == "test": orch.run_tests(args.id)
+    elif args.forge_cmd == "bench": orch.run_benchmark(args.id)
+    elif args.forge_cmd == "archive": orch.archive_asset(args.id)
 
-def cmd_auto(args):
-    from clide.brain import auto
-    if args.auto_cmd == "tag": auto.auto_tag_nodes()
-    elif args.auto_cmd == "plan": auto.auto_prioritize_tasks()
-    elif args.auto_cmd == "sync": auto.auto_sync_todos()
-    elif args.auto_cmd == "audit": auto.auto_audit_brain()
+def cmd_system(args):
+    if args.sys_cmd == "config":
+        config = load_config()
+        print("\n--- CLIDE KERNEL CONFIGURATION ---")
+        print(json.dumps(config, indent=2))
+    elif args.sys_cmd == "asset":
+        from clide.brain import memory
+        stats = memory.get_registry_stats()
+        print("\n--- CLIDE ASSET INVENTORY ---")
+        print(f"Total Registered Assets: {stats['total_assets']}")
+        for t, count in stats['distribution'].items():
+            print(f" - {t:15}: {count}")
+    elif args.sys_cmd == "health":
+        # Alias for status or expanded health check
+        from scripts import ingestion_stats
+        ingestion_stats.show_ingestion_stats()
+    elif args.sys_cmd == "backup":
+        import shutil
+        from datetime import datetime
+        backup_dir = os.path.join(BASE_DIR, "clide/backups")
+        os.makedirs(backup_dir, exist_ok=True)
+        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+        db_path = get_path("memory")
+        backup_path = os.path.join(backup_dir, f"memory_{ts}.db")
+        shutil.copy2(db_path, backup_path)
+        print(f"[v] Full-state backup created at: {backup_path}")
+    elif args.sys_cmd == "resume":
+        print("[System] Resuming last cognitive session...")
+        # Implementation for session resumption
+        from clide.serve import dashboard
+        dashboard.run_dashboard()
+    elif args.sys_cmd == "dash":
+         from clide.serve import dashboard
+         dashboard.run_dashboard()
 
 def main():
     intercept_info_requests(sys.argv)
     parser = argparse.ArgumentParser(description="CLIDE: Knowledge Operating System", add_help=False)
     subparsers = parser.add_subparsers(dest="command")
 
-    # 1. WATCH
+    # --- SECTOR 01: SENSORY ---
+    
+    # WATCH
     watch_p = subparsers.add_parser("watch")
     watch_sub = watch_p.add_subparsers(dest="watch_cmd")
-    watch_sub.add_parser("start")
-    watch_sub.add_parser("stop")
+    watch_sub.add_parser("go")
+    watch_sub.add_parser("off")
     watch_sub.add_parser("status")
-    watch_sub.add_parser("logs").add_argument("--tail", action="store_true")
+    logs_p = watch_sub.add_parser("logs")
+    logs_p.add_argument("--tail", action="store_true")
+    logs_p.add_argument("--limit", type=int, default=10)
 
-    # 2. PROBE
+    # PROBE
     probe_p = subparsers.add_parser("probe")
     probe_sub = probe_p.add_subparsers(dest="probe_cmd")
     probe_sub.add_parser("scout").add_argument("url")
-    probe_sub.add_parser("manual").add_argument("path")
+    probe_sub.add_parser("ingest").add_argument("path")
     probe_sub.add_parser("capture")
-    probe_sub.add_parser("crawl")
+    crawl_p = probe_sub.add_parser("crawl")
+    crawl_p.add_argument("url")
+    crawl_p.add_argument("--depth", type=int, default=1)
 
-    # 3. BRAIN
+    # --- SECTOR 02: COGNITIVE ---
+
+    # SEARCH
+    search_p = subparsers.add_parser("search")
+    search_p.add_argument("query")
+
+    # BRAIN
     brain_p = subparsers.add_parser("brain")
     brain_sub = brain_p.add_subparsers(dest="brain_cmd")
-    brain_sub.add_parser("query").add_argument("q")
-    brain_sub.add_parser("graph")
-    brain_sub.add_parser("merge")
-    cloud_p = brain_sub.add_parser("cloud")
+    brain_sub.add_parser("analyze")
+    brain_sub.add_parser("summary")
+    brain_sub.add_parser("verify")
+    brain_sub.add_parser("approve")
+
+    # MAP
+    map_p = subparsers.add_parser("map")
+    map_sub = map_p.add_subparsers(dest="map_cmd")
+    map_graph = map_sub.add_parser("graph")
+    map_graph.add_argument("--mermaid", action="store_true", help="Export Mermaid graph to file")
+    cloud_p = map_sub.add_parser("cloud")
     cloud_p.add_argument("--live", action="store_true")
     cloud_p.add_argument("--html", action="store_true")
     cloud_p.add_argument("--top", type=int, default=100)
     cloud_p.add_argument("--min", type=int, default=1)
-    brain_sub.add_parser("analyze")
-    brain_sub.add_parser("summary")
-    brain_sub.add_parser("audit")
-    brain_sub.add_parser("verify")
-    brain_sub.add_parser("list")
-    link_p = brain_sub.add_parser("connect")
-    link_p.add_argument("id1", type=int); link_p.add_argument("id2", type=int)
-    brain_sub.add_parser("forget").add_argument("id", type=int)
+    map_sub.add_parser("trace").add_argument("id")
+    map_sub.add_parser("stats")
 
-    # 4. INDEX
+    # INDEX
     index_p = subparsers.add_parser("index")
     index_sub = index_p.add_subparsers(dest="index_cmd")
-    index_sub.add_parser("full")
-    index_sub.add_parser("near").add_argument("id")
-    index_sub.add_parser("trace").add_argument("id")
+    index_sub.add_parser("rebuild")
+    index_sub.add_parser("archives")
     index_sub.add_parser("cluster")
     index_sub.add_parser("prune")
     index_sub.add_parser("optimize")
-    index_sub.add_parser("stat")
+    index_sub.add_parser("stats")
 
-    # 5. FORGE
+    # --- SECTOR 03: STATE ---
+
+    # MEMORY
+    mem_p = subparsers.add_parser("memory")
+    mem_sub = mem_p.add_subparsers(dest="mem_cmd")
+    mem_list = mem_sub.add_parser("list")
+    mem_list.add_argument("--limit", type=int, default=20)
+    mem_create = mem_sub.add_parser("create")
+    mem_create.add_argument("content")
+    mem_create.add_argument("--category", default="general")
+    mem_create.add_argument("--tags", nargs="+", default=[])
+    mem_edit = mem_sub.add_parser("edit")
+    mem_edit.add_argument("id", type=int)
+    mem_edit.add_argument("content")
+    mem_del = mem_sub.add_parser("delete")
+    mem_del.add_argument("id", type=int)
+    mem_conn = mem_sub.add_parser("connect")
+    mem_conn.add_argument("id1", type=int)
+    mem_conn.add_argument("id2", type=int)
+    mem_sub.add_parser("merge")
+    mem_forget = mem_sub.add_parser("forget")
+    mem_forget.add_argument("id", type=int)
+
+    # RUN
+    run_p = subparsers.add_parser("run")
+    run_sub = run_p.add_subparsers(dest="run_cmd")
+    run_sub.add_parser("plan")
+    run_task = run_sub.add_parser("task")
+    run_task_op = run_task.add_subparsers(dest="op")
+    run_task_op.add_parser("list")
+    run_task_add = run_task_op.add_parser("add")
+    run_task_add.add_argument("content")
+    run_task_rem = run_task_op.add_parser("remove")
+    run_task_rem.add_argument("id", type=int)
+    run_task_comp = run_task_op.add_parser("complete")
+    run_task_comp.add_argument("id", type=int)
+    run_sub.add_parser("sync")
+
+    # MAINTAIN
+    maint_p = subparsers.add_parser("maintain")
+    maint_sub = maint_p.add_subparsers(dest="main_cmd")
+    maint_sub.add_parser("tag")
+    maint_sub.add_parser("clean")
+    maint_sub.add_parser("audit")
+    maint_sub.add_parser("strategist")
+
+    # --- SECTOR 04: EXECUTIVE ---
+
+    # FORGE
     forge_p = subparsers.add_parser("forge")
     forge_sub = forge_p.add_subparsers(dest="forge_cmd")
-    tool_p = forge_sub.add_parser("tool")
-    tool_p.add_argument("name"); tool_p.add_argument("prompt")
-    evolve_p = forge_sub.add_parser("evolve")
-    evolve_p.add_argument("id"); evolve_p.add_argument("instruction")
-    forge_sub.add_parser("design").add_argument("desc")
-    forge_sub.add_parser("skill").add_argument("name")
-    forge_sub.add_parser("persona").add_argument("name")
-    forge_sub.add_parser("test").add_argument("id")
-    forge_sub.add_parser("bench").add_argument("id")
-    forge_sub.add_parser("archive").add_argument("id")
+    forge_tool = forge_sub.add_parser("tool")
+    forge_tool.add_argument("name")
+    forge_tool.add_argument("prompt")
+    forge_evolve = forge_sub.add_parser("evolve")
+    forge_evolve.add_argument("id")
+    forge_evolve.add_argument("instruction")
+    forge_design = forge_sub.add_parser("design")
+    forge_design.add_argument("name")
+    forge_design.add_argument("desc")
+    forge_skill = forge_sub.add_parser("skill")
+    forge_skill.add_argument("name")
+    forge_skill.add_argument("description", nargs="?", default="Modular skill.")
+    forge_persona = forge_sub.add_parser("persona")
+    forge_persona.add_argument("name")
+    forge_persona.add_argument("description", nargs="?", default="System persona.")
+    forge_persona.add_argument("directive", nargs="?", default="Optimize output.")
+    forge_test = forge_sub.add_parser("test")
+    forge_test.add_argument("id")
+    forge_bench = forge_sub.add_parser("bench")
+    forge_bench.add_argument("id")
+    forge_archive = forge_sub.add_parser("archive")
+    forge_archive.add_argument("id")
 
-    # 6. AUTO
-    auto_p = subparsers.add_parser("auto")
-    auto_sub = auto_p.add_subparsers(dest="auto_cmd")
-    auto_sub.add_parser("tag")
-    auto_sub.add_parser("plan")
-    auto_sub.add_parser("sync")
-    auto_sub.add_parser("audit")
-    auto_sub.add_parser("clean")
+    # SYSTEM
+    sys_p = subparsers.add_parser("system")
+    sys_sub = sys_p.add_subparsers(dest="sys_cmd")
+    sys_sub.add_parser("dash") # alias
+    sys_sub.add_parser("config")
+    sys_sub.add_parser("asset")
+    sys_sub.add_parser("health")
+    sys_sub.add_parser("backup")
+    sys_sub.add_parser("resume")
 
-    # 7. SYSTEM
-    sys_p = subparsers.add_parser("status")
-    sys_p.set_defaults(command="system", sys_cmd="status")
-    
-    # 8. DASHBOARD
-    subparsers.add_parser("dash")
-    subparsers.add_parser("cli")
-
-    # 9. MANUAL
-    manual_p = subparsers.add_parser("manual")
-    manual_sub = manual_p.add_subparsers(dest="manual_cmd")
-    node_p = manual_sub.add_parser("node")
-    node_op = node_p.add_subparsers(dest="op")
-    node_op.add_parser("get").add_argument("id", type=int)
-    move_p = node_op.add_parser("move"); move_p.add_argument("id", type=int); move_p.add_argument("cat")
-    node_op.add_parser("delete").add_argument("id", type=int)
-    tag_p = node_op.add_parser("tag")
-    tag_p.add_argument("id", type=int); tag_p.add_argument("tags", nargs="+")
-    task_p = manual_sub.add_parser("task")
-    task_op = task_p.add_subparsers(dest="op")
-    task_op.add_parser("list")
-    task_op.add_parser("add").add_argument("content")
-    task_op.add_parser("remove").add_argument("id", type=int)
+    # --- LEGACY / ALIASES ---
+    subparsers.add_parser("dash") # Top level dash alias
 
     args = parser.parse_args()
 
-    if not args.command:
-        from clide.serve import dashboard
-        dashboard.run_dashboard()
+    if not args.command or args.command == "dash":
+        from clide.serve import ui
+        ui.launch_hub()
         return
 
-    if args.command == "system": cmd_system(args)
-    elif args.command == "manual": cmd_manual(args)
-    elif args.command == "watch": cmd_watch(args)
-    elif args.command == "forge": cmd_forge(args)
+    # Dispatch
+    if args.command == "watch": cmd_watch(args)
+    elif args.command == "probe": cmd_probe(args)
+    elif args.command == "search": cmd_search(args)
     elif args.command == "brain": cmd_brain(args)
+    elif args.command == "map": cmd_map(args)
     elif args.command == "index": cmd_index(args)
-    elif args.command == "auto": cmd_auto(args)
-    elif args.command in ["dash", "cli"]:
-        from clide.serve import dashboard
-        dashboard.run_dashboard()
-    elif args.command == "probe":
-        from clide.probe import scout, manual
-        if args.probe_cmd == "manual": manual.extract_from_file(args.path)
-        elif args.probe_cmd == "scout": scout.scout_url(args.url)
-    else: print(f"Command '{args.command}' logic integration pending.")
+    elif args.command == "memory": cmd_memory(args)
+    elif args.command == "run": cmd_run(args)
+    elif args.command == "maintain": cmd_maintain(args)
+    elif args.command == "forge": cmd_forge(args)
+    elif args.command == "system": cmd_system(args)
 
 if __name__ == "__main__":
     main()

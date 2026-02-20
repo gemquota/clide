@@ -44,3 +44,15 @@ This document defines the structured workflows used by CLIDE agents. Protocols a
 - **Goal:** Evolving the agents themselves (updating `agents.md` or core CLIDE logic).
 - **Key Gate:** "Self-Reflection" artifact documenting why the change is necessary.
 - **Command:** `meta`
+
+---
+
+## Group 4: Documentation (The SSoT)
+*Focus: Ensuring absolute consistency across all system interfaces.*
+
+### Protocol 4.1: Documentation Single Source of Truth (SSoT)
+- **Goal:** Preventing "Source Drift" between CLI and Web interfaces.
+- **Source Root:** All documentation MUST reside in 'docs/cli/'.
+- **CLI Access:** The './cli help' system parses these files for terminal output.
+- **Web Access:** The 'V7: ATLAS Navigator' SPA consumes these same files via the '/api/docs' endpoints in 'viz/serve.py'.
+- **Parity:** Any structural change to the docs must be verified in both the CLI and the Web SPA to ensure correct rendering.

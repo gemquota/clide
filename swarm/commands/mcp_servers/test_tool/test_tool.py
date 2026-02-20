@@ -7,27 +7,29 @@
 # ///
 import asyncio
 from mcp.server.fastmcp import FastMCP
+import datetime
 
 # Initialize FastMCP server synthesized by CLIDE
 mcp = FastMCP("test_tool")
 
 @mcp.tool()
-```python
-def test_tool() -> None:
-    """Prints "hello" to the console.
 
-    This tool serves as a basic example for testing and demonstration purposes.
-    It performs a simple print operation.
-
-    Tool Name: test_tool
+def test_tool(args: str) -> str:
     """
-```
+    Returns the current date and time as a string.
 
-```python
-def test_tool() -> None:
-```
-    # A tool for testing
-    print('hello')
+    Args:
+        args: (str) Unused argument. Included for tool consistency.
+
+    Returns:
+        str: A string representing the current date and time in ISO format,
+             or an error message if an exception occurs.
+    """
+    try:
+        now = datetime.datetime.now()
+        return now.isoformat()
+    except Exception as e:
+        return f"Error: Could not get current date and time. {e}"
 
 if __name__ == "__main__":
     mcp.run()
