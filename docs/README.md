@@ -1,10 +1,16 @@
-# CLIDE (v0.6.0-Alpha)
+# CLIDE (v0.7.0)
 **Command Line Interface - Database: Everything**
 
 ## Project Thesis
 CLIDE is an **Autonomous Knowledge & Asset Forge**. It solves the "Ephemeral Intent Gap" by monitoring user interactions and shell history to formalize them into two distinct outputs:
 1. **Agentic Assets:** Hot-swappable Prompts (TOML) and MCP Servers (Python).
 2. **Project Brain:** A persistent knowledge base of Facts, Discoveries, Lessons, and TODOs.
+
+## 🧠 Massive Scale: The 1.5M Brain
+CLIDE has scaled to ingest **1.5M+ lines of code and interaction history** into its persistent memory.
+- **Dynamic Context:** 1.5M lines of project-wide source code and logs are indexed for real-time RAG.
+- **Persistent Memory:** High-density vector registry for sub-second retrieval across the entire knowledge base.
+- **Forge Velocity:** Capable of synthesizing assets from a context window that spans the entire project history.
 
 ## 🚦 Quick Start
 1. **Start the Brain Monitor:**
@@ -63,4 +69,4 @@ Agents follow a standardized taxonomy to ensure engineering rigor:
 - **Repetition Override:** If you ask for the same thing 3 times, CLIDE overrides normal monitoring to force a command extraction proposal.
 
 ---
-*Identity: CLIDE v0.6.0-Alpha - "The Extraction Refocus"*
+*Identity: CLIDE v0.7.0 - "The 1.5M Brain Ingestion"*

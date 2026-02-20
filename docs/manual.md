@@ -1,4 +1,4 @@
-# CLIDE: The In-Depth Manual (v0.6.0)
+# CLIDE: The In-Depth Manual (v0.7.0)
 
 Welcome to CLIDE. This manual covers the operational workflows, database synchronization, and reporting mechanisms of the system.
 

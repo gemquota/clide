@@ -1,4 +1,4 @@
-# CLIDE Operational Protocols (v0.6.0)
+# CLIDE Operational Protocols (v0.7.0)
 
 This document defines the structured workflows used by CLIDE agents. Protocols are organized logically: **Design -> Implementation -> Oversight.**
 
