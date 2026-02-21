@@ -22,8 +22,6 @@ def intercept_info_requests(argv):
     if not any(k in argv for k in primary_info):
         return None
     
-    is_ref = any(k in argv for k in ["ref", "atlas", "map"])
-    
     # Remove primary info keywords from args to find domain/command
     cleaned_args = [a for a in argv[1:] if a not in primary_info]
     domain = cleaned_args[0] if cleaned_args else None
@@ -33,18 +31,22 @@ def intercept_info_requests(argv):
     
     command = cleaned_args[1] if len(cleaned_args) > 1 else None
     
-    if is_ref: guide.show_ref(domain, command)
-    else: guide.show_help(domain, command)
+    guide.show_unified_help(domain, command)
     sys.exit(0)
 
 # --- SECTOR 01: SENSORY ---
 
 def cmd_watch(args):
     from clide.watch import stream
-    if args.watch_cmd == "go": stream.ClideExtractor().run()
+    if not args.watch_cmd or args.watch_cmd == "go": stream.ClideExtractor().run()
     elif args.watch_cmd == "off": stream.stop_monitor()
     elif args.watch_cmd == "status": print(f"Monitor Status: {stream.get_monitor_status()}")
     elif args.watch_cmd == "logs": stream.tail_logs(follow=args.tail, limit=args.limit)
+    elif args.watch_cmd == "progress":
+        from clide.watch import history
+        if os.path.exists(history.PROGRESS_PATH):
+            with open(history.PROGRESS_PATH, "r") as f: print(f.read())
+        else: print("[!] Progress data not found.")
 
 def cmd_probe(args):
     from clide.probe import scout, manual, crawl
@@ -82,7 +84,7 @@ def cmd_search(args):
 def cmd_brain(args):
     from clide.serve import atlas
     from clide.brain import auto
-    if args.brain_cmd == "analyze": atlas.run_deep_analysis()
+    if args.brain_cmd == "analyze": atlas.run_deep_analysis(limit=args.amount)
     elif args.brain_cmd == "summary": atlas.generate_brain_summary()
     elif args.brain_cmd == "verify": atlas.verify_facts()
     elif args.brain_cmd == "approve": auto.approve_proposals()
@@ -91,7 +93,7 @@ def cmd_map(args):
     from clide.serve import atlas
     # map graph, cloud, trace, stats
     if args.map_cmd == "graph":
-        nodes = atlas.get_brain_data(limit=100)
+        nodes = atlas.get_brain_data(limit=args.amount)
         if getattr(args, "mermaid", False):
             mmd_path = os.path.join(BASE_DIR, "docs/brain_graph.mmd")
             with open(mmd_path, "w", encoding="utf-8") as f: f.write(atlas.generate_mermaid_graph(nodes))
@@ -100,7 +102,7 @@ def cmd_map(args):
             atlas.render_ascii_graph(nodes)
     elif args.map_cmd == "cloud":
         from scripts import command_cloud
-        data = command_cloud.get_data(min_count=args.min, top_n=args.top)
+        data = command_cloud.get_data(min_count=args.min, top_n=args.amount)
         if args.html: command_cloud.generate_html(data)
         elif args.live: command_cloud.generate_live(data)
         else: command_cloud.generate_static(data)
@@ -111,29 +113,24 @@ def cmd_map(args):
 
 def cmd_index(args):
     from clide.brain import memory
-    from rich.table import Table
-    from rich.console import Console
-    console = Console()
+    from clide.serve import atlas
     
     if args.index_cmd == "stats":
-        stats = memory.get_registry_stats()
-        table = Table(title="Index Registry Metrics", header_style="bold red")
-        table.add_column("Metric", style="white")
-        table.add_column("Value", style="cyan")
-        table.add_row("Total Assets", str(stats['total_assets']))
-        table.add_row("File Size", f"{stats['file_size_kb']:.2f} KB")
-        table.add_row("Dimensions", str(stats['dimensions']))
-        for t, count in stats['distribution'].items():
-            table.add_row(f"Type: {t}", str(count))
-        console.print(table)
+        atlas.render_stats_table()
     elif args.index_cmd == "rebuild":
-        from scripts import batch_indexer
-        batch_indexer.run_full_index()
+        print("[!] WARNING: Full index rebuild will re-vectorize all knowledge units.")
+        print("    This may take significant time and consume API tokens.")
+        confirm = input("    Proceed with total rebuild? (y/N): ").lower()
+        if confirm == 'y':
+            from scripts import batch_indexer
+            batch_indexer.run_full_index()
+        else:
+            print("[x] Rebuild aborted.")
     elif args.index_cmd == "archives":
         from scripts import rebuild_archives
         rebuild_archives.run_archive_rebuild()
     elif args.index_cmd == "cluster":
-        clusters = memory.cluster_registry(threshold=0.85)
+        clusters = memory.cluster_registry(threshold=0.85, persist=args.persist)
         
         print(f"\n--- Knowledge Clusters (Threshold: 0.85) ---")
         if not clusters:
@@ -202,7 +199,7 @@ def cmd_maintain(args):
     # tag, clean, audit, strategist
     if args.main_cmd == "tag": auto.auto_tag_nodes()
     elif args.main_cmd == "clean": auto.auto_clean_metadata()
-    elif args.main_cmd == "audit": auto.auto_audit_brain()
+    elif args.main_cmd == "audit": auto.auto_audit_brain(threshold=args.threshold)
     elif args.main_cmd == "strategist": governance.run_strategist()
 
 # --- SECTOR 04: EXECUTIVE ---
@@ -220,17 +217,13 @@ def cmd_forge(args):
     elif args.forge_cmd == "archive": orch.archive_asset(args.id)
 
 def cmd_system(args):
+    from clide.serve import atlas
     if args.sys_cmd == "config":
         config = load_config()
         print("\n--- CLIDE KERNEL CONFIGURATION ---")
         print(json.dumps(config, indent=2))
     elif args.sys_cmd == "asset":
-        from clide.brain import memory
-        stats = memory.get_registry_stats()
-        print("\n--- CLIDE ASSET INVENTORY ---")
-        print(f"Total Registered Assets: {stats['total_assets']}")
-        for t, count in stats['distribution'].items():
-            print(f" - {t:15}: {count}")
+        atlas.render_stats_table()
     elif args.sys_cmd == "health":
         # Alias for status or expanded health check
         from scripts import ingestion_stats
@@ -254,162 +247,178 @@ def cmd_system(args):
          from clide.serve import dashboard
          dashboard.run_dashboard()
 
+# --- CLI ORCHESTRATOR ---
+
+class ClideArgumentParser(argparse.ArgumentParser):
+    def error(self, message):
+        print(f"Error: {message}\n")
+        self.print_help()
+        sys.exit(2)
+
 def main():
     intercept_info_requests(sys.argv)
-    parser = argparse.ArgumentParser(description="CLIDE: Knowledge Operating System", add_help=False)
+    parser = ClideArgumentParser(description="CLIDE: Knowledge Operating System", add_help=False)
     subparsers = parser.add_subparsers(dest="command")
 
     # --- SECTOR 01: SENSORY ---
     
     # WATCH
-    watch_p = subparsers.add_parser("watch")
+    watch_p = subparsers.add_parser("watch", help="Monitor and process Gemini logs")
     watch_sub = watch_p.add_subparsers(dest="watch_cmd")
-    watch_sub.add_parser("go")
-    watch_sub.add_parser("off")
-    watch_sub.add_parser("status")
-    logs_p = watch_sub.add_parser("logs")
-    logs_p.add_argument("--tail", action="store_true")
-    logs_p.add_argument("--limit", type=int, default=10)
+    watch_sub.add_parser("go", help="Start background monitoring")
+    watch_sub.add_parser("off", help="Stop background monitoring")
+    watch_sub.add_parser("status", help="Check monitor status")
+    watch_sub.add_parser("progress", help="Show ingestion progress")
+    logs_p = watch_sub.add_parser("logs", help="Tail enriched logs")
+    logs_p.add_argument("--tail", action="store_true", help="Follow log output")
+    logs_p.add_argument("--limit", type=int, default=10, help="Number of lines to show")
 
     # PROBE
-    probe_p = subparsers.add_parser("probe")
+    probe_p = subparsers.add_parser("probe", help="Scout and ingest external data")
     probe_sub = probe_p.add_subparsers(dest="probe_cmd")
-    probe_sub.add_parser("scout").add_argument("url")
-    probe_sub.add_parser("ingest").add_argument("path")
-    probe_sub.add_parser("capture")
-    crawl_p = probe_sub.add_parser("crawl")
+    probe_p_scout = probe_sub.add_parser("scout", help="Scout a URL for metadata")
+    probe_p_scout.add_argument("url")
+    probe_ingest = probe_sub.add_parser("ingest", help="Ingest facts from a local file")
+    probe_ingest.add_argument("path")
+    probe_sub.add_parser("capture", help="Extract facts from system clipboard")
+    crawl_p = probe_sub.add_parser("crawl", help="Recursively crawl a website")
     crawl_p.add_argument("url")
-    crawl_p.add_argument("--depth", type=int, default=1)
+    crawl_p.add_argument("--depth", type=int, default=1, help="Crawl depth")
 
     # --- SECTOR 02: COGNITIVE ---
 
     # SEARCH
-    search_p = subparsers.add_parser("search")
+    search_p = subparsers.add_parser("search", help="Semantic search across knowledge registry")
     search_p.add_argument("query")
 
     # BRAIN
-    brain_p = subparsers.add_parser("brain")
+    brain_p = subparsers.add_parser("brain", help="High-level cognitive analysis and management")
     brain_sub = brain_p.add_subparsers(dest="brain_cmd")
-    brain_sub.add_parser("analyze")
-    brain_sub.add_parser("summary")
-    brain_sub.add_parser("verify")
-    brain_sub.add_parser("approve")
+    brain_analyze = brain_sub.add_parser("analyze", help="Perform deep analysis on unlinked facts")
+    brain_analyze.add_argument("--amount", type=int, default=100)
+    brain_sub.add_parser("summary", help="Generate executive summary of brain state")
+    brain_sub.add_parser("verify", help="Verify fact consistency and accuracy")
+    brain_sub.add_parser("approve", help="Manually approve pending command proposals")
 
     # MAP
-    map_p = subparsers.add_parser("map")
+    map_p = subparsers.add_parser("map", help="Visualize knowledge structures")
     map_sub = map_p.add_subparsers(dest="map_cmd")
-    map_graph = map_sub.add_parser("graph")
+    map_graph = map_sub.add_parser("graph", help="Render knowledge graph (ASCII/Mermaid)")
     map_graph.add_argument("--mermaid", action="store_true", help="Export Mermaid graph to file")
-    cloud_p = map_sub.add_parser("cloud")
-    cloud_p.add_argument("--live", action="store_true")
-    cloud_p.add_argument("--html", action="store_true")
-    cloud_p.add_argument("--top", type=int, default=100)
-    cloud_p.add_argument("--min", type=int, default=1)
-    map_sub.add_parser("trace").add_argument("id")
-    map_sub.add_parser("stats")
+    map_graph.add_argument("--amount", type=int, default=100, help="Max nodes to render")
+    cloud_p = map_sub.add_parser("cloud", help="Generate command word cloud")
+    cloud_p.add_argument("--live", action="store_true", help="Launch live interactive cloud")
+    cloud_p.add_argument("--html", action="store_true", help="Export as HTML file")
+    cloud_p.add_argument("--amount", type=int, default=100, help="Top N terms")
+    cloud_p.add_argument("--min", type=int, default=1, help="Min term frequency")
+    map_trace = map_sub.add_parser("trace", help="Trace lineage of a specific node")
+    map_trace.add_argument("id")
+    map_sub.add_parser("stats", help="Show system-wide statistics")
 
     # INDEX
-    index_p = subparsers.add_parser("index")
+    index_p = subparsers.add_parser("index", help="Registry optimization and maintenance")
     index_sub = index_p.add_subparsers(dest="index_cmd")
-    index_sub.add_parser("rebuild")
-    index_sub.add_parser("archives")
-    index_sub.add_parser("cluster")
-    index_sub.add_parser("prune")
-    index_sub.add_parser("optimize")
-    index_sub.add_parser("stats")
+    index_sub.add_parser("rebuild", help="Full re-vectorization of knowledge base")
+    index_sub.add_parser("archives", help="Rebuild long-term ingestion archives")
+    index_cluster = index_sub.add_parser("cluster", help="Group knowledge into semantic clusters")
+    index_cluster.add_argument("--persist", action="store_true", help="Save cluster IDs to registry metadata")
+    index_sub.add_parser("prune", help="Remove low-importance knowledge units")
+    index_sub.add_parser("optimize", help="Deduplicate and sort the vector registry")
+    index_sub.add_parser("stats", help="Telemetry on registry health")
 
     # --- SECTOR 03: STATE ---
 
     # MEMORY
-    mem_p = subparsers.add_parser("memory")
+    mem_p = subparsers.add_parser("memory", help="Direct CRUD operations on knowledge nodes")
     mem_sub = mem_p.add_subparsers(dest="mem_cmd")
-    mem_list = mem_sub.add_parser("list")
+    mem_list = mem_sub.add_parser("list", help="List recent knowledge units")
     mem_list.add_argument("--limit", type=int, default=20)
-    mem_create = mem_sub.add_parser("create")
+    mem_create = mem_sub.add_parser("create", help="Manually create a knowledge node")
     mem_create.add_argument("content")
     mem_create.add_argument("--category", default="general")
     mem_create.add_argument("--tags", nargs="+", default=[])
-    mem_edit = mem_sub.add_parser("edit")
+    mem_edit = mem_sub.add_parser("edit", help="Update existing node content")
     mem_edit.add_argument("id", type=int)
     mem_edit.add_argument("content")
-    mem_del = mem_sub.add_parser("delete")
+    mem_del = mem_sub.add_parser("delete", help="Soft-delete a node")
     mem_del.add_argument("id", type=int)
-    mem_conn = mem_sub.add_parser("connect")
+    mem_conn = mem_sub.add_parser("connect", help="Create a relationship between two nodes")
     mem_conn.add_argument("id1", type=int)
     mem_conn.add_argument("id2", type=int)
-    mem_sub.add_parser("merge")
-    mem_forget = mem_sub.add_parser("forget")
+    mem_sub.add_parser("merge", help="Merge scattered logs into memory")
+    mem_forget = mem_sub.add_parser("forget", help="Permanently purge a node")
     mem_forget.add_argument("id", type=int)
 
     # RUN
-    run_p = subparsers.add_parser("run")
+    run_p = subparsers.add_parser("run", help="Execution and task management")
     run_sub = run_p.add_subparsers(dest="run_cmd")
-    run_sub.add_parser("plan")
-    run_task = run_sub.add_parser("task")
+    run_sub.add_parser("plan", help="Auto-prioritize brain tasks")
+    run_task = run_sub.add_parser("task", help="CLI task list management")
     run_task_op = run_task.add_subparsers(dest="op")
-    run_task_op.add_parser("list")
-    run_task_add = run_task_op.add_parser("add")
+    run_task_op.add_parser("list", help="List all todos")
+    run_task_add = run_task_op.add_parser("add", help="Add a new todo")
     run_task_add.add_argument("content")
-    run_task_rem = run_task_op.add_parser("remove")
+    run_task_rem = run_task_op.add_parser("remove", help="Remove a todo")
     run_task_rem.add_argument("id", type=int)
-    run_task_comp = run_task_op.add_parser("complete")
+    run_task_comp = run_task_op.add_parser("complete", help="Mark todo as finished")
     run_task_comp.add_argument("id", type=int)
-    run_sub.add_parser("sync")
+    run_sub.add_parser("sync", help="Synchronize todos with cognitive state")
 
     # MAINTAIN
-    maint_p = subparsers.add_parser("maintain")
+    maint_p = subparsers.add_parser("maintain", help="Automated governance and cleanup")
     maint_sub = maint_p.add_subparsers(dest="main_cmd")
-    maint_sub.add_parser("tag")
-    maint_sub.add_parser("clean")
-    maint_sub.add_parser("audit")
-    maint_sub.add_parser("strategist")
+    maint_sub.add_parser("tag", help="Auto-tag knowledge based on content")
+    maint_sub.add_parser("clean", help="Sanitize and normalize metadata")
+    maint_audit = maint_sub.add_parser("audit", help="Run semantic audit for duplicates")
+    maint_audit.add_argument("--threshold", type=float, default=0.95, help="Similarity threshold")
+    maint_sub.add_parser("strategist", help="Run architectural strategist agent")
 
     # --- SECTOR 04: EXECUTIVE ---
 
     # FORGE
-    forge_p = subparsers.add_parser("forge")
+    forge_p = subparsers.add_parser("forge", help="Asset synthesis and evolution")
     forge_sub = forge_p.add_subparsers(dest="forge_cmd")
-    forge_tool = forge_sub.add_parser("tool")
+    forge_tool = forge_sub.add_parser("tool", help="Synthesize a new MCP tool")
     forge_tool.add_argument("name")
     forge_tool.add_argument("prompt")
-    forge_evolve = forge_sub.add_parser("evolve")
+    forge_evolve = forge_sub.add_parser("evolve", help="Iteratively refine an existing tool")
     forge_evolve.add_argument("id")
     forge_evolve.add_argument("instruction")
-    forge_design = forge_sub.add_parser("design")
+    forge_design = forge_sub.add_parser("design", help="Generate UI/UX design brief")
     forge_design.add_argument("name")
     forge_design.add_argument("desc")
-    forge_skill = forge_sub.add_parser("skill")
+    forge_skill = forge_sub.add_parser("skill", help="Create a new modular skill")
     forge_skill.add_argument("name")
     forge_skill.add_argument("description", nargs="?", default="Modular skill.")
-    forge_persona = forge_sub.add_parser("persona")
+    forge_persona = forge_sub.add_parser("persona", help="Define a new system persona")
     forge_persona.add_argument("name")
     forge_persona.add_argument("description", nargs="?", default="System persona.")
     forge_persona.add_argument("directive", nargs="?", default="Optimize output.")
-    forge_test = forge_sub.add_parser("test")
+    forge_test = forge_sub.add_parser("test", help="Run tests for a forged asset")
     forge_test.add_argument("id")
-    forge_bench = forge_sub.add_parser("bench")
+    forge_bench = forge_sub.add_parser("bench", help="Benchmark asset performance")
     forge_bench.add_argument("id")
-    forge_archive = forge_sub.add_parser("archive")
+    forge_archive = forge_sub.add_parser("archive", help="Archive a forged asset")
     forge_archive.add_argument("id")
 
     # SYSTEM
-    sys_p = subparsers.add_parser("system")
+    sys_p = subparsers.add_parser("system", help="Kernel-level diagnostics and management")
     sys_sub = sys_p.add_subparsers(dest="sys_cmd")
-    sys_sub.add_parser("dash") # alias
-    sys_sub.add_parser("config")
-    sys_sub.add_parser("asset")
-    sys_sub.add_parser("health")
-    sys_sub.add_parser("backup")
-    sys_sub.add_parser("resume")
+    sys_sub.add_parser("dash", help="Launch the management dashboard")
+    sys_sub.add_parser("config", help="View current kernel configuration")
+    sys_sub.add_parser("asset", help="Show system-wide asset statistics")
+    sys_sub.add_parser("health", help="Run system health diagnostics")
+    sys_sub.add_parser("backup", help="Create full-state backup of the brain")
+    sys_sub.add_parser("resume", help="Resume last cognitive session")
 
     # --- LEGACY / ALIASES ---
-    subparsers.add_parser("dash") # Top level dash alias
+    subparsers.add_parser("dash", help="Alias for system dash")
 
     args = parser.parse_args()
 
     if not args.command or args.command == "dash":
-        from clide.serve import ui
-        ui.launch_hub()
+        from clide.serve import dashboard
+        dashboard.run_dashboard()
         return
 
     # Dispatch

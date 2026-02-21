@@ -5,7 +5,19 @@
 - Provides visibility into active pathing, API keys (redacted), and model settings.
 Usage: ./cli system config
 
-TECHNICAL DEEP-DIVE:
+### Configuration Variables
+
+#### [paths]
+- **commands**: Directory containing forged MCP server tools.
+- **core**: Directory for system-critical core modules.
+- **memory**: Path to the primary SQLite knowledge database (`memory.db`).
+- **registry**: Path to the semantic vector registry (`vector_registry.json`).
+
+#### [extraction]
+- **repetition_limit**: Maximum number of similar items allowed before flagging as redundancy.
+- **complexity_threshold**: Heuristic score (1-10) used to determine if a message warrants deep LLM analysis.
+
+### Technical Deep-Dive
 The `config` command is implemented in `clide.serve.portal.cmd_system`.
 
 ### Logic Flow

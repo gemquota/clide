@@ -31,15 +31,8 @@ The CLIDE ecosystem operates on a **Cyclical Intelligence Model**. Data flows fr
 ╰────────────────────╯      ╰───────────────────╯
 ```
 
-<card>
-title: ⦗ COMMAND MODIFIERS ⦘
-all: Recursive output of specified tier.
-more: Technical specifications and architectural depth.
-full: High-order neural-kernel deep-dive.
-</card>
-
 ### Neural-Kernel Deep-Dive
-The CLIDE kernel is a documentation-driven interceptor. Commands are parsed via `portal.py` and documentation is extracted via `guide.py` using regex-based tiering.
+The CLIDE kernel is a documentation-driven interceptor. Commands are parsed via `portal.py` and documentation is extracted via `guide.py` to provide comprehensive context-aware information.
 
 <card>
 title: ⦗ KERNEL SPECIFICATIONS ⦘
@@ -54,4 +47,4 @@ Telemetry: ▅ ▆ ▇ █ ▇ ▆ ▅ ▄ (Simulated)
 Developers can add new capabilities by:
 1.  Adding logic to `clide/` sectors.
 2.  Registering the command in `portal.py`.
-3.  Creating a corresponding `.md` file in `docs/cli/` with Tiered sections.
+3.  Creating a corresponding `.md` file in `docs/cli/`.

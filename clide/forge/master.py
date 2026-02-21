@@ -1,11 +1,53 @@
 import os
 import subprocess
+from datetime import datetime
 from clide.forge import asset as mcp_generator
 from clide.brain import memory as vector_registry
 
 class SynthesisOrchestrator:
     def __init__(self):
         self.mcp_dir = "/data/data/com.termux/files/home/openclaw/meta/swarm/commands/mcp_servers"
+
+    def process_intent(self, intent):
+        """Orchestrates the synthesis of a tool from an intent analysis."""
+        name = intent.get("tool_name")
+        logic = intent.get("logic_code")
+        desc = intent.get("suggested_description") or intent.get("description") or "Synthesized tool"
+        
+        if not name or not logic:
+            return {"status": "failure", "message": "Missing tool_name or logic_code in intent."}
+            
+        print(f"[Forge] Orchestrating synthesis for: '{name}'...")
+        
+        try:
+            # 1. Generate Template
+            content = mcp_generator.get_python_mcp_template(
+                server_name=name,
+                description=desc,
+                tool_name=name,
+                tool_description=desc,
+                logic_code=logic
+            )
+
+            # 2. Save (Complex package with tests)
+            path = mcp_generator.save_mcp_server(name, content, is_complex=True, description=desc)
+            
+            # 3. Verify
+            package_dir = os.path.dirname(path)
+            if mcp_generator.verify_and_deploy(name, package_dir):
+                # 4. Index
+                asset_id = f"mcp:{name}"
+                metadata = {"type": "mcp", "desc": desc, "path": path}
+                vector_registry.add_to_registry(asset_id, metadata, f"{name} {desc}")
+                return {"status": "success", "path": path}
+            else:
+                return {"status": "failure", "message": "Verification failed."}
+                
+        except Exception as e:
+            import traceback
+            print(f"[!] Synthesis error: {e}")
+            traceback.print_exc()
+            return {"status": "failure", "message": str(e)}
 
     def process_tool_request(self, name, prompt):
         """Manual trigger for synthesizing a new MCP tool."""
@@ -97,21 +139,36 @@ class SynthesisOrchestrator:
             shutil.move(backup_path, path)
 
     def generate_design(self, name, desc):
-        """Generates UI/UX designs or mockups."""
-        print(f"[Forge] Generating design for: '{name}'...")
+        """Generates UI/UX designs or mockups using LLM synthesis."""
+        from clide.brain.model import call_llm
+        print(f"[Forge] Generating detailed design brief for: '{name}'...")
         design_dir = "/data/data/com.termux/files/home/openclaw/meta/swarm/designs"
         os.makedirs(design_dir, exist_ok=True)
         
         path = os.path.join(design_dir, f"{name}.md")
-        # Logic for UI/UX generation would call an LLM here
-        content = f"# Design: {name}\n\n## Description\n{desc}\n\n## Mockup Placeholder\n[SCENE: {desc}]\n"
+        
+        prompt = f"""Generate a professional UI/UX design brief for a feature named '{name}'.
+        Description: {desc}
+        
+        Include:
+        1. User Flow
+        2. Visual Hierarchy
+        3. Component Breakdown (using Rich/TUI components)
+        4. ASCII Mockup of the interface
+        """
+        
+        try:
+            content = call_llm(prompt)
+        except Exception as e:
+            print(f"[!] LLM Design Synthesis failed: {e}")
+            content = f"# Design: {name}\n\n## Description\n{desc}\n\n## Mockup Placeholder\n[SCENE: {desc}]\n"
         
         with open(path, 'w') as f:
             f.write(content)
             
-        print(f"[v] Design brief saved to {path}")
+        print(f"[v] Detailed design brief saved to {path}")
         # Index
-        vector_registry.add_to_registry(f"design:{name}", {"type": "design", "desc": desc}, f"{name} {desc}")
+        vector_registry.add_to_registry(f"design:{name}", {"type": "design", "desc": desc}, f"{name} {desc} {content[:200]}")
 
     def create_skill(self, name, description):
         """Creates a new modular skill for the agent swarm."""

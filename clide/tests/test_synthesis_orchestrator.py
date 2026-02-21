@@ -3,16 +3,18 @@ from unittest.mock import MagicMock, patch
 import os
 import sys
 
-# Ensure clide is in path
-sys.path.append(os.path.join(os.getcwd(), 'clide'))
+# Ensure project root is in path
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+if BASE_DIR not in sys.path:
+    sys.path.append(BASE_DIR)
 
 class TestSynthesisOrchestrator(unittest.TestCase):
-    @patch('mcp_generator.get_python_mcp_template')
-    @patch('mcp_generator.save_mcp_server')
-    @patch('mcp_generator.verify_and_deploy')
-    @patch('vector_registry.add_to_registry')
+    @patch('clide.forge.master.mcp_generator.get_python_mcp_template')
+    @patch('clide.forge.master.mcp_generator.save_mcp_server')
+    @patch('clide.forge.master.mcp_generator.verify_and_deploy')
+    @patch('clide.forge.master.vector_registry.add_to_registry')
     def test_orchestrate_synthesis(self, mock_index, mock_verify, mock_save, mock_template):
-        from synthesis_orchestrator import SynthesisOrchestrator
+        from clide.forge.master import SynthesisOrchestrator
         
         orchestrator = SynthesisOrchestrator()
         

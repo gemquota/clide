@@ -106,48 +106,53 @@ def get_help_content(file_path):
             return f.read().strip()
     except: return None
 
-def show_help(domain=None, command=None):
+def show_unified_help(domain=None, command=None):
+    """The unified portal for system intelligence, combining Atlas and Help."""
     print_banner()
+    
+    # 1. Handle Global Index (No args)
     if not domain:
-        print_help_index()
+        index_path = os.path.join(DOCS_ROOT, "index.md")
+        content = get_help_content(index_path)
+        if content: render_content(content)
+        
+        full_tree = get_atlas_tree()
+        if full_tree:
+            console.print()
+            console.print(Panel(Text(full_tree, style="dim"), title="[header]GLOBAL COMMAND ATLAS[/]", border_style="dim", box=box.MINIMAL, expand=True))
+        
+        # Display Domain/Meta Panels
+        console.print("\n[header]Active Domains[/]")
+        domains = [d for d in os.listdir(DOCS_ROOT) if os.path.isdir(os.path.join(DOCS_ROOT, d))]
+        domain_panels = [f"[concept]◈ {d.upper()}[/]" for d in sorted(domains)]
+        console.print(Columns(domain_panels, equal=True, expand=True))
         return
 
-    if domain and not command:
-        console.print(f"[header]DOMAIN: {domain.upper()}[/]")
-        domain_tree = get_atlas_tree(domain)
-        if domain_tree:
-            console.print(Panel(Text(domain_tree, style="dim"), title="[section]Structure[/]", border_style="dim", box=box.MINIMAL))
-        console.print()
-
+    # 2. Handle Domain/Command with Contextual Atlas
+    console.print(f"[header]PORTAL // {domain.upper()}{' // ' + command.upper() if command else ''}[/]")
+    
+    # Show local atlas branch for context
+    tree = get_atlas_tree(domain)
+    if tree:
+        console.print(Panel(Text(tree, style="dim"), title="[section]Local Atlas[/]", border_style="dim", box=box.MINIMAL))
+    
+    # Resolve and show content
     file_path = resolve_doc_path(domain, command)
     content = get_help_content(file_path)
+    
     if content:
+        console.print()
         render_content(content, title=f"KNOWLEDGE BASE")
         console.print(Rule(style="border"))
-    else:
-        console.print(f"[danger]⦗ERROR⦘[/danger] Documentation for '[info]{domain or 'root'}[/info]' not found.")
+    elif not tree:
+        # Only show error if BOTH tree and content are missing
+        console.print(f"[danger]⦗ERROR⦘[/danger] Intelligence for '[info]{domain}[/info]' not found in current SSoT.")
 
-def print_help_index():
-    index_path = os.path.join(DOCS_ROOT, "index.md")
-    content = get_help_content(index_path)
-    if content: render_content(content)
-    else:
-        render_content("# INTELLIGENCE PORTAL\nWelcome to CLIDE.")
+def show_help(domain=None, command=None):
+    show_unified_help(domain, command)
 
-    full_tree = get_atlas_tree()
-    if full_tree:
-        console.print()
-        console.print(Panel(Text(full_tree, style="dim"), title="[header]GLOBAL COMMAND ATLAS[/]", border_style="dim", box=box.MINIMAL, expand=True))
-    
-    console.print("\n[header]Active Domains[/]")
-    domains = [d for d in os.listdir(DOCS_ROOT) if os.path.isdir(os.path.join(DOCS_ROOT, d))]
-    domain_panels = [f"[concept]◈ {d.upper()}[/]" for d in sorted(domains)]
-    console.print(Columns(domain_panels, equal=True, expand=True))
-        
-    console.print("\n[header]System Documentation[/]")
-    meta = [f.replace(".md", "") for f in os.listdir(DOCS_ROOT) if f.endswith(".md") and f != "index.md"]
-    meta_panels = [f"[code]⬢ {m.upper()}[/]" for m in sorted(meta)]
-    console.print(Columns(meta_panels, equal=True, expand=True))
+def show_ref(domain=None, command=None):
+    show_unified_help(domain, command)
 
 def get_atlas_tree(domain=None):
     atlas_path = os.path.join(DOCS_ROOT, "atlas.md")
@@ -210,19 +215,5 @@ def resolve_doc_path(domain=None, command=None):
         return os.path.join(DOCS_ROOT, f"{domain}.md")
     return os.path.join(DOCS_ROOT, domain, f"{command}.md")
 
-def show_ref(domain=None, command=None):
-    print_banner()
-    if domain:
-        console.print(f"[header]ATLAS // {domain.upper()}[/]")
-        tree = get_atlas_tree(domain)
-        if tree:
-            console.print(Panel(Text(tree, style="dim"), box=box.MINIMAL))
-            console.print(Rule(style="border"))
-        else:
-            console.print(f"[danger]⦗ERROR⦘[/danger] Domain '{domain}' not found.")
-        return
-    console.print("[header]ATLAS // TOTAL SYSTEM[/]")
-    file_path = os.path.join(DOCS_ROOT, "atlas.md")
-    content = get_help_content(file_path)
     if content: render_content(content, title=f"ATLAS TREE")
     else: console.print(f"[danger]⦗ERROR⦘[/danger] Command Atlas source file missing.")

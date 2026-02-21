@@ -190,9 +190,14 @@ def merge_knowledge_nodes(node_ids):
     conn.commit()
     conn.close()
     console.print(f"  [green][v] Successfully merged into Master Node #{master_id}[/]")
+    return new_content
 
-def auto_audit_brain(auto_merge=True):
-    console.print("[bold blue][Brain][/] Searching for knowledge anomalies...")
+def auto_audit_brain(auto_merge=True, threshold=0.95):
+    """Searches for near-duplicate knowledge nodes and merges them."""
+    # Safety cap: Don't allow threshold below 0.80 to prevent massive accidental merging
+    safe_threshold = max(threshold, 0.80)
+    
+    console.print(f"[bold blue][Brain][/] Searching for knowledge anomalies (threshold: {safe_threshold})...")
     nodes = storage.get_knowledge(limit=1000) # Increased scan breadth
     
     from clide.brain.memory import cosine_similarity
@@ -237,7 +242,7 @@ def auto_audit_brain(auto_merge=True):
                 if n2['id'] in processed: continue
                 
                 sim = cosine_similarity(n1['emb'], n2['emb'])
-                if sim > 0.95:
+                if sim > safe_threshold:
                     to_merge.append(n2['id'])
                     processed.add(n2['id'])
             
@@ -245,7 +250,9 @@ def auto_audit_brain(auto_merge=True):
                 # Close the progress bar temporarily to print log
                 progress.console.print(f"  [red][!] Collision:[/] {len(to_merge)} nodes detected as near-duplicates.")
                 if auto_merge:
-                    merge_knowledge_nodes(to_merge)
+                    new_node_content = merge_knowledge_nodes(to_merge)
+                    from rich.panel import Panel
+                    progress.console.print(Panel(new_node_content, title=f"New Master Node #{to_merge[0]}", border_style="green"))
                     merges_performed += 1
                 
             processed.add(n1['id'])
@@ -290,6 +297,20 @@ def auto_clean_metadata():
             progress.advance(task)
             
     console.print(f"[green][v] Sanitization complete. Cleaned: {cleaned}, Removed: {removed}[/]")
+
+def auto_sync_todos():
+    """Synchronizes tasks between memory.db and todo.md."""
+    console.print("[bold blue][Brain][/] Synchronizing tasks...")
+    from clide.tools import janitor
+    mgr = janitor.TodoManager()
+    
+    # Rebuild todo.md from DB
+    mgr.sync_to_file()
+    
+    # Fetch from memory.db (category=TODO)
+    db_todos = storage.get_knowledge(category="TODO")
+    count = len(db_todos)
+    console.print(f"[green][v] Synchronized {count} tasks from neural memory to todo.md.[/]")
 
 def approve_proposals():
     """Converts PROPOSAL nodes into permanent knowledge units."""

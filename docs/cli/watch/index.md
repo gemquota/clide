@@ -13,7 +13,7 @@ Status: ACTIVE
 
 ### Commands
 *   **start**: Launches the background monitor.
-*   **stop**: Gracefully terminates the monitor via `SIGTERM`.
+*   **off**: Gracefully terminates the monitor via `SIGTERM`.
 *   **status**: Displays the current PID, uptime, and health metrics.
 *   **logs**: Tails enriched logs from the monitor.
 

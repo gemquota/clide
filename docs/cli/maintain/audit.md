@@ -1,26 +1,32 @@
-# MAINTAIN AUDIT
+# MAINTAIN // AUDIT
 
-- Searches for 'semantic collisions' (near-duplicate knowledge) in the registry.
-- Uses vector similarity to detect nodes that are > 95% identical.
-- Reports anomalies for manual review or automated merging.
-Usage: ./cli maintain audit
+Searches for 'semantic collisions' (near-duplicate knowledge) in the registry and resolves them through synthesis.
 
-- Searches for 'semantic collisions' (near-duplicate knowledge) in the registry.
-- Uses vector similarity to detect nodes that are > 95% identical.
-- Reports anomalies for manual review or automated merging.
-Usage: ./cli maintain audit
+## Usage
+`./cli maintain audit [--threshold T]`
 
-TECHNICAL DEEP-DIVE:
-The `audit` command is implemented in `clide.brain.auto.auto_audit_brain`.
+## Description
+This command uses vector similarity to detect nodes that are semantically near-duplicates. When a collision is detected, the system:
+1. Reports the overlapping IDs.
+2. Synthesizes a new "Master Node" using the LLM to preserve all unique facts.
+3. Redirects relationships to the master node and prunes the redundant units.
 
-### Logic Flow
-1. **Loading**: Fetches up to 500 recent nodes and decodes their JSON embeddings.
-2. **Analysis**:
-   - Performs an $O(N^2)$ comparison across the selection (or optimized subset).
-   - Calculates **Cosine Similarity** between every pair of nodes.
-3. **Detection**:
-   - Threshold: **0.95**. Any pair exceeding this is marked as an "anomaly".
-4. **Reporting**: Prints node IDs and categories for detected duplicates to the TUI.
+## Arguments
+- `--threshold T`: Similarity threshold for detection (default: 0.95). 
+- **Safety Cap**: The threshold cannot be set lower than **0.80** to prevent over-aggressive merging.
+
+<card>
+Title: AUDIT PARAMETERS
+Default Threshold: 0.95 (Near-Exact)
+Minimum Threshold: 0.80 (Strongly Related)
+Engine: clide.brain.auto.auto_audit_brain
+</card>
+
+### Technical Deep-Dive
+1. **Loading**: Fetches knowledge units and decodes their semantic embeddings.
+2. **Analysis**: Calculates **Cosine Similarity** between node pairs.
+3. **Detection**: Any pair exceeding the threshold is flagged for merging.
+4. **Resolution**: Merges content via `merge_knowledge_nodes` and updates relationship lineage.
 
 ### Code Reference
 - **Entry Point**: `clide/serve/portal.py` -> `cmd_maintain`

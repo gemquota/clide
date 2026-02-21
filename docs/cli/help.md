@@ -17,7 +17,7 @@ The help engine operates as a middle-ware layer between the user's request and t
 
 1.  **INTERCEPTION**: `portal.py` catches any command containing `help`, `?`, or `atlas`.
 2.  **RESOLUTION**: `guide.py` resolves the logical domain/command to a physical path in `docs/cli/`.
-3.  **EXTRACTION**: The parser reads the `.md` file and extracts content under the `## Full` header (falling back to `## Tier: Basic` if necessary).
+3.  **EXTRACTION**: The parser reads the entire `.md` file to provide high-fidelity documentation by default.
 4.  **ENRICHMENT**: `pre_process_content()` applies semantic highlighting to technical terms (e.g., paths, commands, status keywords).
 5.  **RENDERING**: The `rich` library renders the Markdown, including custom `<card>` components, with the **Cyber-Kernel Palette**.
 
@@ -31,7 +31,7 @@ While `help` is functional and educational, the `atlas` command provides a struc
 ### Extensibility
 To add help for a new command:
 1.  Create a Markdown file in `docs/cli/[domain]/[command].md`.
-2.  Add a `## Full` header followed by your documentation.
+2.  Add your documentation using standard Markdown.
 3.  The system will automatically detect and serve this content.
 
 ### Code Reference

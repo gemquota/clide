@@ -34,15 +34,15 @@ def list_brain_units(category=None, limit=20):
     table.add_column("Imp", style="green", justify="center")
 
     for n in nodes:
-        content = (n['content'] or "").replace("\n", " ")[:60] + "..."
+        content = (n['content'] or "").replace("\n", " ")[:240] + "..."
         table.add_row(str(n['id']), n['category'], content, str(n['importance']))
     
     console.print(table)
 
-def run_deep_analysis():
+def run_deep_analysis(limit=100):
     """Performs a deep semantic clustering and relationship mapping of the brain."""
     from clide.brain import memory
-    console.print("[bold cyan][Brain][/] Initiating deep semantic analysis...")
+    console.print(f"[bold cyan][Brain][/] Initiating deep semantic analysis (limit: {limit})...")
     
     clusters = memory.cluster_registry(threshold=0.85)
     if not clusters:

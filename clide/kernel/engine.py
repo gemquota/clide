@@ -43,7 +43,7 @@ def handle_analysis(analysis, msg, embedding):
         )
 
     elif category == "TOOL_INTENT":
-        from clide.gen.master import SynthesisOrchestrator
+        from clide.forge.master import SynthesisOrchestrator
         orchestrator = SynthesisOrchestrator()
         result = orchestrator.process_intent(analysis)
         if result.get("status") == "success":

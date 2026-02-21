@@ -1,0 +1,1 @@
+# WATCH // GO\n\nInitiates the real-time extraction monitor to ingest conversation logs as they happen.\n\n## Usage\n`./cli watch go`\n\n## Description\nThis command starts the background monitor that watches for new session files and logs in the .gemini/tmp directory. It processes these in real-time to update the project brain.

@@ -11,10 +11,10 @@ Target: ClideExtractor
 </card>
 
 ### Usage
-`./cli watch stop`
+`./cli watch off`
 
 ### Technical Details
 Sends a termination signal to the PID found in the lock file. Cleans up temporary resources.
 
 ### Code Internals
-Calls `stream.stop_monitor()`. Ensures file handles are closed properly.
+Calls `stream.off_monitor()`. Ensures file handles are closed properly.

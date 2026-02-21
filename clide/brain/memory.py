@@ -191,7 +191,7 @@ def prune_registry(min_importance=3):
             
     return initial_count - len(pruned)
 
-def cluster_registry(threshold=0.85):
+def cluster_registry(threshold=0.85, persist=False):
     """
     Performs a density-based clustering (Leader Algorithm) on the registry.
     Returns a list of clusters: [{'centroid': id, 'members': [id, ...], 'size': N, 'topic': '...'}]
@@ -234,53 +234,46 @@ def cluster_registry(threshold=0.85):
             sanitized_vectors.append(v + [0.0] * (target_dim - len(v)))
     
     X = np.array(sanitized_vectors, dtype=np.float32)
-    # Normalize for cosine similarity (dot product of normalized vectors)
+    # Normalize for cosine similarity
     norms = np.linalg.norm(X, axis=1, keepdims=True)
     norms[norms == 0] = 1.0
     X = X / norms
     
-    clusters = [] # List of {centroid_idx, members: [indices]}
-    
-    # Simple Leader Algorithm
-    # 1. Shuffle or iterate (order matters for Leader, but okay for rough clustering)
-    # We'll just iterate to be deterministic for now
-    
+    clusters = [] 
     assigned = np.zeros(len(X), dtype=bool)
     
-    print(f"[*] Clustering {len(X)} assets with threshold {threshold}...")
+    # Track cluster assignments if persisting
+    registry_map = {item['id']: item for item in registry}
     
     for i in range(len(X)):
         if assigned[i]: continue
         
-        # New cluster leader
         current_vector = X[i]
-        
-        # Compute similarities to all UNASSIGNED points (optimization: check all, filter later)
-        # Actually, let's just compute against all to find members, but only mark unassigned ones
-        # For strict partition, we only look at unassigned.
-        # But maybe overlapping is okay? Let's stick to partition.
-        
-        # We need to find all unassigned points close to this leader
-        # Identifying candidates: we can't easily mask the dot product without computing it
-        # So we compute dot product against ALL, then filter by `assigned` mask
-        
         sims = np.dot(X, current_vector)
+        members_idx = np.where((sims > threshold) & (~assigned))[0]
         
-        # Find indices where sim > threshold AND not assigned
-        members = np.where((sims > threshold) & (~assigned))[0]
-        
-        # If no other members (just itself), checking if it fits better in an existing cluster?
-        # The Leader algo says it forms a new cluster.
-        
-        if len(members) > 0:
-            assigned[members] = True
+        if len(members_idx) > 0:
+            assigned[members_idx] = True
+            cluster_id = f"cluster_{ids[i]}"
+            member_ids = [ids[m] for m in members_idx]
+            
+            if persist:
+                for mid in member_ids:
+                    if 'metadata' not in registry_map[mid]: registry_map[mid]['metadata'] = {}
+                    registry_map[mid]['metadata']['cluster_id'] = cluster_id
+
             clusters.append({
                 "centroid_id": ids[i],
                 "centroid_desc": descriptions[i],
-                "members": [ids[m] for m in members],
-                "size": len(members)
+                "members": member_ids,
+                "size": len(members_idx)
             })
             
+    if persist:
+        with open(VECTOR_DB_PATH, "w") as f:
+            json.dump(list(registry_map.values()), f, indent=2)
+        print(f"[v] Registry updated with {len(clusters)} cluster assignments.")
+
     # Sort by size
     clusters.sort(key=lambda x: x['size'], reverse=True)
     return clusters

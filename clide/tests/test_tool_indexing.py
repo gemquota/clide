@@ -4,17 +4,19 @@ import os
 import sys
 import json
 
-# Ensure clide is in path
-sys.path.append(os.path.join(os.getcwd(), 'clide'))
+# Ensure project root is in path
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+if BASE_DIR not in sys.path:
+    sys.path.append(BASE_DIR)
 
 class TestToolIndexing(unittest.TestCase):
-    @patch('vector_registry.get_embedding')
+    @patch('clide.brain.memory.get_embedding')
     def test_add_tool_to_registry(self, mock_emb):
-        import vector_registry
-        mock_emb.return_value = [0.1] * 32
+        from clide.brain import memory as vector_registry
+        mock_emb.return_value = [0.1] * 768 # Standard dimension for gemini-embedding-001
         
-        asset_id = "mcp:test_tool"
-        metadata = {"type": "mcp", "desc": "A test tool"}
+        asset_id = "mcp:test_tool_indexing"
+        metadata = {"type": "mcp", "desc": "A test tool for indexing"}
         text = "test tool description"
         
         vector_registry.add_to_registry(asset_id, metadata, text)
@@ -26,7 +28,7 @@ class TestToolIndexing(unittest.TestCase):
         found = False
         for item in registry:
             if item['id'] == asset_id:
-                self.assertEqual(item['metadata']['desc'], "A test tool")
+                self.assertEqual(item['metadata']['desc'], "A test tool for indexing")
                 found = True
                 break
         self.assertTrue(found)

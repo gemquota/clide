@@ -1,9 +1,10 @@
 # [ SECTOR 01: SENSORY ] ───────────────────────────────────────────────
 cli
 ├── watch (Sensory Stream)
-│   ├── start ......... Launch monitor [Watchdog Core]
-│   ├── stop .......... Terminate [SIGTERM]
+│   ├── go ............ Launch monitor [Watchdog Core]
+│   ├── off ........... Terminate [SIGTERM]
 │   ├── status ........ PID & Health metrics
+│   ├── progress ...... Ingestion metrics & status
 │   └── logs .......... Tail enriched logs [768D]
 └── probe (Targeted Extraction)
     ├── scout ......... Single URL analysis [LLM Synthesis]

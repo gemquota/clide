@@ -3,13 +3,15 @@ from unittest.mock import MagicMock, patch
 import os
 import sys
 
-# Ensure clide is in path
-sys.path.append(os.path.join(os.getcwd(), 'clide'))
+# Ensure project root is in path
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+if BASE_DIR not in sys.path:
+    sys.path.append(BASE_DIR)
 
 class TestExtractorTool(unittest.TestCase):
-    @patch('synthesis_orchestrator.SynthesisOrchestrator.process_intent')
+    @patch('clide.forge.master.SynthesisOrchestrator.process_intent')
     def test_handle_tool_intent(self, mock_process):
-        from extractor import handle_analysis
+        from clide.kernel.engine import handle_analysis
         
         analysis = {
             "category": "TOOL_INTENT",
@@ -22,8 +24,8 @@ class TestExtractorTool(unittest.TestCase):
         
         mock_process.return_value = {"status": "success", "path": "/mock/path"}
         
-        # We need to mock save_enriched_log as it writes to file
-        with patch('extractor.save_enriched_log'):
+        # We need to mock print as it might output to terminal
+        with patch('builtins.print'):
             handle_analysis(analysis, msg, embedding)
         
         mock_process.assert_called_once_with(analysis)
