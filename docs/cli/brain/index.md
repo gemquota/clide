@@ -33,6 +33,19 @@ Precision: High (Temperature 0.1)
 3. Fact Check: `./cli brain verify`
 4. Batch Approval: `./cli brain approve`
 
+## Cognitive Architecture
+
+```mermaid
+graph TD
+    A[Sensory Stream] --> B{Intent Classifier}
+    B -->|MATCH| C[Tool Execution]
+    B -->|FACT| D[Neural Storage]
+    B -->|TODO| E[Strategy Queue]
+    D --> F[768D Vector Registry]
+    F --> G[Semantic Retrieval]
+    G --> H[Executive Decision]
+```
+
 ### Architecture Internals
 The `brain` operates as an orchestrator between the `Vector Registry` and the `LLM Gateway`.
 

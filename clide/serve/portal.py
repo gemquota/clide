@@ -417,8 +417,28 @@ def main():
     args = parser.parse_args()
 
     if not args.command or args.command == "dash":
-        from clide.serve import dashboard
-        dashboard.run_dashboard()
+        import subprocess
+        import time
+        import webbrowser
+        
+        print("[System] Initializing Unified Intelligence Portal...")
+        # Start the integrated server as a background process
+        server_path = os.path.join(BASE_DIR, "scripts/serve_integrated.py")
+        subprocess.Popen([sys.executable, server_path])
+        
+        # Give it a second to start
+        time.sleep(1.5)
+        
+        url = "http://localhost:8888"
+        print(f"[v] Portal active at {url}")
+        
+        # Try to open in browser (might not work in headless termux, but good for users)
+        try:
+            webbrowser.open(url)
+        except:
+            pass
+            
+        print("[!] Interface is now live. Keep this terminal open to maintain the link.")
         return
 
     # Dispatch
